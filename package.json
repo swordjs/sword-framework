@@ -4,6 +4,7 @@
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
+  "type": "module",
   "scripts": {
     "dev": "unbuild --stub",
     "prettier": "prettier --write '**/*.{js,ts,json,md}'",
@@ -11,13 +12,15 @@
     "lint-staged": "lint-staged",
     "build": "unbuild",
     "async": "npm run build && yalc push",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/swordCodePractice/unicloud-framework.git"
   },
-  "keywords": ["serverless"],
+  "keywords": [
+    "serverless"
+  ],
   "author": "Seho",
   "license": "ISC",
   "bugs": {
@@ -31,10 +34,14 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.0",
     "eslint-plugin-prettier": "^3.4.0",
+    "h3": "^0.3.9",
     "husky": "^7.0.1",
+    "jest": "^27.3.1",
     "lint-staged": "^11.1.2",
     "prettier": "^2.3.2",
     "rimraf": "^3.0.2",
+    "ts-jest": "^27.0.7",
+    "tsconfig-paths": "^3.12.0",
     "typescript": "^4.3.5",
     "unbuild": "^0.6.9"
   }
