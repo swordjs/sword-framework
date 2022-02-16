@@ -1,17 +1,28 @@
-import { useFlow } from '../../src';
+import { usePipeline } from '../../src';
 
-const flow = useFlow();
+describe('管道测试', () => {
+  it('同步和异步方法混合', () => {
+    type Msg = {
+      data: string
+    }
+    const pipeline = usePipeline<Msg>();
+    const defaultData: Msg = {
+      data: "default"
+    }
+    pipeline.push((e: Msg) => {
+      expect(e).toBe({data: "default"});
+      return {
+        data: '我是节点1'
+      };
+    });
 
-flow.push((e: any) => {
-  console.log(e, '接受到的值');
-  return {
-    text: '我是节点1'
-  };
-});
+    pipeline.push((e: Msg) => {
+      expect(e).toBe({data: "我是节点1"});
+      return {
+        data: '我是节点2'
+      };
+    });
 
-flow.push((e: any) => {
-  console.log(e, '接受到的值1');
-  return {
-    text: '我是节点2'
-  };
+    pipeline.exec(defaultData)
+  });
 });
