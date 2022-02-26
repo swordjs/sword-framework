@@ -1,5 +1,5 @@
 {
-  "name": "sword-unicloud-framework",
+  "name": "@sword-code-practice/backend-framework",
   "version": "1.0.0",
   "description": "",
   "types": "./lib/index.d.ts",
@@ -7,6 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "unbuild --stub",
+    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
     "prettier": "prettier --write '**/*.{js,ts,json,md}'",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
@@ -28,15 +29,14 @@
   },
   "homepage": "https://github.com/swordCodePractice/unicloud-framework#readme",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.29.2",
-    "@typescript-eslint/parser": "^4.29.2",
     "@types/jest": "^26.0.10",
     "@types/node": "^14.17.16",
+    "@typescript-eslint/eslint-plugin": "^4.29.2",
+    "@typescript-eslint/parser": "^4.29.2",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.0",
     "eslint-plugin-prettier": "^3.4.0",
-    "h3": "^0.3.9",
     "husky": "^7.0.1",
     "jest": "^27.3.1",
     "lint-staged": "^11.1.2",

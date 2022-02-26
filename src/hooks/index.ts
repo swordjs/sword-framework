@@ -1,15 +1,8 @@
-// HTTP 触发器
-export const Get = (path?: string) => {
-  return {
-    method: 'get'
-  };
-};
-
-export const Post = (path?: string) => {
-  return {
-    method: 'post'
-  };
-};
+import type { HttpApi } from '../../typings/hook/index';
 
 // 创建API
-export const Api = () => {};
+export const Api: HttpApi = (instruct, handler) => {
+  return {
+    instruct
+  };
+};
