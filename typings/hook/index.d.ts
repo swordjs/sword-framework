@@ -1,11 +1,16 @@
 export type HttpInstructMethod = 'all' | 'get' | 'post' | 'patch' | 'put' | 'delete' | 'head' | 'options';
-export type HttpInstruct = (path?: string) => {
+export type HttpInstruct = (path?: string) => HttpInstructReturn;
+export type HttpInstructReturn = {
   method: HttpInstructMethod;
   path?: string;
 };
 export type HttpApi = (
-  instruct: HttpInstruct | HttpInstruct[],
+  instruct: HttpInstructReturn | HttpInstructReturn[],
   handler: () => void
 ) => {
-  instruct: any;
+  instruct: {
+    method: HttpInstructMethod | HttpInstructMethod[];
+    path?: string;
+  };
+  handler: () => void;
 };
