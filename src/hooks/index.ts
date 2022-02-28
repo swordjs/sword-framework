@@ -7,18 +7,15 @@ export const useApi: HttpApi = (instruct, handler) => {
   let method: HttpInstructMethod[] = [];
   // 如果传递了多个指示器
   if (Array.isArray(instruct)) {
+    // 对instruct进行过滤，将非法的错误进行排除
+    instruct = instruct.filter((i) => i.path && i.path.trim() !== '');
     if (instruct.length === 0) {
       // 如果传入了一个空数组，就默认给一个method
       method.push('get');
     } else {
       // 取出method，并且进行去重复
-      method = [...new Set(instruct.map(i => i.method))]
-      // 获取队列中除去为null/undefined的第一个有效path
-      const result = instruct.filter((i) => i.path && i.path.trim() !== '');
-      if (result.length > 0) {
-        // 如果存在有效的path就赋值
-        path = result[0].path;
-      }
+      method = [...new Set(instruct.map((i) => i.method))];
+      path = instruct[0].path;
     }
   } else {
     // 如果仅仅传入了一个指示器，那么直接对method和path做处理

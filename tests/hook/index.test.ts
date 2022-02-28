@@ -49,7 +49,7 @@ describe('useApi', () => {
       };
     });
     expect(res.instruct).toEqual({
-      method: ['get', 'post'],
+      method: ['post'],
       path: '/detail'
     });
   });
