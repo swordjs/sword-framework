@@ -1,0 +1,7 @@
+.husky
+.vscode
+.src
+.tests
+.typings
+.*
+*.config

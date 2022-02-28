@@ -1,13 +1,18 @@
 {
   "name": "@sword-code-practice/backend-framework",
-  "version": "1.0.0",
+  "version": "0.0.1-rc.1",
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
+  "main": "./lib/index.cjs",
   "type": "module",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "dev": "unbuild --stub",
-    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
+    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run async'",
     "prettier": "prettier --write '**/*.{js,ts,json,md}'",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
