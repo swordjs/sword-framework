@@ -1,4 +1,4 @@
-import type { HttpApi, HttpInstructMethod } from '../../typings/hook/index';
+import type { HttpApi, HttpInstructMethod } from "@sword-code-practice/types/sword-backend-framework";
 
 // 创建API
 export const useApi: HttpApi = (instruct, handler) => {
@@ -30,5 +30,6 @@ export const useApi: HttpApi = (instruct, handler) => {
     handler
   };
 };
+
 
 export * from './instruct';

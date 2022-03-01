@@ -1,2 +1,1 @@
-import './hook';
 import './middleware';

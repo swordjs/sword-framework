@@ -1,6 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@sword-code-practice/types': file:.yalc/@sword-code-practice/types
   '@types/jest': ^26.0.10
   '@types/node': ^14.17.16
   '@typescript-eslint/eslint-plugin': ^4.29.2
@@ -20,6 +21,7 @@ specifiers:
   unbuild: ^0.6.9
 
 devDependencies:
+  '@sword-code-practice/types': link:.yalc/@sword-code-practice/types
   '@types/jest': 26.0.24
   '@types/node': 14.18.12
   '@typescript-eslint/eslint-plugin': 4.33.0_959502c0ea240e86d4d2ba8b8c0fee45

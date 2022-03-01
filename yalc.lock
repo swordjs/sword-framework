@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "@sword-code-practice/types": {
+      "signature": "ea95bb057ab50e4b9c638d31d51e6d5a",
+      "file": true
+    }
+  }
+}
