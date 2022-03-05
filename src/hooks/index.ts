@@ -1,4 +1,8 @@
-import type { HttpApi, HttpInstructMethod } from "@sword-code-practice/types/sword-backend-framework";
+import type { HttpApi, HttpInstructMethod, Use } from '@sword-code-practice/types/sword-backend-framework';
+import { createServer } from 'http';
+import { createApp } from 'h3';
+import { TSBufferValidator } from 'tsbuffer-validator';
+import log from '../log';
 
 // 创建API
 export const useApi: HttpApi = (instruct, handler) => {
@@ -11,7 +15,7 @@ export const useApi: HttpApi = (instruct, handler) => {
     instruct = instruct.filter((i) => i.path && i.path.trim() !== '');
     if (instruct.length === 0) {
       // 如果传入了一个空数组，就默认给一个method
-      method.push('get');
+      method.push('GET');
     } else {
       // 取出method，并且进行去重复
       method = [...new Set(instruct.map((i) => i.method))];
@@ -27,9 +31,33 @@ export const useApi: HttpApi = (instruct, handler) => {
       method,
       path
     },
+    validateProto: useValidateProto,
     handler
   };
 };
 
+// 检查proto
+export const useValidateProto: Use['ValidateProto'] = (
+  key,
+  data,
+  schema
+):
+  | {
+      isSucc: true;
+      errMsg?: undefined;
+    }
+  | {
+      isSucc: false;
+      errMsg: string;
+    } => {
+  const validator = new TSBufferValidator({ [key]: schema } as any);
+  return validator.validate(data, key);
+};
+
+// 创建sword app
+export const useApp = () => {
+  const app = createApp();
+  return createServer(app);
+};
 
 export * from './instruct';
