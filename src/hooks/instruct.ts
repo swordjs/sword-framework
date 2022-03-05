@@ -2,49 +2,56 @@ import type { HttpInstruct } from '@sword-code-practice/types/sword-backend-fram
 
 export const Get: HttpInstruct = (path) => {
   return {
-    method: 'get',
+    method: 'GET',
     path
   };
 };
 
 export const Post: HttpInstruct = (path) => {
   return {
-    method: 'post',
-    path
-  };
-};
-
-export const Patch: HttpInstruct = (path) => {
-  return {
-    method: 'patch',
+    method: 'POST',
     path
   };
 };
 
 export const Put: HttpInstruct = (path) => {
   return {
-    method: 'put',
+    method: 'PUT',
     path
   };
 };
 
 export const Delete: HttpInstruct = (path) => {
   return {
-    method: 'delete',
+    method: 'DELETE',
     path
   };
 };
 
 export const Head: HttpInstruct = (path) => {
   return {
-    method: 'head',
+    method: 'HEAD',
     path
   };
 };
 
 export const Options: HttpInstruct = (path) => {
   return {
-    method: 'options',
+    method: 'OPTIONS',
+    path
+  };
+};
+
+export const Trace: HttpInstruct = (path) => {
+  return {
+    method: 'TRACE',
+    path
+  };
+};
+
+export const Connect: HttpInstruct = (path) => {
+  return {
+    method: 'CONNECT',
     path
   };
 };
