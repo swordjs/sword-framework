@@ -6,19 +6,29 @@ specifiers:
   '@types/node': ^14.17.16
   '@typescript-eslint/eslint-plugin': ^4.29.2
   '@typescript-eslint/parser': ^4.29.2
+  chalk: ^5.0.0
+  consola: ^2.15.3
   eslint: ^7.32.0
   eslint-config-prettier: ^8.3.0
   eslint-plugin-import: ^2.24.0
   eslint-plugin-prettier: ^3.4.0
+  h3: ^0.3.9
   husky: ^7.0.1
   jest: ^27.3.1
   lint-staged: ^11.1.2
   prettier: ^2.3.2
   rimraf: ^3.0.2
   ts-jest: ^27.0.7
+  tsbuffer-validator: ^2.1.0
   tsconfig-paths: ^3.12.0
   typescript: ^4.3.5
   unbuild: ^0.6.9
+
+dependencies:
+  chalk: 5.0.0
+  consola: 2.15.3
+  h3: 0.3.9
+  tsbuffer-validator: 2.1.0
 
 devDependencies:
   '@sword-code-practice/types': link:.yalc/@sword-code-practice/types
@@ -1315,7 +1325,6 @@ packages:
   /chalk/5.0.0:
     resolution: {integrity: sha512-/duVOqst+luxCQRKEo4bNxinsOQtMP80ZYm7mMqzuh5PociNL0PvmHFvREJ9ueYL2TxlHjBcmLCdmocx9Vg+IQ==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
-    dev: true
 
   /char-regex/1.0.2:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
@@ -1418,7 +1427,6 @@ packages:
 
   /consola/2.15.3:
     resolution: {integrity: sha512-9vAdYbHj6x2fLKC4+oPH0kFzY/orMZyG2Aj+kNylHxKGJ/Ed4dpNyAQYwJOdqO4zdM7XpVHmyejQDcQHrnuXbw==}
-    dev: true
 
   /convert-source-map/1.8.0:
     resolution: {integrity: sha512-+OQdjP49zViI/6i7nIJpA8rAl4sV/JdPfU9nZs3VqOwGIgizICvuN2ru6fMd+4llL0tar18UYJXfZ/TWtmhUjA==}
@@ -2462,6 +2470,10 @@ packages:
     resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==}
     dev: true
 
+  /h3/0.3.9:
+    resolution: {integrity: sha512-C9MbuWVQ88mGb3lmqtp/iqXdALBo34oyjrVT1hx+FYRgcQReNXiKWvzXM6eQdpp4MWQkMGNnp4tlRBT7wsgmmg==}
+    dev: false
+
   /has-bigints/1.0.1:
     resolution: {integrity: sha512-LSBS2LjbNBTf6287JEbEzvJgftkF5qFkmCo9hDRpAzKhUOlJ+hx8dd4USs00SgsUNwc4617J9ki5YtEClM2ffA==}
     dev: true
@@ -3389,6 +3401,26 @@ packages:
     optionalDependencies:
       graceful-fs: 4.2.9
     dev: true
+
+  /k8w-extend-native/1.4.6:
+    resolution: {integrity: sha512-AHTCyFshldMme0s9FKD+QKG+QZdBkHXzl+8kYfNhsSDhcdQ5TYWQwphjecSJjxNdGd78TIbO0fHiOvM+Ei22YA==}
+    dependencies:
+      k8w-linq-array: 0.2.8
+      k8w-super-date: 0.1.3
+      k8w-super-object: 0.3.0
+    dev: false
+
+  /k8w-linq-array/0.2.8:
+    resolution: {integrity: sha512-4IAkQN8UJdk804tQi++wuwSZvFWk/Wcl1uG5PR/0c0YvB5hUd2f8tJm3OgOMOxjV9UVByNLvnPYGIwrFQPpjlA==}
+    dev: false
+
+  /k8w-super-date/0.1.3:
+    resolution: {integrity: sha512-IBqKOAMAXR/bgzu+rYI30tEMP/Y6Q8HQuqJiTkE2mLJg11yok9guoi8uZTynTahviVBndcfBpOgi1H/zhihv7w==}
+    dev: false
+
+  /k8w-super-object/0.3.0:
+    resolution: {integrity: sha512-u2jfh4goYXKZmSucaLaOTaNbLRatjv0CSRpzE0KU0732+9XtYZFd5vrdw/mzJfK5fPHb/zyikOSHDX5mJrav+g==}
+    dev: false
 
   /kleur/3.0.3:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
@@ -4387,6 +4419,18 @@ packages:
       yargs-parser: 20.2.4
     dev: true
 
+  /tsbuffer-schema/2.2.0:
+    resolution: {integrity: sha512-I4+5Xfk7G+D++kXdNnYTeY26WQTaf14C84XQwPKteNmrwxRY3CQCkMqASRiCUqtpOuDn43qmoxuXpT+Vo8Wltg==}
+    dev: false
+
+  /tsbuffer-validator/2.1.0:
+    resolution: {integrity: sha512-pI4qqKVVFWOF8nF7wGGT+WzNnOMOb1skhSjigtKiWOzkpVhoiOvyPJamFQvc0MVbhoGTySuVUzp3KFclo4lVxw==}
+    dependencies:
+      k8w-extend-native: 1.4.6
+      tsbuffer-schema: 2.2.0
+      tslib: 2.3.1
+    dev: false
+
   /tsconfig-paths/3.12.0:
     resolution: {integrity: sha512-e5adrnOYT6zqVnWqZu7i/BQ3BnhzvGbjEjejFXO20lKIKpwTaupkCPgEfv4GZK1IBciJUEhYs3J3p75FdaTFVg==}
     dependencies:
@@ -4402,7 +4446,6 @@ packages:
 
   /tslib/2.3.1:
     resolution: {integrity: sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==}
-    dev: true
 
   /tsutils/3.21.0_typescript@4.5.5:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}

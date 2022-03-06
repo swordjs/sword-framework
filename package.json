@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/backend-framework",
-  "version": "0.0.1-rc.2",
+  "version": "0.0.1-rc.3",
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
@@ -52,5 +52,11 @@
     "tsconfig-paths": "^3.12.0",
     "typescript": "^4.3.5",
     "unbuild": "^0.6.9"
+  },
+  "dependencies": {
+    "chalk": "^5.0.0",
+    "consola": "^2.15.3",
+    "h3": "^0.3.9",
+    "tsbuffer-validator": "^2.1.0"
   }
 }
