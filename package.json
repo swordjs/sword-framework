@@ -5,7 +5,6 @@
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
   "main": "./lib/index.cjs",
-  "type": "module",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
@@ -54,8 +53,9 @@
     "unbuild": "^0.6.9"
   },
   "dependencies": {
-    "chalk": "^5.0.0",
+    "chalk": "4.1.2",
     "consola": "^2.15.3",
+    "dayjs": "^1.10.8",
     "h3": "^0.3.9",
     "tsbuffer-validator": "^2.1.0"
   }

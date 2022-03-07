@@ -1,4 +1,4 @@
-import type { PipelineNode, PipelineNodeReturn } from '../../typings/middleware/index';
+import type { PipelineNode, PipelineNodeReturn } from '../../typings/middleware';
 
 const pipeline: PipelineNode<any>[] = [];
 const preApiCallPipeline: PipelineNode<any>[] = [];

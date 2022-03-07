@@ -1,5 +1,10 @@
 import consola from 'consola';
 import chalk from 'chalk';
+import dayjs from 'dayjs';
+
+const now = () => {
+  return dayjs().format('YYYY-MM-DD HH:mm:ss');
+};
 
 /**
  * 终端打印日志
@@ -7,12 +12,12 @@ import chalk from 'chalk';
  */
 export default {
   err: (v: string | Error) => {
-    consola.error(v);
+    consola.error(`${chalk.gray(now())} ${v}`);
   },
   info: (v: string) => {
-    consola.info(chalk.yellow(v));
+    consola.info(`${chalk.gray(now())} ${chalk.yellow(v)}`);
   },
   success: (v: string) => {
-    consola.success(v);
+    consola.success(`${chalk.gray(now())} ${chalk.green(v)}`);
   }
 };
