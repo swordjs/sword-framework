@@ -57,6 +57,7 @@
     "consola": "^2.15.3",
     "dayjs": "^1.10.8",
     "h3": "^0.3.9",
+    "tsbuffer-proto-generator": "^1.7.0",
     "tsbuffer-validator": "^2.1.0"
   }
 }

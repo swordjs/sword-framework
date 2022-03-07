@@ -20,6 +20,7 @@ specifiers:
   prettier: ^2.3.2
   rimraf: ^3.0.2
   ts-jest: ^27.0.7
+  tsbuffer-proto-generator: ^1.7.0
   tsbuffer-validator: ^2.1.0
   tsconfig-paths: ^3.12.0
   typescript: ^4.3.5
@@ -30,6 +31,7 @@ dependencies:
   consola: 2.15.3
   dayjs: 1.10.8
   h3: 0.3.9
+  tsbuffer-proto-generator: 1.7.0
   tsbuffer-validator: 2.1.0
 
 devDependencies:
@@ -3404,6 +3406,10 @@ packages:
       graceful-fs: 4.2.9
     dev: true
 
+  /k8w-crypto/0.2.0:
+    resolution: {integrity: sha512-M6u4eQ6CQaU5xO3s4zaUUp9G79xNDhXtTU0X7N80tDcBhQC5ggowlyOzj95v7WiCuk7xkV0aFsTmCpuf0m0djw==}
+    dev: false
+
   /k8w-extend-native/1.4.6:
     resolution: {integrity: sha512-AHTCyFshldMme0s9FKD+QKG+QZdBkHXzl+8kYfNhsSDhcdQ5TYWQwphjecSJjxNdGd78TIbO0fHiOvM+Ei22YA==}
     dependencies:
@@ -4420,6 +4426,16 @@ packages:
       yargs-parser: 20.2.4
     dev: true
 
+  /tsbuffer-proto-generator/1.7.0:
+    resolution: {integrity: sha512-aDgdmYSgCZPfmA3Vn73veDdLvAAxI3Qds6odG6FzkkDHxwHyHOSa/H2jbS6d0CQVFbJeSWydem+QGBeAx8mJKw==}
+    dependencies:
+      k8w-crypto: 0.2.0
+      k8w-extend-native: 1.4.6
+      tsbuffer-schema: 2.2.0
+      tslib: 2.3.1
+      typescript: 4.5.5
+    dev: false
+
   /tsbuffer-schema/2.2.0:
     resolution: {integrity: sha512-I4+5Xfk7G+D++kXdNnYTeY26WQTaf14C84XQwPKteNmrwxRY3CQCkMqASRiCUqtpOuDn43qmoxuXpT+Vo8Wltg==}
     dev: false
@@ -4497,7 +4513,6 @@ packages:
     resolution: {integrity: sha512-TCTIul70LyWe6IJWT8QSYeA54WQe8EjQFU4wY52Fasj5UKx88LNYKCgBEHcOMOrFF1rKGbD8v/xcNWVUq9SymA==}
     engines: {node: '>=4.2.0'}
     hasBin: true
-    dev: true
 
   /unbox-primitive/1.0.1:
     resolution: {integrity: sha512-tZU/3NqK3dA5gpE1KtyiJUrEB0lxnGkMFHptJ7q6ewdZ8s12QrODwNbhIJStmJkd1QDXa1NRA8aF2A1zk/Ypyw==}

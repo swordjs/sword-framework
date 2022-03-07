@@ -1,5 +1,5 @@
 import { useQuery, useBody, sendError } from 'h3';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+import { TSBufferProtoGenerator } from 'tsbuffer-proto-generator';
 import { getApiProtoMap } from './map';
 import log from '../log';
 import { validateMethod, validateRequestProto } from './validate';
@@ -7,14 +7,17 @@ import { validateProtoError, validateMethodError } from './error';
 import type { App } from 'h3';
 import type { HttpContext } from '@sword-code-practice/types/sword-backend-framework';
 
+// api对应的proto.ts的字典
+let protoMap: Record<string, string> | null = null;
 // 具体的proto schema引用
-const protoSchema: Record<string, Record<string, unknown>> | null = null;
+let protoSchema: Record<string, Record<string, unknown>> | null = null;
 
 export const implementApi = async (app: App, dirName: string) => {
   // 获取apimap以及proto map
-  const { apiMap, protoMap } = await getApiProtoMap(dirName);
-  // 将api都放入h3的app中
-  // 循环apimap
+  const { apiMap, protoMap: _protoMap } = await getApiProtoMap(dirName);
+  // 将protomap赋值给全局变量，再编译api资源成功后，会去编译proto.json
+  protoMap = _protoMap;
+  getProtoSchema();
   for (const key in apiMap) {
     // key: api value: path
     // 清除缓存，让旧模块无效，无需重启服务器，在开发阶段享受HMR
@@ -50,7 +53,7 @@ export const implementApi = async (app: App, dirName: string) => {
       }) as undefined | { errMsg: string };
       // 如果找到了检测错误
       if (errorResult) {
-        log.err(`[请求类型校验错误]:${errorResult}`);
+        log.err(`[请求类型校验错误]:${JSON.stringify(errorResult)}`);
         return sendError(res, validateProtoError(errorResult.errMsg));
       } else {
         // 执行handler
@@ -76,4 +79,16 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
     params: context.params,
     method: context.method as any
   };
+};
+
+// 通过proto map 生成 proto json类型
+const getProtoSchema = async () => {
+  // 迭代protoMap，异步执行生成类型的函数
+  const result: Record<string, Record<string, unknown>> = {};
+  for (const key in protoMap) {
+    const generator = new TSBufferProtoGenerator();
+    result[key] = await generator.generate(protoMap[key]);
+  }
+  // 将result放入到schema引用中
+  protoSchema = result;
 };
