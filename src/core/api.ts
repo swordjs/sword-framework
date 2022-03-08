@@ -3,7 +3,7 @@ import { TSBufferProtoGenerator } from 'tsbuffer-proto-generator';
 import { getApiProtoMap } from './map';
 import log from '../log';
 import { validateMethod, validateProto, getNeedValidateProto } from './validate';
-import { validateProtoError, validateMethodError, validateResProtoError } from './error';
+import error from './error';
 import type { App } from 'h3';
 import type { HttpContext } from '@sword-code-practice/types/sword-backend-framework';
 
@@ -43,7 +43,7 @@ export const implementApi = async (app: App, dirName: string) => {
         // 如果校验method错误，就返回错误信息
         const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
         log.err(`[请求方法错误]: ${errMsg}`);
-        return sendError(res, validateMethodError(errMsg));
+        return sendError(res, error('VALIDATE_METHOD', errMsg));
       }
       // 获取符合要求的proto
       const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
@@ -58,7 +58,7 @@ export const implementApi = async (app: App, dirName: string) => {
       // 如果找到了检测错误
       if (errorResult) {
         log.err(`[请求类型校验错误]:${JSON.stringify(errorResult.errMsg)}`);
-        return sendError(res, validateProtoError(errorResult.errMsg));
+        return sendError(res, error('VALIDATE_REQUEST', errorResult.errMsg));
       } else {
         // 执行handler
         const _handlerRes = await _res.handler(context);
@@ -68,7 +68,7 @@ export const implementApi = async (app: App, dirName: string) => {
         if (!resProtoResult.isSucc) {
           // 如果返回结果不符合预期，就抛出错误
           log.err(`[返回类型校验错误]:${JSON.stringify(resProtoResult.errMsg)}`);
-          return sendError(res, validateResProtoError(resProtoResult.errMsg));
+          return sendError(res, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
         }
         return _handlerRes;
       }

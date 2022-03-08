@@ -1,25 +1,16 @@
 import { createError } from 'h3';
 
-// 校验参数错误
-export const validateProtoError = (message: string) => {
-  return createError({
-    statusCode: 400,
-    statusMessage: message
-  });
-};
+// 定义不同错误类型以及它们所代表的状态码
+// 定义错误类型
+enum ErrorType {
+  VALIDATE_REQUEST = 400,
+  VALIDATE_RESPONSE = 500,
+  VALIDATE_METHOD = 405
+}
 
-// 校验返回参数错误（服务器内部）
-export const validateResProtoError = (message: string) => {
+export default (type: keyof typeof ErrorType, message: string) => {
   return createError({
-    statusCode: 500,
-    statusMessage: message
-  });
-};
-
-// 校验methods错误
-export const validateMethodError = (message: string) => {
-  return createError({
-    statusCode: 405,
+    statusCode: ErrorType[type],
     statusMessage: message
   });
 };
