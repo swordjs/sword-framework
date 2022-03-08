@@ -2,8 +2,8 @@ import { useQuery, useBody, sendError } from 'h3';
 import { TSBufferProtoGenerator } from 'tsbuffer-proto-generator';
 import { getApiProtoMap } from './map';
 import log from '../log';
-import { validateMethod, validateRequestProto } from './validate';
-import { validateProtoError, validateMethodError } from './error';
+import { validateMethod, validateProto, getNeedValidateProto } from './validate';
+import { validateProtoError, validateMethodError, validateResProtoError } from './error';
 import type { App } from 'h3';
 import type { HttpContext } from '@sword-code-practice/types/sword-backend-framework';
 
@@ -45,20 +45,31 @@ export const implementApi = async (app: App, dirName: string) => {
         log.err(`[请求方法错误]: ${errMsg}`);
         return sendError(res, validateMethodError(errMsg));
       }
-      // 检查proto
-      const validateProtoResult = validateRequestProto(context, query, params, apiMap[key].validateProto);
-      // 查看是否有错误的结果
-      const errorResult = validateProtoResult.find((v: null | { isSucc: boolean }) => {
+      // 获取符合要求的proto
+      const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
+      // 检查请求params的proto
+      const requestParamsProtoResult = validateProto(reqParamsProto, params);
+      // 检查请求query的proto
+      const requestQueryProtoResult = validateProto(reqQueryProto, query);
+      // 查看请求的参数校验结果，是否有错误
+      const errorResult = [requestParamsProtoResult, requestQueryProtoResult].find((v: null | { isSucc: boolean }) => {
         return v && !v.isSucc;
       }) as undefined | { errMsg: string };
       // 如果找到了检测错误
       if (errorResult) {
-        log.err(`[请求类型校验错误]:${JSON.stringify(errorResult)}`);
+        log.err(`[请求类型校验错误]:${JSON.stringify(errorResult.errMsg)}`);
         return sendError(res, validateProtoError(errorResult.errMsg));
       } else {
         // 执行handler
         const _handlerRes = await _res.handler(context);
-        log.info(`[返回结果]: ${typeof _handlerRes === 'undefined' ? null : JSON.stringify(_handlerRes)}`);
+        log.info(`[返回结果]: ${typeof _handlerRes === 'undefined' ? {} : JSON.stringify(_handlerRes)}`);
+        // 校验返回结果是否符合预期
+        const resProtoResult = validateProto(resProto, _handlerRes || {});
+        if (!resProtoResult.isSucc) {
+          // 如果返回结果不符合预期，就抛出错误
+          log.err(`[返回类型校验错误]:${JSON.stringify(resProtoResult.errMsg)}`);
+          return sendError(res, validateResProtoError(resProtoResult.errMsg));
+        }
         return _handlerRes;
       }
     });

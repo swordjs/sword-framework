@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/backend-framework",
-  "version": "0.0.1-rc.3",
+  "version": "0.0.1-rc.4",
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
