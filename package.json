@@ -1,10 +1,10 @@
 {
   "name": "@sword-code-practice/backend-framework",
-  "version": "0.0.1-rc.4",
+  "version": "0.0.1-rc.5",
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
-  "main": "./lib/index.cjs",
+  "main": "./lib/index.js",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
