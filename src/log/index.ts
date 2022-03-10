@@ -1,9 +1,8 @@
-import consola from 'consola';
 import chalk from 'chalk';
-import dayjs from 'dayjs';
 
 const now = () => {
-  return dayjs().format('YYYY-MM-DD HH:mm:ss');
+  const _ = new Date();
+  return `${_.getFullYear()}-${_.getMonth() + 1}-${_.getDate()} ${_.getHours()}:${_.getMinutes()}:${_.getSeconds()}`;
 };
 
 /**
@@ -12,12 +11,12 @@ const now = () => {
  */
 export default {
   err: (v: string | Error) => {
-    consola.error(`${chalk.gray(now())} ${v}`);
+    console.log(`${chalk.gray(now())} ${v}`);
   },
   info: (v: string) => {
-    consola.info(`${chalk.gray(now())} ${chalk.yellow(v)}`);
+    console.log(`${chalk.gray(now())} ${chalk.yellow(v)}`);
   },
   success: (v: string) => {
-    consola.success(`${chalk.gray(now())} ${chalk.green(v)}`);
+    console.log(`${chalk.gray(now())} ${chalk.green(v)}`);
   }
 };
