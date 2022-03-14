@@ -1,5 +1,4 @@
 import type { HttpApi, HttpInstructMethod } from '@sword-code-practice/types/sword-backend-framework';
-import { useValidateProto } from './proto';
 
 // 创建API
 export const useApi: HttpApi = (instruct, handler) => {
@@ -28,7 +27,6 @@ export const useApi: HttpApi = (instruct, handler) => {
       method,
       path
     },
-    validateProto: useValidateProto,
     handler
   };
 };

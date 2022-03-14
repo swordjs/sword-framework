@@ -10,11 +10,11 @@ export type Map = {
 };
 
 /**
- * 生成api和proto
+ * 生成api
  * @param {string} dir
  * @return {*}
  */
-export const getApiProtoMap = async (
+export const getApiMap = async (
   apiDir: string,
   dir = 'src'
 ): Promise<{

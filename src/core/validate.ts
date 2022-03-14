@@ -1,6 +1,6 @@
 import { isMethod } from 'h3';
 import { useValidateProto } from '../hooks/proto';
-import type { HttpInstructMethod, HttpApiReturn, HttpContext, Use } from '@sword-code-practice/types/sword-backend-framework';
+import type { HttpInstructMethod, HttpContext } from '@sword-code-practice/types/sword-backend-framework';
 
 /**
  *
