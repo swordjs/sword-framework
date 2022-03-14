@@ -1,2 +1,3 @@
 export * from './hooks';
-export * from './middleware';
+
+export { usePostApiCallPipeline, usePreApiCallPipeline } from './middleware';
