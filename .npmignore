@@ -4,4 +4,6 @@
 .tests
 .typings
 .*
-*.config
+*.config.*
+/src
+/tests
