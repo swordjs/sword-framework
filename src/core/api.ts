@@ -1,16 +1,100 @@
 import { useQuery, useBody, sendError } from 'h3';
+import { IncomingMessage, ServerResponse } from 'http';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { getApiMap } from './map';
 import log from '../log';
 import { validateMethod, validateProto, getNeedValidateProto } from './validate';
+import { exec } from '../middleware/index';
 import error from './error';
+import { isJSON } from '../util/data';
 import type { App } from 'h3';
 import type { HttpContext } from '@sword-code-practice/types/sword-backend-framework';
+import type { UnPromisify } from '../../typings/index';
+import type { ValidateProto } from './validate';
 
 // 具体的proto schema引用
 let protoSchema: Record<string, Record<string, unknown>> | null = null;
 
+// 定义log集合
+const logMap = {
+  REQUEST_URL: (key: string) => log.info(`[请求URL]: ${key}`),
+  REQUEST_METHOD_ERROR: (msg: string) => log.err(`[请求方法错误]: ${msg}`),
+  REQUEST_TYPE_ERROR: (msg: string) => log.err(`[请求类型校验错误]:${msg}`),
+  REQUEST_QUERY: (query: string) => log.info(`[请求参数-query]: ${query}`),
+  REQUEST_PARAMS: (query: string) => log.info(`[请求参数-params]: ${query}`),
+  RESPONSE_RESULT: (msg: string, suffix = '') => log.info(`[返回结果${suffix}]: ${msg}`),
+  RESPONSE_TYPE_ERROR: (msg: string) => log.err(`[返回类型校验错误]:${msg}`)
+};
+
+/**
+ *
+ * 处理exec (middleware pipeline)
+ * @param {UnPromisify<ReturnType<typeof exec>>} execResult
+ * @param {ServerResponse} res
+ * @return {*}
+ */
+const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, res: ServerResponse) => {
+  // 判断execresult的类型
+  if (execResult instanceof Error) {
+    return sendError(res, error('PIPELINE_ERROR', execResult.message));
+  }
+  return true;
+};
+
+/**
+ *
+ * 处理检查method
+ * @param {HttpContext} context
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ * @return {*}
+ */
+const handleValidateMethod = (context: HttpContext, req: IncomingMessage, res: ServerResponse) => {
+  if (!validateMethod(req, context.method)) {
+    // 如果校验method错误，就返回错误信息
+    const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
+    logMap.REQUEST_METHOD_ERROR(errMsg);
+    return sendError(res, error('VALIDATE_METHOD', errMsg));
+  }
+  return true;
+};
+
+type ProtoData = { proto: ValidateProto; data: any };
+
+/**
+ *
+ * 处理检查request proto
+ * @param {ProtoData} params
+ * @param {ProtoData} query
+ * @param {ServerResponse} res
+ * @param {() => void} cb
+ * @return {*}
+ */
+const handleValidateRequestProto = (params: ProtoData, query: ProtoData, res: ServerResponse, cb: () => void) => {
+  // 检查请求params的proto
+  const requestParamsProtoResult = validateProto(params.proto, params.data);
+  // 检查请求query的proto
+  const requestQueryProtoResult = validateProto(query.proto, query.data);
+  // 查看请求的参数校验结果，是否有错误
+  const errorResult = [requestParamsProtoResult, requestQueryProtoResult].find((v: null | { isSucc: boolean }) => {
+    return v && !v.isSucc;
+  }) as undefined | { errMsg: string };
+  if (errorResult) {
+    logMap.REQUEST_TYPE_ERROR(JSON.stringify(errorResult.errMsg));
+    return sendError(res, error('VALIDATE_REQUEST', errorResult.errMsg));
+  } else {
+    // proto检测成功的回调
+    return cb();
+  }
+};
+
+/**
+ *
+ * 实现API的装载
+ * @param {App} app
+ * @param {string} dirName
+ */
 export const implementApi = async (app: App, dirName: string) => {
   // 获取apimap以及proto map
   const { apiMap } = await getApiMap(dirName);
@@ -19,60 +103,83 @@ export const implementApi = async (app: App, dirName: string) => {
   for (const key in apiMap) {
     // key: api value: path
     app?.use(key, async (req, res) => {
-      // 打印json日志
-      log.info(`[请求URL]: ${key}`);
+      logMap.REQUEST_URL(key);
       // url query参数
-      const query = await useQuery(req);
-      const params = await useBody(req);
-      log.info(`[请求参数-query]: ${JSON.stringify(query)}`);
-      log.info(`[请求参数-params]:  ${JSON.stringify(params)}`);
+      const query = isJSON(await useQuery(req));
+      const params = isJSON(await useBody(req));
       // 构造context
-      const context = createContext({
+      let context = createContext({
         key,
         query,
         params,
         method: apiMap[key].method
       });
       const _res = apiMap[key];
-      // 检查method
-      if (!validateMethod(req, context.method)) {
-        // 如果校验method错误，就返回错误信息
-        const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
-        log.err(`[请求方法错误]: ${errMsg}`);
-        return sendError(res, error('VALIDATE_METHOD', errMsg));
-      }
+      // 校验method
+      const validateMethodResult = handleValidateMethod(context, req, res);
+      if (!validateMethodResult) return validateMethodResult;
       // 获取符合要求的proto
       const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
-      // 检查请求params的proto
-      const requestParamsProtoResult = validateProto(reqParamsProto, params);
-      // 检查请求query的proto
-      const requestQueryProtoResult = validateProto(reqQueryProto, query);
-      // 查看请求的参数校验结果，是否有错误
-      const errorResult = [requestParamsProtoResult, requestQueryProtoResult].find((v: null | { isSucc: boolean }) => {
-        return v && !v.isSucc;
-      }) as undefined | { errMsg: string };
-      // 如果找到了检测错误
-      if (errorResult) {
-        log.err(`[请求类型校验错误]:${JSON.stringify(errorResult.errMsg)}`);
-        return sendError(res, error('VALIDATE_REQUEST', errorResult.errMsg));
-      } else {
-        // 执行handler
-        const _handlerRes = await _res.handler(context);
-        log.info(`[返回结果]: ${typeof _handlerRes === 'undefined' ? {} : JSON.stringify(_handlerRes)}`);
-        // 校验返回结果是否符合预期
-        const resProtoResult = validateProto(resProto, _handlerRes || {});
-        if (!resProtoResult.isSucc) {
-          // 如果返回结果不符合预期，就抛出错误
-          log.err(`[返回类型校验错误]:${JSON.stringify(resProtoResult.errMsg)}`);
-          return sendError(res, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
+      // 校验请求proto，如果成功则会执行回调
+      return handleValidateRequestProto({ proto: reqParamsProto, data: params }, { proto: reqQueryProto, data: query }, res, async () => {
+        // 执行pipeline
+        const preApiCallExecResult = await exec('preApiCall', context);
+        if (handleExecError(preApiCallExecResult, res)) {
+          // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
+          if (!(preApiCallExecResult instanceof Error)) {
+            if (Array.isArray(preApiCallExecResult)) {
+              // 如果pipeline返回了null或者undefined，我们就把context替换为上一个pipeline的返回结果
+              context = preApiCallExecResult[preApiCallExecResult.length - 1] as HttpContext;
+            } else if (preApiCallExecResult.return) {
+              // 判断是否有return，就不用执行handler，直接返回data
+              // 直接返回的data不会校验返回类型
+              const res = preApiCallExecResult.return.data;
+              logMap.RESPONSE_RESULT(JSON.stringify(res), '-preApiCall');
+              return res;
+            } else {
+              // 如果所有的情况都避过了，即非error，非边界条件（return null | undefined）,非中途直接返回
+              // 就只剩正常的pipeline返回情况了，即替换context进行请求
+              context = preApiCallExecResult as HttpContext;
+            }
+            logMap.REQUEST_QUERY(JSON.stringify(context.query));
+            logMap.REQUEST_QUERY(JSON.stringify(context.params));
+            // 执行handler
+            const _handlerRes = await _res.handler(context);
+            // 执行pipeline
+            const postApiCallExecResult = await exec('postApiCall', context);
+            if (handleExecError(postApiCallExecResult, res)) {
+              if (!(postApiCallExecResult instanceof Error)) {
+                if (!Array.isArray(postApiCallExecResult) && postApiCallExecResult.return) {
+                  // 直接返回return的内容，不经过类型校验
+                  const data = postApiCallExecResult.return.data;
+                  logMap.RESPONSE_RESULT(JSON.stringify(data), '-postApiCall');
+                  return data as any;
+                } else {
+                  // 校验返回结果是否符合预期
+                  const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
+                  if (!resProtoResult.isSucc) {
+                    // 如果返回结果不符合预期，就抛出错误
+                    logMap.RESPONSE_TYPE_ERROR(JSON.stringify(resProtoResult.errMsg));
+                    return sendError(res, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
+                  }
+                }
+              }
+            }
+            logMap.RESPONSE_RESULT(typeof _handlerRes === 'undefined' ? '{}' : JSON.stringify(_handlerRes));
+            return _handlerRes;
+          }
         }
-        return _handlerRes;
-      }
+      });
     });
   }
 };
 
-// 创建context对象
+/**
+ *
+ * 创建context对象
+ * @param {Partial<HttpContext>} context
+ * @return {*}  {HttpContext}
+ */
 const createContext = (context: Partial<HttpContext>): HttpContext => {
   // 查询key对应的proto
   let proto: Record<string, unknown> = {};
@@ -88,7 +195,9 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
   };
 };
 
-// 加载根目录下的protoschema（由cli生成）
+/**
+ * 加载根目录下的protoschema（由cli生成）
+ */
 const getProtoSchema = async () => {
   const schema = readFileSync(resolve(process.cwd(), './src/proto.json')).toString();
   if (schema) {

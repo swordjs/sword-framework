@@ -14,7 +14,7 @@ export const validateMethod = (req: any, expected: HttpInstructMethod | HttpInst
 };
 
 // 需要校验的proto节点
-type ValidateProto = { key: string; data: Record<string, unknown> } | null;
+export type ValidateProto = { key: string; data: Record<string, unknown> } | null;
 
 // 获取需要校验的proto
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
