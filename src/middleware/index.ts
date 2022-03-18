@@ -1,7 +1,12 @@
-import type { PipelineNode, PipelineNodeReturn } from '../../typings/middleware';
+import type { PipelineNode } from '../../typings/middleware';
+import type { HttpContext } from '@sword-code-practice/types/sword-backend-framework';
 
-export const preApiCallPipeline: PipelineNode<any>[] = [];
-export const postApiCallPipeline: PipelineNode<any>[] = [];
+type PipelineTypeKeys = 'preApiCall' | 'postApiCall';
+
+export const pipelineMap: Record<PipelineTypeKeys, PipelineNode<any>[]> = {
+  preApiCall: [],
+  postApiCall: []
+};
 
 // 推送到队列中
 const push =
@@ -11,84 +16,58 @@ const push =
     return cb;
   };
 
-// 执行队列
-export const exec =
-  <T>(input: T) =>
-  async (pipeline: PipelineNode<any>[]) => {
-    let res = input;
-    for (let i = 0; i < pipeline.length; i++) {
-      try {
-        res = await pipeline[i](res);
-      } catch (error) {
-        return new Error('pipeline eror');
-      }
-      if (res === undefined || res === null) {
-        return res;
-      }
-    }
-    return res;
-  };
-
 /**
- *
- * @name 使用PreApiCall管道
+ * 执行队列
  * @description
- * 可以给`usePreApiCallPipeline`传递一个类型T，代表了管道流通的数据类型，
- * 在`push`这个方法中也可以传递一个T的子类型，参数为一个可异步也可同步的cb，
- * 而`exec`方法则就是执行队列中存储的cb，如果遇到null|undefined则就会立即停止
- * 执行。
- * @example
- *  const pipeline = usePreApiCallPipeline();
- *  pipeline.push(() => {
- *     console.log("管道1")
- *  })
- *  pipeline.push(async () => {
- *     console.log("管道2")
- *  })
- *  pipeline.exec({default: "message"})
+ * exec内部维护了一个数组，保存了每一个pipeline的返回值它们类型默认是T，但是pipeline也会返回undefined
+ * 或者null值，内部对于undefined和null值会返回一个[null, 上一个pipeline返回值]
+ * 在用户显式地返回了带有return的对象时，则exec函数就会返回这个return对象
+ * 综上exec的返回值可能是error ｜ 也可能是正常的T ｜ 也可能是一个数组 | 也可能返回一个对象return
  * @template T
- * @return {*}  {{
- *   push: <K extends T>(cb: PipelineNode<K>) => void;
- * }}
+ * @param {T} input
  */
-export const usePreApiCallPipeline = <T>(): {
-  push: <K extends T>(cb: PipelineNode<K>) => PipelineNode<K>;
-} => {
-  return {
-    push: (cb) => {
-      return push(cb)(preApiCallPipeline);
+export const exec = async <T extends HttpContext>(
+  type: PipelineTypeKeys,
+  input: T
+): Promise<Error | T | [null, T] | Record<'return', HttpContext['return']>> => {
+  const res = [input];
+  for (let i = 0; i < pipelineMap[type].length; i++) {
+    const last = res[res.length - 1];
+    try {
+      res.push(await pipelineMap[type][i](typeof last === 'object' ? JSON.parse(JSON.stringify(last)) : last));
+    } catch (error) {
+      return new Error(`pipeline ${type} error`);
     }
-  };
+    const current = res[res.length - 1];
+    // console.log(current);
+    if (current && current.return) {
+      return {
+        return: current.return
+      };
+    } else if (current === undefined || current === null) {
+      return [null, last];
+    }
+  }
+  return res[res.length - 1];
 };
 
 /**
  *
- * @name 使用PostApiCall管道
+ * @name 使用管道
  * @description
- * 可以给`usePostApiCallPipeline`传递一个类型T，代表了管道流通的数据类型，
- * 在`push`这个方法中也可以传递一个T的子类型，参数为一个可异步也可同步的cb，
- * 而`exec`方法则就是执行队列中存储的cb，如果遇到null|undefined则就会立即停止
- * 执行。
+ * 可以给`usePipeline`传递一个类型T，代表了管道流通的数据类型，
+ * 在usePipeline这个函数中，第一个参数为pipeline类型，第二个参数为一个可异步也可同步的cb，
+ * pipeline内部有一个`exec`方法就是顺序执行队列中存储的cb，如果遇到cb返回值为null|undefined则就会立即停止执行。
  * @example
- *  const pipeline = usePostApiCallPipeline();
- *  pipeline.push(() => {
- *     console.log("管道1")
+ *  const pipeline = usePipeline();
+ *
+ *  pipeline('preApiCall', (v) => {
+ *    return v;
  *  })
- *  pipeline.push(async () => {
- *     console.log("管道2")
- *  })
- *  pipeline.exec({default: "message"})
  * @template T
- * @return {*}  {{
- *   push: <K extends T>(cb: PipelineNode<K>) => void;
- * }}
  */
-export const usePostApiCallPipeline = <T>(): {
-  push: <K extends T>(cb: PipelineNode<K>) => PipelineNode<K>;
-} => {
-  return {
-    push: (cb) => {
-      return push(cb)(postApiCallPipeline);
-    }
+export const usePipeline =
+  <T extends HttpContext>() =>
+  (type: PipelineTypeKeys, cb: PipelineNode<T>) => {
+    push(cb)(pipelineMap[type]);
   };
-};
