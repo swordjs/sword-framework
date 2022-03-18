@@ -34,16 +34,18 @@ export const exec = async <T extends HttpContext>(
   for (let i = 0; i < pipelineMap[type].length; i++) {
     const last = res[res.length - 1];
     try {
-      res.push(await pipelineMap[type][i](last));
+      res.push(await pipelineMap[type][i](typeof last === 'object' ? JSON.parse(JSON.stringify(last)) : last));
     } catch (error) {
       return new Error(`pipeline ${type} error`);
     }
-    if (last === undefined || last === null) {
-      return [null, last];
-    } else if (last.return) {
+    const current = res[res.length - 1];
+    // console.log(current);
+    if (current && current.return) {
       return {
-        return: last.return
+        return: current.return
       };
+    } else if (current === undefined || current === null) {
+      return [null, last];
     }
   }
   return res[res.length - 1];

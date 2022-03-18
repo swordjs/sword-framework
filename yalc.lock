@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "@sword-code-practice/types": {
-      "signature": "30983c9d54ea07f707e52145b632f391",
+      "signature": "cec20bfb17adc1acf54af821329894c8",
       "file": true,
       "replaced": "1.1.6"
     }
