@@ -89,6 +89,9 @@ const handleValidateRequestProto = (params: ProtoData, query: ProtoData, res: Se
   }
 };
 
+// 在核心程序中，读取usebody的时候，需要进行判断，只有在几个method的请求上才可以对body进行解析
+const readBodyPayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'];
+
 /**
  *
  * 实现API的装载
@@ -106,7 +109,7 @@ export const implementApi = async (app: App, dirName: string) => {
       logMap.REQUEST_URL(key);
       // url query参数
       const query = isJSON(await useQuery(req));
-      const params = isJSON(await useBody(req));
+      const params = isJSON(readBodyPayloadMethods.includes(req.method as string) ? await useBody(req) : {});
       // 构造context
       let context = createContext({
         key,
