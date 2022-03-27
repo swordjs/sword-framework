@@ -1,10 +1,19 @@
-import type { HttpApi, HttpInstructMethod } from '@sword-code-practice/types/sword-backend-framework';
+import type { HttpInstructReturn, HttpApiHandler, HttpInstructMethod, HttpApiReturn, ContextData } from '@sword-code-practice/types/sword-backend-framework';
 
 // 创建API
-export const useApi: HttpApi = (instruct, handler) => {
+export const useApi = <C extends ContextData>(params: {
+  instruct?: HttpInstructReturn | HttpInstructReturn[];
+  handler: HttpApiHandler<C>;
+}): HttpApiReturn<C> => {
+  let {
+    instruct = {
+      method: 'GET'
+    }
+  } = params;
   // 对指示器做一下输出处理，避免编译器做过多逻辑
   let path;
   let method: HttpInstructMethod[] = [];
+  // 判断是否传递了指示器
   // 如果传递了多个指示器
   if (Array.isArray(instruct)) {
     // 对instruct进行过滤，将非法的错误进行排除
@@ -27,6 +36,6 @@ export const useApi: HttpApi = (instruct, handler) => {
       method,
       path
     },
-    handler
+    handler: params.handler
   };
 };
