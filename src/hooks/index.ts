@@ -13,7 +13,7 @@ export const useApp = () => {
   return {
     server: {
       start: startServer,
-      implementApi: (dirName: string) => implementApi(app, dirName)
+      implementApi: () => implementApi(app)
     }
   };
 };

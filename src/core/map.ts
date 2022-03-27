@@ -15,7 +15,7 @@ export type Map = {
  * @return {*}
  */
 export const getApiMap = async (
-  apiDir: string,
+  apiDir = 'api',
   dir = 'src'
 ): Promise<{
   apiMap: Record<string, Map>;
@@ -30,7 +30,7 @@ export const getApiMap = async (
     // 注册API和proto到map中
     if (['index.ts'].includes(d)) {
       // apiPath 比如hello/detail 诸如此类
-      const apiPath = path.substring(path.lastIndexOf(dir)).substring(dir.length);
+      const apiPath = path.substring(path.lastIndexOf(apiDir)).substring(apiDir.length);
       // 执行函数，获取instruct指示器
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { instruct, handler } = require(path).main as HttpApiReturn<any>;
@@ -55,11 +55,5 @@ export const getApiMap = async (
 
 // 获取map的存储key
 const getApiProtoMapKey = (urlPrefix: string, apiPath: string, path?: string) => {
-  let currentPath = null;
-  if (path) {
-    currentPath = path;
-  } else {
-    currentPath = urlPrefix + apiPath;
-  }
-  return currentPath;
+  return `${urlPrefix}${path ? path : apiPath}`;
 };
