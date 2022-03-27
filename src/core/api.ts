@@ -145,7 +145,7 @@ export const implementApi = async (app: App, dirName: string) => {
               context = preApiCallExecResult as HttpContext;
             }
             logMap.REQUEST_QUERY(JSON.stringify(context.query));
-            logMap.REQUEST_QUERY(JSON.stringify(context.params));
+            logMap.REQUEST_PARAMS(JSON.stringify(context.params));
             // 执行handler
             const _handlerRes = await _res.handler(context);
             // 执行pipeline
