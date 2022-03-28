@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "chalk": "5.0.1",
-    "h3": "^0.4.1",
+    "h3": "^0.4.2",
     "tsbuffer-validator": "^2.1.0"
   }
 }
