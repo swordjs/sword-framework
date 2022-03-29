@@ -13,7 +13,7 @@ importers:
       eslint-config-prettier: ^8.3.0
       eslint-plugin-import: ^2.24.0
       eslint-plugin-prettier: ^3.4.0
-      h3: ^0.4.2
+      h3: ^0.5.1
       husky: ^7.0.1
       lint-staged: ^11.1.2
       prettier: ^2.3.2
@@ -25,7 +25,7 @@ importers:
       vitest: latest
     dependencies:
       chalk: 5.0.1
-      h3: 0.4.2
+      h3: 0.5.1
       tsbuffer-validator: 2.1.0
     devDependencies:
       '@sword-code-practice/types': link:.yalc/@sword-code-practice/types
@@ -1535,8 +1535,8 @@ packages:
     resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==}
     dev: true
 
-  /h3/0.4.2:
-    resolution: {integrity: sha512-dKKv0GglP+qGGDKtH+jlLLPTYxY/GLui0Uwft6OkMd7yCxGt0X3xTLHZEhtFmG64F2LEa0phzXONHDagQel6mw==}
+  /h3/0.5.1:
+    resolution: {integrity: sha512-66etY83yRsHdfnog9REg/eJtP/UA18iIA4kkISaHXZBBzKHbQa9D7Ma7ZXdSEIWOxQ011IPSQXU7/6GzMnrNKA==}
     dependencies:
       cookie-es: 0.5.0
       destr: 1.1.0
