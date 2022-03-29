@@ -1,0 +1,41 @@
+{
+  "name": "@sword-code-practice/sword-plugin-server",
+  "version": "0.0.1-rc.1",
+  "description": "",
+  "types": "./lib/index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "main": "./lib/index.cjs",
+  "module": "./lib/index.mjs",
+  "exports": {
+    "require": "./lib/index.cjs",
+    "import": "./lib/index.mjs"
+  },
+  "scripts": {
+    "dev": "unbuild --stub",
+    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run async'",
+    "prettier": "prettier --write '**/*.{js,ts,json,md}'",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged",
+    "build": "unbuild",
+    "async": "npm run build && yalc push",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swordCodePractice/sword-plugin-server.git"
+  },
+  "keywords": [
+    "serverless",
+    "uni"
+  ],
+  "author": "Seho",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/swordCodePractice/sword-plugin-server/issues"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
