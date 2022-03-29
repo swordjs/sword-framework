@@ -1,4 +1,6 @@
-import { usePipeline, exec } from '../../src/middleware';
+import { exec } from '../../src/core/pipeline';
+import { usePipeline } from '../../src/hooks/pipeline';
+import { describe, it, expect } from 'vitest';
 
 const pipeline = usePipeline<any>();
 

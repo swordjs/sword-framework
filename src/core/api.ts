@@ -5,7 +5,7 @@ import { resolve } from 'path';
 import { getApiMap } from './map';
 import log from '../log';
 import { validateMethod, validateProto, getNeedValidateProto } from './validate';
-import { exec } from '../middleware/index';
+import { exec } from './pipeline';
 import error from './error';
 import { isJSON } from '../util/data';
 import type { App } from 'h3';
@@ -104,7 +104,6 @@ export const implementApi = async (app: App) => {
   const router = createRouter();
   // 获取proto schema
   getProtoSchema();
-  console.log(apiMap);
   for (const key in apiMap) {
     // key: api value: path
     router.add(key, async (req, res) => {
