@@ -1,4 +1,4 @@
-import './middleware';
+import './pipeline';
 import './config';
 import './hook';
 
