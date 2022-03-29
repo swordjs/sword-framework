@@ -10,13 +10,13 @@ const now = () => {
  * @return {*}
  */
 export default {
-  err: (v: string | Error) => {
+  err: (v: string | Error): void => {
     console.log(`${chalk.gray(now())} ${v}`);
   },
-  info: (v: string) => {
+  info: (v: string): void => {
     console.log(`${chalk.gray(now())} ${chalk.yellow(v)}`);
   },
-  success: (v: string) => {
+  success: (v: string): void => {
     console.log(`${chalk.gray(now())} ${chalk.green(v)}`);
   }
 };
