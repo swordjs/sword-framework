@@ -37,5 +37,18 @@
     "url": "https://github.com/swordCodePractice/sword-plugin-server/issues"
   },
   "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "@sword-code-practice/sword-plugin-log": "workspace:*"
+  },
+  "unbuild": {
+    "entries": [
+      "./src/index"
+    ],
+    "outDir": "lib",
+    "declaration": true,
+    "rollup": {
+      "emitCJS": true,
+      "cjsBridge": true
+    }
+  }
 }
