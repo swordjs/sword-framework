@@ -1,6 +1,32 @@
 import type { HttpInstructReturn, HttpApiHandler, HttpInstructMethod, HttpApiReturn, ContextData } from '@sword-code-practice/types/sword-backend-framework';
 
-// 创建API
+/**
+ * 创建API
+ * @description 你可以用`useApi`来快速创建一个api，
+ * 这个api默认是get请求，如果你没有指定指示器的话，你可以在`useApi`中
+ * 传入一个指示器，这个指示器代表了请求的方法和路由
+ * @template C
+ * @example
+ *
+ * import { useApi } from "@sword-code-practice/backend-framework";
+ * import { ReqQuery, ReqParams, Res } from "./proto";
+ * export const main = useApi<{
+ *  query: ReqQuery;
+ *  params: ReqParams;
+ *  res: Res;
+ *}>({
+ *  handler: (ctx) => {
+ *    return {
+ *      name: "1",
+ *    };
+ *  },
+  });
+ * @param {({
+ *   instruct?: HttpInstructReturn | HttpInstructReturn[];
+ *   handler: HttpApiHandler<C>;
+ * })} params
+ * @return {*}  {HttpApiReturn<C>}
+ */
 export const useApi = <C extends ContextData>(params: {
   instruct?: HttpInstructReturn | HttpInstructReturn[];
   handler: HttpApiHandler<C>;

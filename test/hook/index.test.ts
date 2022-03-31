@@ -1,4 +1,5 @@
 import { useApi, Get, Post } from '../../src/hooks';
+import { describe, it, expect } from 'vitest';
 
 describe('useApi', () => {
   it('传递单个指示器，不传入任何参数', () => {
@@ -10,9 +11,7 @@ describe('useApi', () => {
         };
       }
     });
-    expect(res.instruct).toEqual({
-      method: ['get']
-    });
+    expect(res.instruct.method).toEqual(['GET']);
   });
   // it('传递单个指示器，传入空字符串', () => {
   //   const res = useApi({
@@ -23,9 +22,7 @@ describe('useApi', () => {
   //       };
   //     }
   //   });
-  //   expect(res.instruct).toEqual({
-  //     method: ['get']
-  //   });
+  //   expect(res.instruct.method).toEqual(['GET']);
   // });
   // it('传递多个指示器，只传递空数组', () => {
   //   const res = useApi({
@@ -36,9 +33,7 @@ describe('useApi', () => {
   //       };
   //     }
   //   });
-  //   expect(res.instruct).toEqual({
-  //     method: ['get']
-  //   });
+  //   expect(res.instruct.method).toEqual(['GET']);
   // });
   // it('传递多个指示器，首个传值，剩下的随机非法值', () => {
   //   const res = useApi({
@@ -50,7 +45,7 @@ describe('useApi', () => {
   //     }
   //   });
   //   expect(res.instruct).toEqual({
-  //     method: ['get', 'post'],
+  //     method: ['GET', 'POST'],
   //     path: '/'
   //   });
   // });
@@ -64,7 +59,7 @@ describe('useApi', () => {
   //     }
   //   });
   //   expect(res.instruct).toEqual({
-  //     method: ['post'],
+  //     method: ['POST'],
   //     path: '/detail'
   //   });
   // });
