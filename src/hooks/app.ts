@@ -13,7 +13,7 @@ const app = createApp();
  * import { useApp } from "@sword-code-practice/backend-framework";
  * const app = useApp();
  * const init = async () => {
- *  app.server.implementApi();
+ *  app.implementApi();
  * };
  * init()
  * @return {*}
@@ -23,11 +23,11 @@ export const useApp = () => {
   const aggregatePlugin = aggregatePluginBehavior();
   // 返回app对象,并且返回一些实例，比如说启动http服务以及实现api
   return {
+    implementApi: () => implementApi(app),
     server: {
       start: () => {
         if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);
-      },
-      implementApi: () => implementApi(app)
+      }
     }
   };
 };

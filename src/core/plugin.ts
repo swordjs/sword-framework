@@ -55,7 +55,6 @@ type AggregatePlugin = Record<Exclude<keyof Plugin, 'name'>, { name: string; plu
  * @return {*}  {Record<string, unknown>}
  */
 export const aggregatePluginBehavior = (): AggregatePlugin => {
-  console.log('进来了', aggregatePlugin);
   if (aggregatePlugin === null) {
     // 设置一个默认空对象
     aggregatePlugin = {} as any;
