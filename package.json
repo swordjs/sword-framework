@@ -1,6 +1,6 @@
 {
-  "name": "@sword-code-practice/backend-framework",
-  "version": "0.0.1-rc.14",
+  "name": "@sword-code-practice/sword-framework",
+  "version": "0.0.1-rc.15",
   "description": "",
   "types": "./lib/index.d.ts",
   "publishConfig": {
@@ -21,11 +21,12 @@
     "lint-staged": "lint-staged",
     "build": "unbuild",
     "async": "npm run build && yalc push",
-    "test": "vitest run"
+    "test": "vitest run",
+    "publish:dev": "pnpm publish --no-git-checks"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/swordCodePractice/unicloud-framework.git"
+    "url": "git+https://github.com/swordCodePractice/sword-framework.git"
   },
   "keywords": [
     "serverless"
@@ -33,9 +34,9 @@
   "author": "Seho",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/swordCodePractice/unicloud-framework/issues"
+    "url": "https://github.com/swordCodePractice/sword-framework/issues"
   },
-  "homepage": "https://github.com/swordCodePractice/unicloud-framework#readme",
+  "homepage": "https://github.com/swordCodePractice/sword-framework#readme",
   "devDependencies": {
     "@sword-code-practice/types": "file:.yalc/@sword-code-practice/types",
     "@types/node": "^14.17.16",
@@ -57,7 +58,7 @@
   "dependencies": {
     "@sword-code-practice/sword-plugin-log": "workspace:*",
     "@sword-code-practice/sword-plugin-server": "workspace:*",
-    "h3": "^0.5.1",
+    "h3": "0.5.2",
     "tsbuffer-validator": "^2.1.0"
   }
 }
