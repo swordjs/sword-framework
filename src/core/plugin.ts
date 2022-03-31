@@ -4,6 +4,8 @@ import type { Plugin } from '@sword-code-practice/types/sword-backend-framework'
 
 export const plugins: Plugin[] = [];
 
+let aggregatePlugin: AggregatePlugin | null = null as any;
+
 /**
  *
  * 添加plugin插件
@@ -45,43 +47,47 @@ type AggregatePlugin = Record<Exclude<keyof Plugin, 'name'>, { name: string; plu
  *  log: {
  *    name: "new-plugin",
  *    plugin: {
- *      successL () => {}
+ *      success () => {}
  *    }
  *  }
  * }
  *
  * @return {*}  {Record<string, unknown>}
  */
-export const aggregatePluginBehavior = () => {
-  const aggregatePlugin: AggregatePlugin = {} as any;
-  // 处理plugin数组
-  for (const i in plugins) {
-    const plugin = plugins[i];
-    let key: keyof Plugin;
-    for (key in plugin) {
-      // 聚合不需要把name也聚合进去
-      if (key !== 'name') {
-        // 循环plugin下的每一个节点,将所有插件的行为递归聚合到aggregatePlugin中，可以调用一个方法
-        // 这个数据结构每个root根节点之下，都保存了一个对象，key就是声明此root功能的插件名称，它的值则是插件核心
-        aggregatePlugin[key] = { name: plugin.name, plugin: plugin[key] as any };
+export const aggregatePluginBehavior = (): AggregatePlugin => {
+  console.log('进来了', aggregatePlugin);
+  if (aggregatePlugin === null) {
+    // 设置一个默认空对象
+    aggregatePlugin = {} as any;
+    // 处理plugin数组
+    for (const i in plugins) {
+      const plugin = plugins[i];
+      let key: keyof Plugin;
+      for (key in plugin) {
+        // 聚合不需要把name也聚合进去
+        if (key !== 'name') {
+          // 循环plugin下的每一个节点,将所有插件的行为递归聚合到aggregatePlugin中，可以调用一个方法
+          // 这个数据结构每个root根节点之下，都保存了一个对象，key就是声明此root功能的插件名称，它的值则是插件核心
+          aggregatePlugin![key] = { name: plugin.name, plugin: plugin[key] as any };
+        }
+      }
+    }
+    // 如果聚合后的插件对象有空缺，那么就用预设插件顶替，比如说log，server...
+    // 可以进行预设的插件内容
+    const presetPlugin: Record<Exclude<keyof Plugin, 'name'>, any> = {
+      server: useServer(),
+      log: useLogPlugin()
+    };
+    // 迭代聚合后的插件对象，如果没有聚合的插件，那么就用预设插件顶替
+    // 迭代预设插件对象
+    let presetKey: Exclude<keyof Plugin, 'name'>;
+    for (presetKey in presetPlugin) {
+      const currentPlugin = presetPlugin[presetKey];
+      // 如果不存在且预设的key也符合要求
+      if (!aggregatePlugin![presetKey]) {
+        aggregatePlugin![presetKey] = { name: presetKey, plugin: currentPlugin[presetKey] };
       }
     }
   }
-  // 如果聚合后的插件对象有空缺，那么就用预设插件顶替，比如说log，server...
-  // 可以进行预设的插件内容
-  const presetPlugin: Record<Exclude<keyof Plugin, 'name'>, any> = {
-    server: useServer(),
-    log: useLogPlugin()
-  };
-  // 迭代聚合后的插件对象，如果没有聚合的插件，那么就用预设插件顶替
-  // 迭代预设插件对象
-  let presetKey: Exclude<keyof Plugin, 'name'>;
-  for (presetKey in presetPlugin) {
-    const currentPlugin = presetPlugin[presetKey];
-    // 如果不存在且预设的key也符合要求
-    if (!aggregatePlugin[presetKey]) {
-      aggregatePlugin[presetKey] = { name: presetKey, plugin: currentPlugin[presetKey] };
-    }
-  }
-  return aggregatePlugin;
+  return aggregatePlugin as AggregatePlugin; // 可以强制设置类型，因为此时的聚合对象不再是null或者undefined
 };

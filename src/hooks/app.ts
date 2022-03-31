@@ -25,9 +25,7 @@ export const useApp = () => {
   return {
     server: {
       start: () => {
-        if (aggregatePlugin.server.plugin.start) {
-          aggregatePlugin.server.plugin.start(app);
-        }
+        if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);
       },
       implementApi: () => implementApi(app)
     }

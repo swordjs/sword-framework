@@ -1,13 +1,12 @@
 import { createRouter, useQuery, useBody, sendError } from 'h3';
-import { IncomingMessage, ServerResponse } from 'http';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { getApiMap } from './map';
-import log from '../log';
 import { validateMethod, validateProto, getNeedValidateProto } from './validate';
 import { exec } from './pipeline';
 import error from './error';
 import { isJSON } from '../util/data';
+import { log } from './log';
 import type { App } from 'h3';
 import type { HttpContext } from '@sword-code-practice/types/sword-backend-framework';
 import type { UnPromisify } from '../../typings/index';
@@ -34,7 +33,7 @@ const logMap = {
  * @param {ServerResponse} res
  * @return {*}
  */
-const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, res: ServerResponse) => {
+const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, res: any) => {
   // 判断execresult的类型
   if (execResult instanceof Error) {
     return sendError(res, error('PIPELINE_ERROR', execResult.message));
@@ -46,11 +45,11 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, res: 
  *
  * 处理检查method
  * @param {HttpContext} context
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
+ * @param {any} req
+ * @param {any} res
  * @return {*}
  */
-const handleValidateMethod = (context: HttpContext, req: IncomingMessage, res: ServerResponse) => {
+const handleValidateMethod = (context: HttpContext, req: any, res: any) => {
   if (!validateMethod(req, context.method)) {
     // 如果校验method错误，就返回错误信息
     const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
@@ -67,11 +66,11 @@ type ProtoData = { proto: ValidateProto; data: any };
  * 处理检查request proto
  * @param {ProtoData} params
  * @param {ProtoData} query
- * @param {ServerResponse} res
+ * @param {any} res
  * @param {() => void} cb
  * @return {*}
  */
-const handleValidateRequestProto = (params: ProtoData, query: ProtoData, res: ServerResponse, cb: () => void) => {
+const handleValidateRequestProto = (params: ProtoData, query: ProtoData, res: any, cb: () => void) => {
   // 检查请求params的proto
   const requestParamsProtoResult = validateProto(params.proto, params.data);
   // 检查请求query的proto
@@ -106,7 +105,7 @@ export const implementApi = async (app: App) => {
   getProtoSchema();
   for (const key in apiMap) {
     // key: api value: path
-    router.add(key, async (req, res) => {
+    router.add(key, async (req: any, res: any) => {
       logMap.REQUEST_URL(key);
       // url query参数
       const query = isJSON(await useQuery(req));
