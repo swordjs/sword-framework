@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { usePlugin } from '../../src/hooks/plugin';
-import { aggregatePluginBehavior } from '../../src/core/plugin';
+import { aggregatePluginBehavior, plugins } from '../../src/core/plugin';
 import type { Plugin } from '@sword-code-practice/types/sword-backend-framework';
 
 describe('plugin', () => {
@@ -49,5 +49,9 @@ describe('plugin', () => {
     const behavior = aggregatePluginBehavior();
     console.log(behavior);
     expect(Object.keys(behavior)).toEqual(['name', 'log', 'server']);
+  });
+
+  it('测试预设插件', () => {
+    console.log(plugins);
   });
 });

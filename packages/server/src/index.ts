@@ -1,7 +1,7 @@
 import { createServer } from 'http';
 import net from 'net';
 import { log } from '@sword-code-practice/sword-plugin-log';
-import type { App } from 'h3';
+import type { Plugin } from '@sword-code-practice/types/sword-backend-framework';
 
 type ServerConfig = {
   port?: number;
@@ -17,7 +17,7 @@ const defaultServerConfig: ServerConfig = {
  * @param {App} app
  * @param {ServerConfig} [serverConfig=defaultServerConfig]
  */
-export const startServer = async (app: App, serverConfig: ServerConfig = defaultServerConfig): Promise<void> => {
+const startServer = async (app: any, serverConfig: ServerConfig = defaultServerConfig): Promise<void> => {
   let key: keyof ServerConfig;
   for (key in serverConfig) {
     if (!serverConfig[key]) {
@@ -72,4 +72,13 @@ const portUsed = (port: number): Promise<number | false> => {
       }
     });
   });
+};
+
+export const useServer = (): Plugin => {
+  return {
+    name: 'server',
+    server: {
+      start: startServer
+    }
+  };
 };

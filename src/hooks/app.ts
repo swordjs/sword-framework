@@ -1,5 +1,5 @@
 import { createApp } from 'h3';
-import { startServer } from '../core/server';
+import { aggregatePluginBehavior } from '../core/plugin';
 import { implementApi } from '../core/api';
 
 // 新建一个h3实例
@@ -19,10 +19,16 @@ const app = createApp();
  * @return {*}
  */
 export const useApp = () => {
+  // 整合插件
+  const aggregatePlugin = aggregatePluginBehavior();
   // 返回app对象,并且返回一些实例，比如说启动http服务以及实现api
   return {
     server: {
-      start: () => startServer(app),
+      start: () => {
+        if (aggregatePlugin.server.plugin.start) {
+          aggregatePlugin.server.plugin.start(app);
+        }
+      },
       implementApi: () => implementApi(app)
     }
   };

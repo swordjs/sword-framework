@@ -15,7 +15,7 @@
   },
   "scripts": {
     "dev": "unbuild --stub",
-    "dev:nodemon": "nodemon --watch packages/ src/ -C -e ts --debug -x 'npm run async'",
+    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run async'",
     "prettier": "prettier --write '**/*.{js,ts,json,md}'",
     "prepare": "husky install",
     "lint-staged": "lint-staged",
@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "@sword-code-practice/sword-plugin-log": "workspace:*",
-    "chalk": "5.0.1",
+    "@sword-code-practice/sword-plugin-server": "workspace:*",
     "h3": "^0.5.1",
     "tsbuffer-validator": "^2.1.0"
   }
