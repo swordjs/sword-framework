@@ -16,20 +16,19 @@ export const push =
     return cb;
   };
 
+// 中断对象（管道返回）
+export type InterruptPipelineResult = { type: 'return' | 'stop'; last: HttpContext; current: HttpContext };
 /**
  * 执行队列
  * @description
  * exec内部维护了一个数组，保存了每一个pipeline的返回值它们类型默认是T，但是pipeline也会返回undefined
- * 或者null值，内部对于undefined和null值会返回一个[null, 上一个pipeline返回值]
- * 在用户显式地返回了带有return的对象时，则exec函数就会返回这个return对象
- * 综上exec的返回值可能是error ｜ 也可能是正常的T ｜ 也可能是一个数组 | 也可能返回一个对象return
+ * 或者null值，内部对于undefined和null值会返回一个对象（中断对象），对象的type属性为stop，并且附带一个last属性
+ * 在用户显式地返回了带有return的对象时，则exec函数就会返回一个对象（中断对象），type属性为return, 附带了一个last属性，并且额外有一个return属性
+ * 综上exec的返回值可能是error ｜ 也可能是正常的T ｜ 也可能是一个中断对象
  * @template T
  * @param {T} input
  */
-export const exec = async <T extends HttpContext>(
-  type: PipelineTypeKeys,
-  input: T
-): Promise<Error | T | [null, T] | Record<'return', HttpContext['return']>> => {
+export const exec = async <T extends HttpContext>(type: PipelineTypeKeys, input: T): Promise<Error | T | InterruptPipelineResult> => {
   const res = [input];
   for (let i = 0; i < pipelineMap[type].length; i++) {
     const last = res[res.length - 1];
@@ -39,13 +38,18 @@ export const exec = async <T extends HttpContext>(
       return new Error(`pipeline ${type} error`);
     }
     const current = res[res.length - 1];
-    // console.log(current);
     if (current && current.return) {
       return {
-        return: current.return
+        type: 'return',
+        last,
+        current
       };
     } else if (current === undefined || current === null) {
-      return [null, last];
+      return {
+        type: 'stop',
+        last,
+        current
+      };
     }
   }
   return res[res.length - 1];

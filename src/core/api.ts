@@ -1,4 +1,4 @@
-import { createRouter, useQuery, useBody, sendError } from 'h3';
+import { createRouter, useQuery, useBody, sendError, appendHeader, IncomingMessage, ServerResponse } from 'h3';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { getApiMap } from './map';
@@ -11,6 +11,7 @@ import type { App } from 'h3';
 import type { HttpContext } from '@sword-code-practice/types/sword-backend-framework';
 import type { UnPromisify } from '../../typings/index';
 import type { ValidateProto } from './validate';
+import type { InterruptPipelineResult } from './pipeline';
 
 // 具体的proto schema引用
 let protoSchema: Record<string, Record<string, unknown>> | null = null;
@@ -59,6 +60,20 @@ const handleValidateMethod = (context: HttpContext, req: any, res: any) => {
   return true;
 };
 
+/**
+ *
+ * 处理返回请求头
+ * @param {HttpContext} context
+ * @param {ServerResponse} res
+ */
+const handleResHeaders = (context: HttpContext, res: ServerResponse) => {
+  if (context.resHeaders) {
+    Object.keys(context.resHeaders).forEach((key) => {
+      appendHeader(res, key, context.resHeaders[key] as string);
+    });
+  }
+};
+
 type ProtoData = { proto: ValidateProto; data: any };
 
 /**
@@ -105,7 +120,7 @@ export const implementApi = async (app: App) => {
   getProtoSchema();
   for (const key in apiMap) {
     // key: api value: path
-    router.add(key, async (req: any, res: any) => {
+    router.add(key, async (req: IncomingMessage, res: ServerResponse) => {
       logMap.REQUEST_URL(key);
       // url query参数
       const query = isJSON(await useQuery(req));
@@ -115,7 +130,8 @@ export const implementApi = async (app: App) => {
         key,
         query,
         params,
-        headers: req.headers,
+        reqHeaders: req.headers,
+        resHeaders: {}, // 返回请求头默认为空
         method: apiMap[key].method
       });
       const _res = apiMap[key];
@@ -131,15 +147,19 @@ export const implementApi = async (app: App) => {
         if (handleExecError(preApiCallExecResult, res)) {
           // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
           if (!(preApiCallExecResult instanceof Error)) {
-            if (Array.isArray(preApiCallExecResult)) {
-              // 如果pipeline返回了null或者undefined，我们就把context替换为上一个pipeline的返回结果
-              context = preApiCallExecResult[preApiCallExecResult.length - 1] as HttpContext;
-            } else if (preApiCallExecResult.return) {
+            // 如果pipeline返回中断对象，则就把context统一修改为上一个pipeline返回结果
+            if ((preApiCallExecResult as InterruptPipelineResult).type === 'return' || (preApiCallExecResult as InterruptPipelineResult).type === 'stop') {
+              const interruptResult = preApiCallExecResult as InterruptPipelineResult;
+              // 中断对象默认的context是上一个，但是呢如果中断对象的type为return强制返回，那么此时context就是当前的context (current)
+              context = interruptResult.last;
               // 判断是否有return，就不用执行handler，直接返回data
-              // 直接返回的data不会校验返回类型
-              const res = preApiCallExecResult.return.data;
-              logMap.RESPONSE_RESULT(JSON.stringify(res), '-preApiCall');
-              return res;
+              if (interruptResult.type === 'return') {
+                // 直接返回的data不会校验返回类型
+                handleResHeaders(interruptResult?.current, res);
+                const returnData = interruptResult?.current.return?.data;
+                logMap.RESPONSE_RESULT(JSON.stringify(returnData), '-preApiCall');
+                return returnData;
+              }
             } else {
               // 如果所有的情况都避过了，即非error，非边界条件（return null | undefined）,非中途直接返回
               // 就只剩正常的pipeline返回情况了，即替换context进行请求
@@ -153,9 +173,11 @@ export const implementApi = async (app: App) => {
             const postApiCallExecResult = await exec('postApiCall', context);
             if (handleExecError(postApiCallExecResult, res)) {
               if (!(postApiCallExecResult instanceof Error)) {
-                if (!Array.isArray(postApiCallExecResult) && postApiCallExecResult.return) {
+                handleResHeaders(context, res);
+                // 如果是中断对象
+                if ((postApiCallExecResult as InterruptPipelineResult).type === 'return') {
                   // 直接返回return的内容，不经过类型校验
-                  const data = postApiCallExecResult.return.data;
+                  const data = (postApiCallExecResult as InterruptPipelineResult).current.return?.data;
                   logMap.RESPONSE_RESULT(JSON.stringify(data), '-postApiCall');
                   return data as any;
                 } else {
@@ -194,7 +216,8 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
   return {
     key: context.key as string,
     proto,
-    headers: context.headers as Record<string, unknown>,
+    reqHeaders: context.reqHeaders as Record<string, unknown>,
+    resHeaders: context.resHeaders as Record<string, unknown>,
     query: context.query,
     params: context.params,
     method: context.method as any
