@@ -115,6 +115,7 @@ export const implementApi = async (app: App) => {
         key,
         query,
         params,
+        headers: req.headers,
         method: apiMap[key].method
       });
       const _res = apiMap[key];
@@ -193,6 +194,7 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
   return {
     key: context.key as string,
     proto,
+    headers: context.headers as Record<string, unknown>,
     query: context.query,
     params: context.params,
     method: context.method as any
