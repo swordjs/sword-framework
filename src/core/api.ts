@@ -103,6 +103,17 @@ const handleValidateRequestProto = (params: ProtoData, query: ProtoData, res: an
   }
 };
 
+/**
+ *
+ * 封装pipeline result不同类型的处理
+ * @param {(HttpContext | InterruptPipelineResult)} pipelineResult
+ * @param {{
+ *     return: (context: InterruptPipelineResult['current'], returnData: InterruptPipelineResult['current']['return']) => any;
+ *     stop: (context: InterruptPipelineResult['last']) => any;
+ *     cb: (context: HttpContext) => any;
+ *   }} map
+ * @return {*}
+ */
 const pipelineResultTypeMap = (
   pipelineResult: HttpContext | InterruptPipelineResult,
   map: {
