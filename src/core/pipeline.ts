@@ -38,6 +38,7 @@ export const exec = async <T extends HttpContext>(type: PipelineTypeKeys, input:
       return new Error(`pipeline ${type} error`);
     }
     const current = res[res.length - 1];
+    // 区分2种情况，一种是中断对象（return, stop），一种是正常的对象（返回ctx）
     if (current && current.return) {
       return {
         type: 'return',

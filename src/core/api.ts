@@ -107,6 +107,7 @@ const handleValidateRequestProto = (params: ProtoData, query: ProtoData, res: an
  *
  * 封装pipeline result不同类型的处理
  * @param {(HttpContext | InterruptPipelineResult)} pipelineResult
+ * @param {(HttpContext | InterruptPipelineResult)} context
  * @param {{
  *     return: (context: InterruptPipelineResult['current'], returnData: InterruptPipelineResult['current']['return']) => any;
  *     stop: (context: InterruptPipelineResult['last']) => any;
@@ -116,6 +117,7 @@ const handleValidateRequestProto = (params: ProtoData, query: ProtoData, res: an
  */
 const pipelineResultTypeMap = (
   pipelineResult: HttpContext | InterruptPipelineResult,
+  context: HttpContext | InterruptPipelineResult,
   map: {
     return: (context: InterruptPipelineResult['current'], returnData: InterruptPipelineResult['current']['return']) => any;
     stop: (context: InterruptPipelineResult['last']) => any;
@@ -123,27 +125,28 @@ const pipelineResultTypeMap = (
   }
 ) => {
   if ((pipelineResult as InterruptPipelineResult).type === 'return') {
-    return map.return((pipelineResult as InterruptPipelineResult).current, (pipelineResult as InterruptPipelineResult).current.return);
+    return map.return((pipelineResult as InterruptPipelineResult).current || context, (pipelineResult as InterruptPipelineResult).current.return);
   } else if ((pipelineResult as InterruptPipelineResult).type === 'stop') {
-    return map.stop((pipelineResult as InterruptPipelineResult).last);
+    return map.stop((pipelineResult as InterruptPipelineResult).last || context);
   } else {
-    return map.cb((pipelineResult as InterruptPipelineResult).current);
+    return map.cb((pipelineResult as HttpContext) || context);
   }
 };
 
 /**
  *
  * 处理preApiCall pipeline
- * @description 把关于PreApiCall的检索和判断进行了封装返回给了router handler，让router handler帮助我们处理context和returndata
  * @param {(HttpContext | InterruptPipelineResult)} preApiCallExecResult
+ * @param {(HttpContext | InterruptPipelineResult)} context
  * @param {ServerResponse} res
- * @return {*}  {HttpContext}
+ * @return {*}  {({ context: HttpContext; returnData: null | unknown })}
  */
 const handlePreApiCall = (
   preApiCallExecResult: HttpContext | InterruptPipelineResult,
+  context: HttpContext | InterruptPipelineResult,
   res: ServerResponse
 ): { context: HttpContext; returnData: null | unknown } => {
-  return pipelineResultTypeMap(preApiCallExecResult, {
+  return pipelineResultTypeMap(preApiCallExecResult, context, {
     return: (context, returnData) => {
       handleResHeaders(context, res);
       logMap.RESPONSE_RESULT(JSON.stringify(returnData?.data), '-preApiCall');
@@ -155,6 +158,7 @@ const handlePreApiCall = (
       return { context };
     },
     cb: (context) => {
+      handleResHeaders(context, res);
       return { context };
     }
   });
@@ -164,10 +168,16 @@ const handlePreApiCall = (
  *
  * 处理postapiCall pipeline
  * @param {(HttpContext | InterruptPipelineResult)} postApiCallExecResult
+ * @param {(HttpContext | InterruptPipelineResult)} context
  * @param {ServerResponse} res
+ * @return {*}
  */
-const handlePostApiCall = (postApiCallExecResult: HttpContext | InterruptPipelineResult, res: ServerResponse) => {
-  return pipelineResultTypeMap(postApiCallExecResult, {
+const handlePostApiCall = (
+  postApiCallExecResult: HttpContext | InterruptPipelineResult,
+  context: HttpContext | InterruptPipelineResult,
+  res: ServerResponse
+) => {
+  return pipelineResultTypeMap(postApiCallExecResult, context, {
     return: (context, returnData) => {
       handleResHeaders(context, res);
       // 直接返回result
@@ -179,6 +189,7 @@ const handlePostApiCall = (postApiCallExecResult: HttpContext | InterruptPipelin
       return { context };
     },
     cb: (context) => {
+      handleResHeaders(context, res);
       return { context };
     }
   });
@@ -229,7 +240,7 @@ export const implementApi = async (app: App) => {
           // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
           if (!(preApiCallExecResult instanceof Error)) {
             // 处理PreApiCall Pipline
-            const { context: preApiCallContext, returnData: preApiCallReturnData } = handlePreApiCall(preApiCallExecResult, res);
+            const { context: preApiCallContext, returnData: preApiCallReturnData } = handlePreApiCall(preApiCallExecResult, context, res);
             // 判断returndata是否存在, 如果存在，则直接返回
             if (preApiCallReturnData) return preApiCallReturnData;
             // 经过pipeline后的context需要重新赋值
@@ -242,7 +253,7 @@ export const implementApi = async (app: App) => {
             const postApiCallExecResult = await exec('postApiCall', context);
             if (handleExecError(postApiCallExecResult, res)) {
               if (!(postApiCallExecResult instanceof Error)) {
-                const { returnData: postApiCallReturnData } = handlePostApiCall(postApiCallExecResult, res);
+                const { returnData: postApiCallReturnData } = handlePostApiCall(postApiCallExecResult, context, res);
                 if (postApiCallReturnData) return postApiCallReturnData;
                 // 校验返回结果是否符合预期
                 const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
