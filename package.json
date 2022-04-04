@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/sword-framework",
-  "version": "0.0.1-rc.16",
+  "version": "0.0.1-rc.18",
   "description": "",
   "types": "./lib/index.d.ts",
   "publishConfig": {

@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/sword-plugin-server",
-  "version": "0.0.1-rc.1",
+  "version": "0.0.1-rc.2",
   "description": "",
   "types": "./lib/index.d.ts",
   "publishConfig": {
@@ -36,7 +36,9 @@
   "bugs": {
     "url": "https://github.com/swordCodePractice/sword-plugin-server/issues"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "unbuild": "^0.6.9"
+  },
   "dependencies": {
     "@sword-code-practice/sword-plugin-log": "workspace:*"
   },
