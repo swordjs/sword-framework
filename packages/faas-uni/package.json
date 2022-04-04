@@ -1,6 +1,6 @@
 {
-  "name": "@sword-code-practice/sword-plugin-server",
-  "version": "0.0.1-rc.2",
+  "name": "@sword-code-practice/sword-plugin-faas-uni",
+  "version": "0.0.1-rc.1",
   "description": "",
   "types": "./lib/index.d.ts",
   "publishConfig": {
@@ -25,7 +25,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/swordCodePractice/sword-plugin-server.git"
+    "url": "git+https://github.com/swordCodePractice/sword-plugin-faas-uni.git"
   },
   "keywords": [
     "serverless",
@@ -34,14 +34,10 @@
   "author": "Seho",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/swordCodePractice/sword-plugin-server/issues"
+    "url": "https://github.com/swordCodePractice/sword-plugin-faas-uni/issues"
   },
-  "devDependencies": {
-    "unbuild": "^0.6.9"
-  },
-  "dependencies": {
-    "@sword-code-practice/sword-plugin-log": "workspace:*"
-  },
+  "devDependencies": {},
+  "dependencies": {},
   "unbuild": {
     "entries": [
       "./src/index"

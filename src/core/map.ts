@@ -28,7 +28,7 @@ export const getApiMap = async (
     // 解构path和d
     const [path, d] = files[key];
     // 注册API和proto到map中
-    if (['index.ts'].includes(d)) {
+    if (['index.ts', 'index.js'].includes(d)) {
       // apiPath 比如hello/detail 诸如此类
       const apiPath = path.substring(path.lastIndexOf(apiDir)).substring(apiDir.length);
       // 执行函数，获取instruct指示器

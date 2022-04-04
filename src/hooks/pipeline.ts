@@ -19,7 +19,7 @@ import { PipelineNode } from '../../typings/pipeline';
  * @template T
  */
 export const usePipeline =
-  <T extends HttpContext>() =>
+  <T extends HttpContext = HttpContext>() =>
   (type: PipelineTypeKeys, cb: PipelineNode<T>): void => {
     push(cb)(pipelineMap[type]);
   };

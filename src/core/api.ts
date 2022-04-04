@@ -1,4 +1,4 @@
-import { createRouter, useQuery, useBody, sendError } from 'h3';
+import { createRouter, useQuery, useBody, sendError, appendHeader, IncomingMessage, ServerResponse } from 'h3';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { getApiMap } from './map';
@@ -11,6 +11,7 @@ import type { App } from 'h3';
 import type { HttpContext } from '@sword-code-practice/types/sword-backend-framework';
 import type { UnPromisify } from '../../typings/index';
 import type { ValidateProto } from './validate';
+import type { InterruptPipelineResult } from './pipeline';
 
 // 具体的proto schema引用
 let protoSchema: Record<string, Record<string, unknown>> | null = null;
@@ -59,6 +60,20 @@ const handleValidateMethod = (context: HttpContext, req: any, res: any) => {
   return true;
 };
 
+/**
+ *
+ * 处理返回请求头
+ * @param {HttpContext} context
+ * @param {ServerResponse} res
+ */
+const handleResHeaders = (context: HttpContext, res: ServerResponse) => {
+  if (context.resHeaders) {
+    Object.keys(context.resHeaders).forEach((key) => {
+      appendHeader(res, key, context.resHeaders[key] as string);
+    });
+  }
+};
+
 type ProtoData = { proto: ValidateProto; data: any };
 
 /**
@@ -88,6 +103,98 @@ const handleValidateRequestProto = (params: ProtoData, query: ProtoData, res: an
   }
 };
 
+/**
+ *
+ * 封装pipeline result不同类型的处理
+ * @param {(HttpContext | InterruptPipelineResult)} pipelineResult
+ * @param {(HttpContext | InterruptPipelineResult)} context
+ * @param {{
+ *     return: (context: InterruptPipelineResult['current'], returnData: InterruptPipelineResult['current']['return']) => any;
+ *     stop: (context: InterruptPipelineResult['last']) => any;
+ *     cb: (context: HttpContext) => any;
+ *   }} map
+ * @return {*}
+ */
+const pipelineResultTypeMap = (
+  pipelineResult: HttpContext | InterruptPipelineResult,
+  context: HttpContext | InterruptPipelineResult,
+  map: {
+    return: (context: InterruptPipelineResult['current'], returnData: InterruptPipelineResult['current']['return']) => any;
+    stop: (context: InterruptPipelineResult['last']) => any;
+    cb: (context: HttpContext) => any;
+  }
+) => {
+  if ((pipelineResult as InterruptPipelineResult).type === 'return') {
+    return map.return((pipelineResult as InterruptPipelineResult).current || context, (pipelineResult as InterruptPipelineResult).current.return);
+  } else if ((pipelineResult as InterruptPipelineResult).type === 'stop') {
+    return map.stop((pipelineResult as InterruptPipelineResult).last || context);
+  } else {
+    return map.cb((pipelineResult as HttpContext) || context);
+  }
+};
+
+/**
+ *
+ * 处理preApiCall pipeline
+ * @param {(HttpContext | InterruptPipelineResult)} preApiCallExecResult
+ * @param {(HttpContext | InterruptPipelineResult)} context
+ * @param {ServerResponse} res
+ * @return {*}  {({ context: HttpContext; returnData: null | unknown })}
+ */
+const handlePreApiCall = (
+  preApiCallExecResult: HttpContext | InterruptPipelineResult,
+  context: HttpContext | InterruptPipelineResult,
+  res: ServerResponse
+): { context: HttpContext; returnData: null | unknown } => {
+  return pipelineResultTypeMap(preApiCallExecResult, context, {
+    return: (context, returnData) => {
+      handleResHeaders(context, res);
+      logMap.RESPONSE_RESULT(JSON.stringify(returnData?.data), '-preApiCall');
+      // 直接返回result
+      return { context, returnData };
+    },
+    stop: (context) => {
+      handleResHeaders(context, res);
+      return { context };
+    },
+    cb: (context) => {
+      handleResHeaders(context, res);
+      return { context };
+    }
+  });
+};
+
+/**
+ *
+ * 处理postapiCall pipeline
+ * @param {(HttpContext | InterruptPipelineResult)} postApiCallExecResult
+ * @param {(HttpContext | InterruptPipelineResult)} context
+ * @param {ServerResponse} res
+ * @return {*}
+ */
+const handlePostApiCall = (
+  postApiCallExecResult: HttpContext | InterruptPipelineResult,
+  context: HttpContext | InterruptPipelineResult,
+  res: ServerResponse
+) => {
+  return pipelineResultTypeMap(postApiCallExecResult, context, {
+    return: (context, returnData) => {
+      handleResHeaders(context, res);
+      // 直接返回result
+      logMap.RESPONSE_RESULT(JSON.stringify(returnData?.data), '-postApiCall');
+      return { context, returnData };
+    },
+    stop: (context) => {
+      handleResHeaders(context, res);
+      return { context };
+    },
+    cb: (context) => {
+      handleResHeaders(context, res);
+      return { context };
+    }
+  });
+};
+
 // 在核心程序中，读取usebody的时候，需要进行判断，只有在几个method的请求上才可以对body进行解析
 const readBodyPayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'];
 
@@ -105,7 +212,7 @@ export const implementApi = async (app: App) => {
   getProtoSchema();
   for (const key in apiMap) {
     // key: api value: path
-    router.add(key, async (req: any, res: any) => {
+    router.add(key, async (req: IncomingMessage, res: ServerResponse) => {
       logMap.REQUEST_URL(key);
       // url query参数
       const query = isJSON(await useQuery(req));
@@ -115,6 +222,8 @@ export const implementApi = async (app: App) => {
         key,
         query,
         params,
+        reqHeaders: req.headers,
+        resHeaders: {}, // 返回请求头默认为空
         method: apiMap[key].method
       });
       const _res = apiMap[key];
@@ -130,20 +239,12 @@ export const implementApi = async (app: App) => {
         if (handleExecError(preApiCallExecResult, res)) {
           // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
           if (!(preApiCallExecResult instanceof Error)) {
-            if (Array.isArray(preApiCallExecResult)) {
-              // 如果pipeline返回了null或者undefined，我们就把context替换为上一个pipeline的返回结果
-              context = preApiCallExecResult[preApiCallExecResult.length - 1] as HttpContext;
-            } else if (preApiCallExecResult.return) {
-              // 判断是否有return，就不用执行handler，直接返回data
-              // 直接返回的data不会校验返回类型
-              const res = preApiCallExecResult.return.data;
-              logMap.RESPONSE_RESULT(JSON.stringify(res), '-preApiCall');
-              return res;
-            } else {
-              // 如果所有的情况都避过了，即非error，非边界条件（return null | undefined）,非中途直接返回
-              // 就只剩正常的pipeline返回情况了，即替换context进行请求
-              context = preApiCallExecResult as HttpContext;
-            }
+            // 处理PreApiCall Pipline
+            const { context: preApiCallContext, returnData: preApiCallReturnData } = handlePreApiCall(preApiCallExecResult, context, res);
+            // 判断returndata是否存在, 如果存在，则直接返回
+            if (preApiCallReturnData) return preApiCallReturnData;
+            // 经过pipeline后的context需要重新赋值
+            context = preApiCallContext;
             logMap.REQUEST_QUERY(JSON.stringify(context.query));
             logMap.REQUEST_PARAMS(JSON.stringify(context.params));
             // 执行handler
@@ -152,19 +253,14 @@ export const implementApi = async (app: App) => {
             const postApiCallExecResult = await exec('postApiCall', context);
             if (handleExecError(postApiCallExecResult, res)) {
               if (!(postApiCallExecResult instanceof Error)) {
-                if (!Array.isArray(postApiCallExecResult) && postApiCallExecResult.return) {
-                  // 直接返回return的内容，不经过类型校验
-                  const data = postApiCallExecResult.return.data;
-                  logMap.RESPONSE_RESULT(JSON.stringify(data), '-postApiCall');
-                  return data as any;
-                } else {
-                  // 校验返回结果是否符合预期
-                  const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
-                  if (!resProtoResult.isSucc) {
-                    // 如果返回结果不符合预期，就抛出错误
-                    logMap.RESPONSE_TYPE_ERROR(JSON.stringify(resProtoResult.errMsg));
-                    return sendError(res, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
-                  }
+                const { returnData: postApiCallReturnData } = handlePostApiCall(postApiCallExecResult, context, res);
+                if (postApiCallReturnData) return postApiCallReturnData;
+                // 校验返回结果是否符合预期
+                const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
+                if (!resProtoResult.isSucc) {
+                  // 如果返回结果不符合预期，就抛出错误
+                  logMap.RESPONSE_TYPE_ERROR(JSON.stringify(resProtoResult.errMsg));
+                  return sendError(res, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
                 }
               }
             }
@@ -193,6 +289,8 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
   return {
     key: context.key as string,
     proto,
+    reqHeaders: context.reqHeaders as Record<string, unknown>,
+    resHeaders: context.resHeaders as Record<string, unknown>,
     query: context.query,
     params: context.params,
     method: context.method as any
