@@ -1,0 +1,22 @@
+{
+  "name": "sword-backend-framework-example",
+  "version": "1.0.0",
+  "description": "this is a sword framework demo",
+  "scripts": {
+    "dev": "sword dev",
+    "build": "sword build && cd .sword",
+    "serve": "node ./src/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@swc-node/register": "^1.4.2",
+    "@swc/core-darwin-arm64": "^1.2.163",
+    "@sword-code-practice/sword-framework": "workspace:^0.0.1-rc.24"
+  },
+  "devDependencies": {
+    "@sword-code-practice/backend-cli": "latest",
+    "@sword-code-practice/types": "latest",
+    "typescript": "^4.6.3"
+  }
+}
