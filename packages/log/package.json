@@ -36,6 +36,9 @@
   "bugs": {
     "url": "https://github.com/swordCodePractice/sword-plugin-log/issues"
   },
+  "devDependencies": {
+    "unbuild": "^0.6.9"
+  },
   "dependencies": {
     "chalk": "4.1.2"
   },
