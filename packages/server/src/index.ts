@@ -1,7 +1,7 @@
 import { createServer } from 'http';
 import net from 'net';
 import { log } from '@sword-code-practice/sword-plugin-log';
-import type { Plugin } from '@sword-code-practice/types/sword-backend-framework';
+import type { Plugin } from '../../../typings/index';
 
 type ServerConfig = {
   port?: number;

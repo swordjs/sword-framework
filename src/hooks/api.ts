@@ -1,4 +1,4 @@
-import type { HttpInstructReturn, HttpApiHandler, HttpInstructMethod, HttpApiReturn, ContextData } from '@sword-code-practice/types/sword-backend-framework';
+import type { HttpInstructReturn, HttpApiHandler, HttpInstructMethod, HttpApiReturn, ContextData } from '../../typings/index';
 
 /**
  * 创建API

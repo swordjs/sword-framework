@@ -1,4 +1,4 @@
-import type { HttpInstruct } from '@sword-code-practice/types/sword-backend-framework';
+import type { HttpInstruct } from '../../typings/index';
 
 export const Get: HttpInstruct = (path) => {
   return {

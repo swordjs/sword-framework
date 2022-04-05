@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { usePlugin } from '../../src/hooks/plugin';
 import { aggregatePluginBehavior, plugins } from '../../src/core/plugin';
-import type { Plugin } from '@sword-code-practice/types/sword-backend-framework';
+import type { Plugin } from '../../typings/index';
 
 describe('plugin', () => {
   const plugin = usePlugin();

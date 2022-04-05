@@ -1,6 +1,6 @@
 import { useLogPlugin } from '@sword-code-practice/sword-plugin-log';
 import { useServer } from '@sword-code-practice/sword-plugin-server';
-import type { Plugin } from '@sword-code-practice/types/sword-backend-framework';
+import type { Plugin } from '../../typings/index';
 
 export const plugins: Plugin[] = [];
 
