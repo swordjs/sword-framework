@@ -1,0 +1,16 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1,
+    "workspacePrefix": "/Users/seho/Desktop/openSource/sword-function-framework"
+  },
+  "1 error pnpm": {
+    "code": "ERR_PNPM_GIT_NOT_UNCLEAN",
+    "hint": "If you want to disable Git checks on publish, set the \"git-checks\" setting to \"false\", or run again with \"--no-git-checks\".",
+    "err": {
+      "name": "pnpm",
+      "message": "Unclean working tree. Commit or stash changes first.",
+      "code": "ERR_PNPM_GIT_NOT_UNCLEAN",
+      "stack": "pnpm: Unclean working tree. Commit or stash changes first.\n    at Object.handler [as publish] (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:129169:17)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)\n    at async /usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:134121:20\n    at async run (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:134095:34)\n    at async runPnpm (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:134307:5)\n    at async /usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:134299:7"
+    }
+  }
+}

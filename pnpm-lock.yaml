@@ -47,6 +47,17 @@ importers:
       unbuild: 0.7.2
       vitest: 0.8.4
 
+  example:
+    specifiers:
+      '@sword-code-practice/backend-cli': latest
+      '@sword-code-practice/sword-framework': latest
+      typescript: ^4.6.3
+    dependencies:
+      '@sword-code-practice/sword-framework': link:..
+    devDependencies:
+      '@sword-code-practice/backend-cli': link:../packages/cli
+      typescript: 4.6.3
+
   packages/cli:
     specifiers:
       '@swc-node/register': ^1.4.2
@@ -518,7 +529,6 @@ packages:
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [darwin]
-    requiresBuild: true
 
   /@swc/core-darwin-x64/1.2.163:
     resolution: {integrity: sha512-pVYtFi0Rfeh0JLZKD0HR1j4chcqEaxyk4lhx2DEMg2VvZYjZd1b6bRKB5gKJy1lLzpiUngqeSpIt14jnCIqWZg==}
@@ -1883,7 +1893,7 @@ packages:
     resolution: {integrity: sha512-NbdoVMZso2Lsrn/QwLXOy6rm0ufY2zEOKCDzJR/0kBsb0E6qed0P3iYK+Ath3BfvXEeu4JhEtXLgILx5psUfag==}
     engines: {node: '>=12'}
     dependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
       jsonfile: 6.1.0
       universalify: 2.0.0
     dev: true
@@ -1982,8 +1992,8 @@ packages:
       slash: 3.0.0
     dev: true
 
-  /graceful-fs/4.2.9:
-    resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==}
+  /graceful-fs/4.2.10:
+    resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
     dev: true
 
   /h3/0.5.2:
@@ -2292,7 +2302,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
     dev: true
 
   /k8w-crypto/0.2.0:
