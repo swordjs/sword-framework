@@ -33,7 +33,7 @@ const build = async (config: ConfigReturn) => {
       log.err(`📦 打包出现未知问题`);
     })
     .finally(() => {
-      process.exit(1);
+      process.exit();
     });
 };
 

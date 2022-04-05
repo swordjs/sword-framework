@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/backend-cli",
-  "version": "0.0.1-rc.16",
+  "version": "0.0.1-rc.17",
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
