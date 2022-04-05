@@ -8,7 +8,7 @@ import error from './error';
 import { isJSON } from '../util/data';
 import { log } from './log';
 import type { App } from 'h3';
-import type { HttpContext } from '@sword-code-practice/types/sword-backend-framework';
+import type { HttpContext } from '../../typings/index';
 import type { UnPromisify } from '../../typings/index';
 import type { ValidateProto } from './validate';
 import type { InterruptPipelineResult } from './pipeline';

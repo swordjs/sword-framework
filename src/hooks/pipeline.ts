@@ -1,6 +1,6 @@
 import { push, pipelineMap } from '../core/pipeline';
 import type { PipelineTypeKeys } from '../core/pipeline';
-import type { HttpContext } from '@sword-code-practice/types/sword-backend-framework';
+import type { HttpContext } from '../../typings/index';
 import { PipelineNode } from '../../typings/pipeline';
 
 /**

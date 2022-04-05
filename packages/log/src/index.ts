@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { Plugin } from '@sword-code-practice/types/sword-backend-framework/';
+import type { Plugin } from '../../../typings/index';
 
 const now = () => {
   const _ = new Date();

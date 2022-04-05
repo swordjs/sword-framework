@@ -2,7 +2,7 @@ import { traverseSourceDir } from '../util/file';
 import { createRequire } from 'module';
 import { resolve } from 'path';
 import { log } from './log';
-import type { HttpInstructMethod, HttpApiReturn, HttpContext } from '@sword-code-practice/types/sword-backend-framework';
+import type { HttpInstructMethod, HttpApiReturn, HttpContext } from '../../typings/index';
 export type Map = {
   sourcePath: string;
   method: HttpInstructMethod[];

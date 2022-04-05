@@ -1,17 +1,12 @@
 {
-  "name": "@sword-code-practice/sword-plugin-server",
-  "version": "0.0.1-rc.4",
+  "name": "@sword-code-practice/backend-cli",
+  "version": "0.0.1-rc.17",
   "description": "",
   "types": "./lib/index.d.ts",
+  "module": "./lib/index.mjs",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
-  },
-  "main": "./lib/index.cjs",
-  "module": "./lib/index.mjs",
-  "exports": {
-    "require": "./lib/index.cjs",
-    "import": "./lib/index.mjs"
   },
   "scripts": {
     "dev": "unbuild --stub",
@@ -20,26 +15,36 @@
     "lint-staged": "lint-staged",
     "build": "unbuild",
     "async": "npm run build && yalc push",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:cli:dev": "node ./lib/index.mjs dev"
+  },
+  "bin": {
+    "sword": "./lib/index.cjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/swordCodePractice/sword-plugin-server.git"
+    "url": "git+https://github.com/swordCodePractice/backend-cli.git"
   },
-  "keywords": [
-    "serverless",
-    "uni"
-  ],
-  "author": "Seho",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/swordCodePractice/sword-plugin-server/issues"
+    "url": "https://github.com/swordCodePractice/backend-cli/issues"
   },
+  "homepage": "https://github.com/swordCodePractice/backend-cli#readme",
   "devDependencies": {
+    "typescript": "^4.3.5",
     "unbuild": "^0.6.9"
   },
   "dependencies": {
-    "@sword-code-practice/sword-plugin-log": "workspace:*"
+    "@swc-node/register": "^1.4.2",
+    "chalk": "^4.1.2",
+    "chokidar": "^3.5.3",
+    "consola": "^2.15.3",
+    "esbuild": "^0.14.27",
+    "mri": "^1.2.0",
+    "tsbuffer-proto-generator": "^1.7.0",
+    "unconfig": "^0.3.1"
   },
   "unbuild": {
     "entries": [

@@ -26,3 +26,7 @@ npm run server
 ```
 
 ### With Docker 🐳
+
+```
+docker build -t sword/app .
+```

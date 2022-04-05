@@ -10,13 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@swc-node/register": "^1.4.2",
-    "@swc/core-darwin-arm64": "^1.2.163",
-    "@sword-code-practice/sword-framework": "workspace:^0.0.1-rc.24"
+    "@sword-code-practice/sword-framework": "latest"
   },
   "devDependencies": {
     "@sword-code-practice/backend-cli": "latest",
-    "@sword-code-practice/types": "latest",
     "typescript": "^4.6.3"
   }
 }
