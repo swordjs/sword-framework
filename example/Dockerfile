@@ -1,23 +1,23 @@
 FROM node:16.14.2
 
-# RUN npm config set registry https://registry.npm.taobao.org/
+# 复制文件到容器
+ADD . /src/
 
-# npm install
-# 复制package.json文件
-COPY package.json /src/
+# Create app directory
 WORKDIR /src
-# 淘宝镜像
-RUN npm --registry=https://registry.npm.taobao.org install
+RUN npm install --registry=https://registry.npm.taobao.org
 
 # build
-COPY . /src
 RUN npm run build
 
 # clean
 RUN npm prune --production
 
 # move
-RUN rm -rf /src
+RUN rm -rf /app \
+    && mv /src/.sword /app/ \
+    && mv /src/node_modules /app/ \
+    && rm -rf /src
 
 # ENV
 ENV NODE_ENV production
@@ -25,4 +25,4 @@ ENV NODE_ENV production
 EXPOSE 3000
 
 WORKDIR /app
-CMD node index.js
+CMD node src/index.js
