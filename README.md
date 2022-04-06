@@ -45,12 +45,6 @@ npm i @sword-code-practice/backend-cli -g
 
 ## 文档
 
-<iframe src="https://www.yuque.com/mlgrgm/lrf0ra"
-     style="width:100%; height:300px; border:0; border-radius: 4px; overflow:hidden;"
-   ></iframe>
-
----
-
 [sword.js 语雀文档库](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
 ## 初始化
 
@@ -61,11 +55,8 @@ npm i @sword-code-practice/backend-cli -g
 我们希望这款小框架是你手中的剑，它能够开箱即用，能够胜任你的大部分 serverless 开发场景，这款框架的实现难度很低，但是由于它的精心设计，使用的成本也非常低。而且它
 可以无痛地让你在不同场景切换，只因为它的跨平台实现都是可插拔插件。
 
-我相信，多说无用，只有尝试了才知道这款框架到底有多香，我准备了一个在线 demo，你可以在这里看到它的用法 ( 但是云端环境运行不了，肯定不是我的锅 😄 )。
+我相信，多说无用，只有尝试了才知道这款框架到底有多香，我准备了一个[在线 demo](https://stackblitz.com/edit/node-73ctyi?embed=1&file=src/index.ts&view=editor)，你可以在这里看到它的用法 ( 但是云端环境运行不了，肯定不是我的锅 😄 )。
 
-<iframe src="https://stackblitz.com/edit/node-73ctyi?embed=1&file=src/index.ts&view=editor"
-     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-   ></iframe>
 
 同样的，你也可以关注我的[bilibili 频道](https://space.bilibili.com/257902802)，我会在频道里面更新这款框架的使用方法。
 
