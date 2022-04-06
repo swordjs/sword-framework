@@ -1,7 +1,11 @@
 {
-  "name": "sword-backend-framework-example",
+  "name": "@sword-code-practice/sword-framework-example",
   "version": "1.0.0",
-  "description": "this is a sword framework demo",
+  "description": "this is a sword framework example",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "dev": "sword dev",
     "build": "sword build && cd .sword",
