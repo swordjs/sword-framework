@@ -61,7 +61,6 @@ importers:
   packages/cli:
     specifiers:
       '@swc-node/register': ^1.4.2
-      '@swc/core-darwin-arm64': ^1.2.163
       chalk: ^4.1.2
       chokidar: ^3.5.3
       consola: ^2.15.3
@@ -73,7 +72,6 @@ importers:
       unconfig: ^0.3.1
     dependencies:
       '@swc-node/register': 1.4.2
-      '@swc/core-darwin-arm64': 1.2.163
       chalk: 4.1.2
       chokidar: 3.5.3
       consola: 2.15.3
@@ -529,6 +527,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [darwin]
+    optional: true
 
   /@swc/core-darwin-x64/1.2.163:
     resolution: {integrity: sha512-pVYtFi0Rfeh0JLZKD0HR1j4chcqEaxyk4lhx2DEMg2VvZYjZd1b6bRKB5gKJy1lLzpiUngqeSpIt14jnCIqWZg==}
