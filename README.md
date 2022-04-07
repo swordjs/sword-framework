@@ -1,23 +1,18 @@
 <p align="center">
-<img src="https://static.yinzhuoei.com/typecho/2022/02/17/048881447338917/WX20220217-212200-removebg-preview.png"/>
+<img width="40%" src="https://static.yinzhuoei.com/typecho/2022/02/17/048881447338917/WX20220217-212200-removebg-preview.png"/>
 </p>
 
----
 
 这是 Sword 团队内部沉淀的第一个云函数框架，毫无疑问它完全是基于`TypeScript`开发的。除了 `framework` 核心程序之外，它为开发者提供了开箱即用的开发套件，使之能够开
-发`serverless`应用像写普通的 nodejs 程序一样简单。得益于插件系统赋予了它跨平台的特性，你可以使用它开发各个厂商的 serverless 应用，比如
-AWS,Aliyun,Tencent,Dcloud...
-
-<div><img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-c7e81452-9d28-4486-bedc-5dbf7c8386a5/e4395033-d45f-4e3e-a930-78ff91c8db54.png" width="80%">
-</div>
+发`serverless`应用像写普通的 nodejs 程序一样简单。得益于插件系统赋予了它跨平台的特性，你可以使用它开发各个厂商的 serverless 应用，比如AWS,Aliyun,Tencent,Dcloud...
 
 ## 特性
 
 - ❤️ 完全拥抱`TypeScript`
-- 😌 也可以私有化部署到服务器，它作为一个纯粹的 web 框架也是一个不错的选择
-- 🐮 通过插件系统支持跨平台: 阿里云/腾讯云/Cloudflare/AWS/Unicloud
+- 🐮 通过插件系统支持跨平台: Server/阿里云/腾讯云/Cloudflare/AWS/Unicloud
 - 🕷️ 基于文件系统的路由
 - 🥷 开箱即用的开发套件
+- 📖 TS运行时类型校验
 - 😍 完全 Hook 的写法与设计
 
 ## 平台
@@ -80,3 +75,8 @@ npm i @sword-code-practice/backend-cli -g
 
 剑指题解团队不需要捐助，如何你觉得这个 repo 对你有用的话，你可以 star 支持一下我们，并且推广更多人使用 Sword。如果你真的想要赞助，那么就以我们的名义（剑指题解团
 队）捐一笔款吧，你可以向[中国红十字会-在线捐助](https://mv.lingxi360.com/m/zjgw7x?utm_bccid=LXEhue1n)
+
+## 我们的服务号
+
+<div><img width="40%" src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-c7e81452-9d28-4486-bedc-5dbf7c8386a5/e4395033-d45f-4e3e-a930-78ff91c8db54.png" width="80%">
+</div>
