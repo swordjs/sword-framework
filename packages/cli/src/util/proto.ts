@@ -4,16 +4,11 @@ import { TSBufferProtoGenerator } from 'tsbuffer-proto-generator';
 import { writeFileRecursive, traverseSourceDir } from './file';
 import log from '../log';
 import type { HttpApiReturn } from '../../../../typings/index';
+import { existsSync } from 'fs';
 
 // 获取map的存储key
-const getProtoMapKey = (urlPrefix: string, apiPath: string, path?: string) => {
-  let currentPath = null;
-  if (path) {
-    currentPath = path;
-  } else {
-    currentPath = urlPrefix + apiPath;
-  }
-  return currentPath;
+const getKey = (urlPrefix: string, apiPath: string, path?: string) => {
+  return `${urlPrefix}${path ? path : apiPath}`;
 };
 
 /**
@@ -31,7 +26,7 @@ export const getProtoMap = async (
   apiDir = 'api',
   dir = 'src'
 ): Promise<{
-  // apiPaths用于cli构建产物，用于esbuild打包分析
+  // apiPaths用于cli构建产物，用于esbuild打包分析, 只需要真实的api路径，不需要指示器强行修改的api路径
   apiPaths: string[];
   protoMap: Record<string, string>;
 }> => {
@@ -39,7 +34,6 @@ export const getProtoMap = async (
   const apiPaths: string[] = [];
   const protoMap: Record<string, string> = {};
   const files = traverseSourceDir(resolve(dir, apiDir));
-  let currentPath = null;
   for (const key in files) {
     // 解构path和d
     const [path, d] = files[key];
@@ -53,9 +47,10 @@ export const getProtoMap = async (
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { instruct } = require(module).main as HttpApiReturn<any>;
         apiPaths.push(apiPath);
-        currentPath = getProtoMapKey(`/${apiDir}`, apiPath, instruct.path);
-      } else if (d === 'proto.ts') {
-        protoMap[currentPath as unknown as string] = resolve(path, d);
+        // 如果当前目录下，存在proto.ts文件，则记录
+        if (existsSync(resolve(path, 'proto.ts'))) {
+          protoMap[getKey(`/${apiDir}`, apiPath, instruct.path)] = resolve(path, 'proto.ts');
+        }
       }
     }
   }
