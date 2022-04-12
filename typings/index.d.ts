@@ -65,4 +65,5 @@ export type Plugin = {
     info: (v: string) => void;
     success: (v: string) => void;
   };
+  context?: (context: HttpContext) => HttpContext;
 };
