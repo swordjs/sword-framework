@@ -1,6 +1,6 @@
 {
-  "name": "@sword-code-practice/sword-plugin-log",
-  "version": "0.0.1-rc.3",
+  "name": "@sword-code-practice/sword-cors",
+  "version": "0.0.1-rc.1",
   "description": "",
   "types": "./lib/index.d.ts",
   "publishConfig": {
@@ -17,10 +17,9 @@
     "dev": "unbuild --stub",
     "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run async'",
     "prettier": "prettier --write '**/*.{js,ts,json,md}'",
-    "lint-staged": "lint-staged",
     "build": "unbuild",
     "async": "npm run build && yalc push",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "vitest run"
   },
   "keywords": [
     "serverless",
@@ -33,9 +32,7 @@
   "devDependencies": {
     "unbuild": "^0.6.9"
   },
-  "dependencies": {
-    "chalk": "4.1.2"
-  },
+  "dependencies": {},
   "unbuild": {
     "entries": [
       "./src/index"

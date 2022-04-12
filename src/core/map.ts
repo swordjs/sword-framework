@@ -34,10 +34,10 @@ export const getApiMap = async (
       // 执行函数，获取instruct指示器
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { instruct, handler } = require(path).main as HttpApiReturn<any>;
-      const currentPath = getApiProtoMapKey(`/${apiDir}`, apiPath, instruct.path);
+      const currentPath = getKey(`/${apiDir}`, apiPath, instruct.path);
       // 判断apiMap中已存在某个apikey，那么就提示api被占用，那么此时默认将不会按照指示器中的path进行替换赋值
       if (apiMap[currentPath]) {
-        log.err(`${currentPath}路由已被占用，已跳过此路由的挂载`);
+        log().err(`${currentPath}路由已被占用，已跳过此路由的挂载`);
         continue;
       } else {
         apiMap[currentPath] = {
@@ -54,6 +54,6 @@ export const getApiMap = async (
 };
 
 // 获取map的存储key
-const getApiProtoMapKey = (urlPrefix: string, apiPath: string, path?: string) => {
+const getKey = (urlPrefix: string, apiPath: string, path?: string) => {
   return `${urlPrefix}${path ? path : apiPath}`;
 };

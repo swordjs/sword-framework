@@ -7,6 +7,7 @@ import { exec } from './pipeline';
 import error from './error';
 import { isJSON } from '../util/data';
 import { log } from './log';
+import { aggregatePlugin } from './plugin';
 import type { App } from 'h3';
 import type { HttpContext } from '../../typings/index';
 import type { UnPromisify } from '../../typings/index';
@@ -18,13 +19,13 @@ let protoSchema: Record<string, Record<string, unknown>> | null = null;
 
 // 定义log集合
 const logMap = {
-  REQUEST_URL: (key: string) => log.info(`[请求URL]: ${key}`),
-  REQUEST_METHOD_ERROR: (msg: string) => log.err(`[请求方法错误]: ${msg}`),
-  REQUEST_TYPE_ERROR: (msg: string) => log.err(`[请求类型校验错误]:${msg}`),
-  REQUEST_QUERY: (query: string) => log.info(`[请求参数-query]: ${query}`),
-  REQUEST_PARAMS: (query: string) => log.info(`[请求参数-params]: ${query}`),
-  RESPONSE_RESULT: (msg: string, suffix = '') => log.info(`[返回结果${suffix}]: ${msg}`),
-  RESPONSE_TYPE_ERROR: (msg: string) => log.err(`[返回类型校验错误]:${msg}`)
+  REQUEST_URL: (key: string) => log().info(`[请求URL]: ${key}`),
+  REQUEST_METHOD_ERROR: (msg: string) => log().err(`[请求方法错误]: ${msg}`),
+  REQUEST_TYPE_ERROR: (msg: string) => log().err(`[请求类型校验错误]:${msg}`),
+  REQUEST_QUERY: (query: string) => log().info(`[请求参数-query]: ${query}`),
+  REQUEST_PARAMS: (query: string) => log().info(`[请求参数-params]: ${query}`),
+  RESPONSE_RESULT: (msg: string, suffix = '') => log().info(`[返回结果${suffix}]: ${msg}`),
+  RESPONSE_TYPE_ERROR: (msg: string) => log().err(`[返回类型校验错误]:${msg}`)
 };
 
 /**
@@ -85,7 +86,7 @@ type ProtoData = { proto: ValidateProto; data: any };
  * @param {() => void} cb
  * @return {*}
  */
-const handleValidateRequestProto = (params: ProtoData, query: ProtoData, res: any, cb: () => void) => {
+const handleValidateRequestProto = (context: HttpContext, params: ProtoData, query: ProtoData, res: any, cb: () => void) => {
   // 检查请求params的proto
   const requestParamsProtoResult = validateProto(params.proto, params.data);
   // 检查请求query的proto
@@ -96,6 +97,7 @@ const handleValidateRequestProto = (params: ProtoData, query: ProtoData, res: an
   }) as undefined | { errMsg: string };
   if (errorResult) {
     logMap.REQUEST_TYPE_ERROR(JSON.stringify(errorResult.errMsg));
+    handleResHeaders(context, res);
     return sendError(res, error('VALIDATE_REQUEST', errorResult.errMsg));
   } else {
     // proto检测成功的回调
@@ -233,7 +235,7 @@ export const implementApi = async (app: App) => {
       // 获取符合要求的proto
       const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
       // 校验请求proto，如果成功则会执行回调
-      return handleValidateRequestProto({ proto: reqParamsProto, data: params }, { proto: reqQueryProto, data: query }, res, async () => {
+      return handleValidateRequestProto(context, { proto: reqParamsProto, data: params }, { proto: reqQueryProto, data: query }, res, async () => {
         // 执行pipeline
         const preApiCallExecResult = await exec('preApiCall', context);
         if (handleExecError(preApiCallExecResult, res)) {
@@ -286,7 +288,7 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
   if (protoSchema && protoSchema[context.key as string]) {
     proto = protoSchema[context.key as string];
   }
-  return {
+  let result = {
     key: context.key as string,
     proto,
     reqHeaders: context.reqHeaders as Record<string, unknown>,
@@ -295,6 +297,11 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
     params: context.params,
     method: context.method as any
   };
+  // 注入plugin中的context, 如果plugin中有context，则会覆盖掉上面的context
+  if (aggregatePlugin?.context) {
+    result = aggregatePlugin?.context.plugin(result);
+  }
+  return result;
 };
 
 /**

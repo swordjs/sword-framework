@@ -5,9 +5,10 @@
 import { register } from '@swc-node/register/register';
 import dev from './dev';
 import build from './build';
+import init from './init';
 import mri from 'mri';
 
-type commands = 'dev' | 'build';
+type commands = 'dev' | 'build' | 'init';
 
 register({});
 
@@ -15,7 +16,8 @@ async function main() {
   const args = mri(process.argv.splice(2));
   const cliHandler = {
     dev,
-    build
+    build,
+    init
   };
   if (args._[0]) {
     cliHandler[args._[0] as commands]();

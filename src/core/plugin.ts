@@ -4,7 +4,7 @@ import type { Plugin } from '../../typings/index';
 
 export const plugins: Plugin[] = [];
 
-let aggregatePlugin: AggregatePlugin | null = null as any;
+export let aggregatePlugin: AggregatePlugin | null = null as any;
 
 /**
  *
@@ -12,7 +12,7 @@ let aggregatePlugin: AggregatePlugin | null = null as any;
  * @param {(Plugin | (() => Plugin))} plugin
  * @return {*}  {Promise<Plugin[]>}
  */
-export const addPlugin = async (plugin: Plugin | (() => Plugin)): Promise<Plugin[]> => {
+export const addPlugin = (plugin: Plugin | (() => Plugin)): Plugin[] => {
   let _plugin: Plugin = plugin;
   // 判断plugin是否是函数
   if (typeof plugin === 'function') {
@@ -71,15 +71,16 @@ export const aggregatePluginBehavior = (): AggregatePlugin => {
         }
       }
     }
+    type PresetPluginKeys = Exclude<keyof Plugin, 'name' | 'context'>;
     // 如果聚合后的插件对象有空缺，那么就用预设插件顶替，比如说log，server...
     // 可以进行预设的插件内容
-    const presetPlugin: Record<Exclude<keyof Plugin, 'name'>, any> = {
+    const presetPlugin: Record<PresetPluginKeys, any> = {
       server: useServer(),
       log: useLogPlugin()
     };
     // 迭代聚合后的插件对象，如果没有聚合的插件，那么就用预设插件顶替
     // 迭代预设插件对象
-    let presetKey: Exclude<keyof Plugin, 'name'>;
+    let presetKey: PresetPluginKeys;
     for (presetKey in presetPlugin) {
       const currentPlugin = presetPlugin[presetKey];
       // 如果不存在且预设的key也符合要求
