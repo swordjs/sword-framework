@@ -22,19 +22,14 @@
     "async": "npm run build && yalc push",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/swordCodePractice/sword-plugin-log.git"
-  },
   "keywords": [
     "serverless",
-    "uni"
+    "swordjs",
+    "sword",
+    "cors"
   ],
   "author": "Seho",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/swordCodePractice/sword-plugin-log/issues"
-  },
   "devDependencies": {
     "unbuild": "^0.6.9"
   },

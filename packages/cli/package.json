@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "unbuild --stub",
-    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run async'",
+    "dev:yalc": "nodemon --watch src/ -C -e ts --debug -x 'npm run async'",
     "prettier": "prettier --write '**/*.{js,ts,json,md}'",
     "lint-staged": "lint-staged",
     "build": "unbuild",
