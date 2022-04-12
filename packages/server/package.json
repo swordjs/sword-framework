@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/sword-plugin-server",
-  "version": "0.0.1-rc.4",
+  "version": "0.0.1-rc.5",
   "description": "",
   "types": "./lib/index.d.ts",
   "publishConfig": {
