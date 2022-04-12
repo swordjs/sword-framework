@@ -3,6 +3,10 @@
 </p>
 
 
+## Sword.js
+
+[中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
+
 这是 Sword 团队内部沉淀的第一个云函数框架，毫无疑问它完全是基于`TypeScript`开发的。除了 `framework` 核心程序之外，它为开发者提供了开箱即用的开发套件，使之能够开
 发`serverless`应用像写普通的 nodejs 程序一样简单。得益于插件系统赋予了它跨平台的特性，你可以使用它开发各个厂商的 serverless 应用，比如AWS,Aliyun,Tencent,Dcloud...
 
@@ -37,10 +41,6 @@ npm i @sword-code-practice/sword-framework
 ```bash
 npm i @sword-code-practice/backend-cli -g
 ```
-
-## 文档
-
-[sword.js 语雀文档库](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
 ## 初始化
 
 你可以更方便的初始化一个项目，它的初始化功能是由 cli 提供的，模板是[从这里](https://github.com/swordCodePractice/sword-framework/tree/master/example)获取的。
