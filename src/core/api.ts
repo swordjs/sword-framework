@@ -88,7 +88,6 @@ type ProtoData = { proto: ValidateProto; data: any };
 const handleValidateRequestProto = (context: HttpContext, params: ProtoData, query: ProtoData, res: any, cb: () => void) => {
   // 检查请求params的proto
   const requestParamsProtoResult = validateProto(params.proto, params.data);
-  console.log(query);
   // 检查请求query的proto
   const requestQueryProtoResult = validateProto(query.proto, query.data);
   // 查看请求的参数校验结果，是否有错误
