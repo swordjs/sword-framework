@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/sword-framework",
-  "version": "0.0.1-rc.34",
+  "version": "1.0.0",
   "description": "",
   "types": "./lib/index.d.ts",
   "publishConfig": {
@@ -58,7 +58,7 @@
   "dependencies": {
     "@sword-code-practice/sword-plugin-log": "workspace:*",
     "@sword-code-practice/sword-plugin-server": "workspace:*",
-    "h3": "0.5.2",
+    "h3": "0.7.3",
     "tsbuffer-validator": "^2.1.0"
   }
 }
