@@ -23,7 +23,7 @@ export interface HttpContext<T extends ContextData = ContextData> {
 
 export type HttpInstructMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE';
 
-export type HttpInstruct = (path?: string) => HttpInstructReturn;
+export type HttpInstruct = (path?: `/${string}`) => HttpInstructReturn;
 export type HttpInstructReturn = {
   method: HttpInstructMethod;
   path?: string;
