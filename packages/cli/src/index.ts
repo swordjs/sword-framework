@@ -1,26 +1,29 @@
 #! /usr/bin/env node
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import { register } from '@swc-node/register/register';
 import dev from './dev';
 import build from './build';
 import init from './init';
 import mri from 'mri';
+import type { Config } from '../typings/config';
 
 type commands = 'dev' | 'build' | 'init';
 
 register({});
 
 async function main() {
-  const args = mri(process.argv.splice(2));
+  const args = mri<Config>(process.argv.splice(2), {
+    default: {
+      platform: 'server'
+    }
+  });
   const cliHandler = {
     dev,
     build,
     init
   };
   if (args._[0]) {
-    cliHandler[args._[0] as commands]();
+    cliHandler[args._[0] as commands](args);
   }
 }
 
