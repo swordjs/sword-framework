@@ -14,7 +14,7 @@ importers:
       eslint-config-prettier: ^8.5.0
       eslint-plugin-import: ^2.25.4
       eslint-plugin-prettier: ^3.4.1
-      h3: 0.5.2
+      h3: 0.7.3
       husky: ^7.0.4
       lint-staged: ^11.2.6
       prettier: ^2.6.2
@@ -27,7 +27,7 @@ importers:
     dependencies:
       '@sword-code-practice/sword-plugin-log': link:packages/log
       '@sword-code-practice/sword-plugin-server': link:packages/server
-      h3: 0.5.2
+      h3: 0.7.3
       tsbuffer-validator: 2.1.0
     devDependencies:
       '@swc-node/register': 1.4.2
@@ -45,7 +45,7 @@ importers:
       tsconfig-paths: 3.14.1
       typescript: 4.6.3
       unbuild: 0.7.2
-      vitest: 0.9.0
+      vitest: 0.9.3
 
   example:
     specifiers:
@@ -91,6 +91,12 @@ importers:
     devDependencies:
       '@types/download': 8.0.1
       typescript: 4.6.3
+      unbuild: 0.6.9
+
+  packages/cors:
+    specifiers:
+      unbuild: ^0.6.9
+    devDependencies:
       unbuild: 0.6.9
 
   packages/faas-uni:
@@ -542,6 +548,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@swc/core-darwin-x64/1.2.163:
@@ -2336,8 +2343,8 @@ packages:
   /graceful-fs/4.2.10:
     resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
 
-  /h3/0.5.2:
-    resolution: {integrity: sha512-WbqBgbEvYpnAgh+0StSEYJOnyvEV+vzHu5A6o8Vm3hn+DrPi2yvdzrry1A9bemj7WduypPrQ3LuUMFsXUq08yQ==}
+  /h3/0.7.3:
+    resolution: {integrity: sha512-4Gz3vukxfZC53pMDfmzUI7mSb3HUqId6tmnrDGck9HuXQzG09tDWOOigfnIFODZrYmySaCUg7OnNnplrsoogKw==}
     dependencies:
       cookie-es: 0.5.0
       destr: 1.1.0
@@ -3752,8 +3759,8 @@ packages:
     engines: {node: '>=14.0.0'}
     dev: true
 
-  /tinyspy/0.3.1:
-    resolution: {integrity: sha512-XXD1NYn5HciffxgxlHmOzq45tTNKRtPHss5go1ZAQmX9LLBIszXLG+NEpnD0shS2F2OMcQ9VSk7IswEeViCrbw==}
+  /tinyspy/0.3.2:
+    resolution: {integrity: sha512-2+40EP4D3sFYy42UkgkFFB+kiX2Tg3URG/lVvAZFfLxgGpnWl5qQJuBw1gaLttq8UOS+2p3C0WrhJnQigLTT2Q==}
     engines: {node: '>=14.0.0'}
     dev: true
 
@@ -4027,8 +4034,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitest/0.9.0:
-    resolution: {integrity: sha512-WyNY35WGRqtW/hd00FPgsnatDxKrRzEWVLS36KPbSFqAOn3HHtV+4/ihiPBaDAzAKtr6/eT52x+7kobUXa59TA==}
+  /vitest/0.9.3:
+    resolution: {integrity: sha512-hKjqdBI732cV5giNLERyAsaJBebstrX5mvTbZr+jUDYUHnX1O4DpAJcHtqBOutuBi7lVIGQ5IF8eWvHHqbCHBA==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:
@@ -4051,7 +4058,7 @@ packages:
       chai: 4.3.6
       local-pkg: 0.4.1
       tinypool: 0.1.2
-      tinyspy: 0.3.1
+      tinyspy: 0.3.2
       vite: 2.9.1
     transitivePeerDependencies:
       - less
