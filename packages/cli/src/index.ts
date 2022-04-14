@@ -4,10 +4,11 @@ import { register } from '@swc-node/register/register';
 import dev from './dev';
 import build from './build';
 import init from './init';
+import doc from './doc';
 import mri from 'mri';
 import type { Config } from '../typings/config';
 
-type commands = 'dev' | 'build' | 'init';
+type commands = 'dev' | 'build' | 'init' | 'doc';
 
 register({});
 
@@ -20,7 +21,8 @@ async function main() {
   const cliHandler = {
     dev,
     build,
-    init
+    init,
+    doc
   };
   if (args._[0]) {
     cliHandler[args._[0] as commands](args);
