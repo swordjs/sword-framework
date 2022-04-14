@@ -17,7 +17,8 @@
     "async": "npm run build && yalc push",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:cli:dev": "node ./lib/index.cjs dev",
-    "test:cli:init": "node ./lib/index.cjs init"
+    "test:cli:init": "node ./lib/index.cjs init",
+    "test:cli:doc": "node ./lib/index.cjs doc"
   },
   "bin": {
     "sword": "./lib/index.cjs"

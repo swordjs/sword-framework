@@ -3,7 +3,7 @@ import { ChildProcess, spawn } from 'child_process';
 import { resolve } from 'path';
 import chokidar from 'chokidar';
 import { debounce } from './util';
-import { generateProtoSchema } from './util/proto';
+import { generateSchema } from './util/proto';
 import { writeFileRecursive } from './util/file';
 import log from './log';
 import type { Argv } from 'mri';
@@ -105,7 +105,7 @@ const listenApiSource = () => {
       'all',
       debounce(async (event: any, path: string) => {
         // 重新编译proto.json
-        await generateProtoSchema(resolve(process.cwd(), `./src/proto.json`));
+        await generateSchema(resolve(process.cwd(), `./src/proto.json`));
         restart();
         switch (event) {
           case 'addDir':
@@ -145,7 +145,7 @@ const listenIndex = () => {
 export default async (args: Argv<Config>) => {
   try {
     // 生成protoschema到指定目录, proto schema为sword runtime提供验证服务
-    await generateProtoSchema(resolve(process.cwd(), `./src/proto.json`));
+    await generateSchema(resolve(process.cwd(), `./src/proto.json`));
     // 判断platform
     switch (args.platform) {
       case 'server':

@@ -73,7 +73,7 @@ export const getProtoMap = async (
  *   protoAst: Record<string, Record<string, unknown>>;
  * }>}
  */
-export const generateProtoSchema = async (
+export const generateSchema = async (
   outPath: string | null,
   options = {
     keepComment: false

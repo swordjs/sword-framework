@@ -4,7 +4,7 @@ import esbuild from 'esbuild';
 import { delDir } from './util/file';
 import log from './log';
 import { writeFileRecursive } from './util/file';
-import { generateProtoSchema } from './util/proto';
+import { generateSchema } from './util/proto';
 import type { Argv } from 'mri';
 import type { Config } from '../typings/config';
 
@@ -16,7 +16,7 @@ const build = async (args: Argv<Config>) => {
   writeFileRecursive(resolve(process.cwd(), `${buildRootPath}/package.json`), readFileSync(resolve(process.cwd(), 'package.json')).toString());
   // 编译proto，并且把json输出到.sword目录中
   // apiPaths是代表了有效api的index.ts路径，我们只需要把路径传递给esbuild即可
-  const { apiPaths } = await generateProtoSchema(resolve(process.cwd(), `${buildRootPath}/src/proto.json`));
+  const { apiPaths } = await generateSchema(resolve(process.cwd(), `${buildRootPath}/src/proto.json`));
   // 使用esbuild构建
   esbuild
     .build({
