@@ -206,7 +206,7 @@ const readBodyPayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'];
  * @param {string} dirName
  */
 export const implementApi = async (app: App) => {
-  // 获取apimap以及proto map
+  // 获取apimap
   const { apiMap } = await getApiMap();
   const router = createRouter();
   // 获取proto schema
