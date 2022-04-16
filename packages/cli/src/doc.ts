@@ -1,6 +1,7 @@
 import { writeFileRecursive } from './util/file';
 import { generateSchema } from './util/proto';
 import { getApiMap } from '../../../src/core/map';
+import log from './log';
 import type { Argv } from 'mri';
 import type { Config } from '../typings/config';
 import type { Map } from '../../../src/core/map';
@@ -49,34 +50,40 @@ let apiMap: Record<string, Map> = {};
 const markdownMap: Record<string, string> = {};
 
 export default async (args: Argv<Config>) => {
-  // 生成api数据，用于获取指示器等详细api信息
-  const { apiMap: map } = await getApiMap();
-  apiMap = map;
-  // 生成ast数据
-  const { protoAst } = await generateSchema(null, {
-    keepComment: true
-  });
-  // 循环ast中的每一个key
-  for (const key in protoAst) {
-    // key 为 api
-    // 判断parentRoute是否存在
-    // 通过key解析出api后的第一个路由作为父路由
-    const parentRoute = key.split('/')[2];
-    if (!markdownMap[parentRoute]) {
-      markdownMap[parentRoute] = ``;
+  try {
+    log.info('开始生成文档');
+    // 生成api数据，用于获取指示器等详细api信息
+    const { apiMap: map } = await getApiMap();
+    apiMap = map;
+    // 生成ast数据
+    const { protoAst } = await generateSchema(null, {
+      keepComment: true
+    });
+    // 循环ast中的每一个key
+    for (const key in protoAst) {
+      // key 为 api
+      // 判断parentRoute是否存在
+      // 通过key解析出api后的第一个路由作为父路由
+      const parentRoute = key.split('/')[2];
+      if (!markdownMap[parentRoute]) {
+        markdownMap[parentRoute] = ``;
+      }
+      const protoData = protoAst[key];
+      const result: transProtoReturn = {
+        url: key,
+        ReqParams: [],
+        ReqQuery: [],
+        Res: []
+      } as any;
+      transAst(protoData, result);
+      // 编译markdown文档
+      markdownMap[parentRoute] += await compileMarkdown(result, markdownMap[parentRoute]);
     }
-    const protoData = protoAst[key];
-    const result: transProtoReturn = {
-      url: key,
-      ReqParams: [],
-      ReqQuery: [],
-      Res: []
-    } as any;
-    transAst(protoData, result);
-    // 编译markdown文档
-    markdownMap[parentRoute] += await compileMarkdown(result, markdownMap[parentRoute]);
+    outputMarkdown();
+  } catch (error) {
+    log.err('生成文档错误');
+    throw new Error(error);
   }
-  outputMarkdown();
 };
 
 // 从ast转换数据
@@ -185,4 +192,5 @@ const outputMarkdown = async () => {
     str += `## ${key} \n ${markdownMap[key]}`;
   }
   writeFileRecursive(resolve(process.cwd(), `docs`, `api.md`), str);
+  log.success('生成markdown成功');
 };
