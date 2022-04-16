@@ -59,12 +59,11 @@ export default async (args: Argv<Config>) => {
   // 循环ast中的每一个key
   for (const key in protoAst) {
     // key 为 api
+    // 判断parentRoute是否存在
     // 通过key解析出api后的第一个路由作为父路由
     const parentRoute = key.split('/')[2];
-    // 给markdown拼接父标题
-    // 判断parentRoute是否存在
     if (!markdownMap[parentRoute]) {
-      markdownMap[parentRoute] = `## ${parentRoute}`;
+      markdownMap[parentRoute] = ``;
     }
     const protoData = protoAst[key];
     const result: transProtoReturn = {
@@ -149,10 +148,6 @@ const parseComment = (proto: Proto, result: transProtoReturn, acceptProtoName: A
 
 // 编译markdown文档
 const compileMarkdown = async (result: transProtoReturn, markdown: string) => {
-  // 通过key去匹配apimap的key，如果匹配成功，获取指示器的详细信息
-  if (apiMap[result.url]) {
-    apiMap[result.url].method;
-  }
   const handleMarkdownTable = (data: PropertiesAstReturn) => {
     return data.map((item) => `| ${item.name || '暂无'} | ${item.type.type} | ${item.type.title || '暂无'} | ${item.type.desc} |`).join('\n');
   };
@@ -186,7 +181,8 @@ const compileMarkdown = async (result: transProtoReturn, markdown: string) => {
 const outputMarkdown = async () => {
   let str = '';
   for (const key in markdownMap) {
-    str += markdownMap[key];
+    // 给markdown拼接父标题
+    str += `## ${key} \n ${markdownMap[key]}`;
   }
   writeFileRecursive(resolve(process.cwd(), `docs`, `api.md`), str);
 };
