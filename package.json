@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/sword-framework",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "",
   "types": "./lib/index.d.ts",
   "publishConfig": {
@@ -21,8 +21,9 @@
     "build": "unbuild",
     "async": "npm run build && yalc push",
     "test": "vitest run",
-    "publish:packages": "node -r @swc-node/register scripts/publish-packages.ts",
-    "publish:main": "pnpm publish --no-git-checks"
+    "publish:main": "pnpm publish --no-git-checks",
+    "publish:packages": "node scripts/publish-packages.mjs",
+    "kill-port": "node scripts/kill-port.mjs"
   },
   "repository": {
     "type": "git",

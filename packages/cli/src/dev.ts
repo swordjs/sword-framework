@@ -3,9 +3,11 @@ import { ChildProcess, spawn } from 'child_process';
 import { resolve } from 'path';
 import chokidar from 'chokidar';
 import { debounce } from './util';
-import { generateProtoSchema } from './util/proto';
+import { generateSchema } from './util/proto';
 import { writeFileRecursive } from './util/file';
 import log from './log';
+import type { Argv } from 'mri';
+import type { Config } from '../typings/config';
 
 let indexcp: ChildProcess | null = null;
 
@@ -93,36 +95,40 @@ export const main = useApi<{
  * @param {Config} config
  */
 const listenApiSource = () => {
-  log.info(`正在监听工程中的src/api文件夹...`);
-  const watcher = chokidar.watch(resolve('src', 'api'), {
-    ignoreInitial: true,
-    atomic: 1000
-  });
-  watcher.on(
-    'all',
-    debounce(async (event: any, path: string) => {
-      // 重新编译proto.json
-      await generateProtoSchema(resolve(process.cwd(), `./src/proto.json`));
-      restart();
-      switch (event) {
-        case 'addDir':
-          // 当文件夹约定一个规则，比如下划线开头，那么将会自动生成proto.ts 以及初始化的hook函数
-          const prefix = '_';
-          // 新增文件夹名称
-          const dir = path.substring(path.lastIndexOf('/') + 1);
-          // 父级目录，比如当前创建的文件夹有父级别，那么就是字符串api之后且dir之间的路径，我们需要把资源产出到正确的目录中
-          const parentDir = path.substring(path.lastIndexOf('api') + 3, path.lastIndexOf(dir));
-          // 判断当前新建的文件夹是否有前缀
-          if (prefix === dir[0]) {
-            // 自动生成预设置
-            generatePreset('src', parentDir, dir);
-          }
-          break;
-        case 'change':
-          log.info(`[重新编译]触发文件:${path}`);
-      }
-    }, 500)
-  );
+  try {
+    log.info(`正在监听工程中的src/api文件夹...`);
+    const watcher = chokidar.watch(resolve('src', 'api'), {
+      ignoreInitial: true,
+      atomic: 1000
+    });
+    watcher.on(
+      'all',
+      debounce(async (event: any, path: string) => {
+        // 重新编译proto.json
+        await generateSchema(resolve(process.cwd(), `./src/proto.json`));
+        restart();
+        switch (event) {
+          case 'addDir':
+            // 当文件夹约定一个规则，比如下划线开头，那么将会自动生成proto.ts 以及初始化的hook函数
+            const prefix = '_';
+            // 新增文件夹名称
+            const dir = path.substring(path.lastIndexOf('/') + 1);
+            // 父级目录，比如当前创建的文件夹有父级别，那么就是字符串api之后且dir之间的路径，我们需要把资源产出到正确的目录中
+            const parentDir = path.substring(path.lastIndexOf('api') + 3, path.lastIndexOf(dir));
+            // 判断当前新建的文件夹是否有前缀
+            if (prefix === dir[0]) {
+              // 自动生成预设置
+              generatePreset('src', parentDir, dir);
+            }
+            break;
+          case 'change':
+            log.info(`[重新编译]触发文件:${path}`);
+        }
+      }, 500)
+    );
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 // 监听入口文件
@@ -136,16 +142,25 @@ const listenIndex = () => {
   });
 };
 
-export default async () => {
+export default async (args: Argv<Config>) => {
   try {
-    // 执行index.ts
-    start();
     // 生成protoschema到指定目录, proto schema为sword runtime提供验证服务
-    generateProtoSchema(resolve(process.cwd(), `./src/proto.json`));
+    await generateSchema(resolve(process.cwd(), `./src/proto.json`));
+    // 判断platform
+    switch (args.platform) {
+      case 'server':
+        start();
+        break;
+      case 'unicloud':
+        break;
+      default:
+        break;
+    }
     listenIndex();
     // 监听资源文件夹下的api文件夹
     listenApiSource();
   } catch (e) {
-    throw log.err(new Error(e as any));
+    log.err(e);
+    indexcp && indexcp.kill();
   }
 };

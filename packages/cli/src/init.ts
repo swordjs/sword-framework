@@ -5,8 +5,10 @@ import download from 'download';
 import { spawnSync } from 'child_process';
 import consola from 'consola';
 import { existsSync } from 'fs';
+import type { Argv } from 'mri';
+import type { Config } from '../typings/config';
 
-export default async () => {
+export default async (args: Argv<Config>) => {
   const project = await prompt({
     type: 'input',
     name: 'value',

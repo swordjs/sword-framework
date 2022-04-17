@@ -62,24 +62,44 @@ export const getProtoMap = async (
 
 /**
  *
- * 生成protoschema到指定目录中
- * @param {string} outPath
- * @return {*}  {Promise<string[]>}
+ * 检索资源目录生成api路径数组 & protoMap & proto ast树
+ * @param {(string | null)} outPath
+ * @param {boolean} [options={
+ *     keepComment: false
+ *   }]
+ * @return {*}  {Promise<{
+ *   apiPaths: string[];
+ *   protoMap: Record<string, string>;
+ *   protoAst: Record<string, Record<string, unknown>>;
+ * }>}
  */
-export const generateProtoSchema = async (outPath: string): Promise<string[]> => {
+export const generateSchema = async (
+  outPath: string | null,
+  options = {
+    keepComment: false
+  }
+): Promise<{
+  apiPaths: string[];
+  protoMap: Record<string, string>;
+  protoAst: Record<string, Record<string, unknown>>;
+}> => {
   const { protoMap: _protoMap, apiPaths } = await getProtoMap();
   const result: Record<string, Record<string, unknown>> = {};
-  for (const key in _protoMap) {
-    const generator = new TSBufferProtoGenerator();
-    result[key] = await generator.generate(_protoMap[key]);
-  }
-  // 生成proto json文件到指定目录
-  await writeFileRecursive(outPath, JSON.stringify(result))
-    .then(() => {
+  try {
+    for (const key in _protoMap) {
+      const generator = new TSBufferProtoGenerator({
+        keepComment: options.keepComment
+      });
+      result[key] = await generator.generate(_protoMap[key]);
+    }
+    // 判断outPath是否存在，如果存在，就把proto输出到指定目录
+    if (outPath) {
+      // 生成proto json文件到指定目录
+      await writeFileRecursive(outPath, JSON.stringify(result));
       log.success('Proto加载成功');
-    })
-    .catch((e) => {
-      log.err(`Proto加载错误, ${JSON.stringify(e)}`);
-    });
-  return apiPaths;
+    }
+  } catch (error) {
+    throw new Error('Proto加载错误');
+  }
+  return { apiPaths, protoMap: _protoMap, protoAst: result };
 };

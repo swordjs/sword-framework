@@ -14,5 +14,5 @@ export default {
   },
   success: (v: string) => {
     consola.success(v);
-  },
+  }
 };

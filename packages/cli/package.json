@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/backend-cli",
-  "version": "0.0.1-rc.19",
+  "version": "1.0.0",
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
@@ -17,7 +17,8 @@
     "async": "npm run build && yalc push",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:cli:dev": "node ./lib/index.cjs dev",
-    "test:cli:init": "node ./lib/index.cjs init"
+    "test:cli:init": "node ./lib/index.cjs init",
+    "test:cli:doc": "node ./lib/index.cjs doc"
   },
   "bin": {
     "sword": "./lib/index.cjs"
@@ -35,6 +36,7 @@
   "homepage": "https://github.com/swordCodePractice/backend-cli#readme",
   "devDependencies": {
     "@types/download": "^8.0.1",
+    "openapi-types": "^11.0.0",
     "typescript": "^4.3.5",
     "unbuild": "^0.6.9"
   },
