@@ -12,6 +12,7 @@
 - 🐮 使用同样超快的 [Swc](https://swc.rs/) 编译开发程序
 - 📦 创建预设模板
 - 🪤 灵活的开发以及部署环境
+- 📃 生成api文档
 - 🧬 对框架 Runtime 作编译补全工作
 
 ## 命令
@@ -25,4 +26,6 @@ sword build
 sword serve
 # 开发环境运行
 sword dev
+# 生成api文档
+sword doc
 ```
