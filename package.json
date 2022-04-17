@@ -21,7 +21,7 @@
     "build": "unbuild",
     "async": "npm run build && yalc push",
     "test": "vitest run",
-    "publish:main": "pnpm publish --no-git-checks",
+    "publish:main": "pnpm publish --no-git-checks && open https://npmmirror.com/sync/@sword-code-practice/sword-framework",
     "publish:packages": "node scripts/publish-packages.mjs",
     "kill-port": "node scripts/kill-port.mjs"
   },
