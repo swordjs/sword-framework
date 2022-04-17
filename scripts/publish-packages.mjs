@@ -3,17 +3,17 @@ import { readdirSync, readFile } from 'fs';
 import { resolve } from 'path';
 
 // 遍历packages
-const packages = readdirSync(resolve(__dirname, '../packages'));
+const packages = readdirSync(resolve('packages'));
 
 packages.forEach((pkg) => {
   if (['.DS_Store', 'README.md'].includes(pkg)) return;
-  spawn('pnpm', ['publish', resolve(__dirname, '../packages', pkg), '--no-git-checks'], {}).on('close', (code) => {
+  spawn('pnpm', ['publish', resolve('packages', pkg), '--no-git-checks'], {}).on('close', (code) => {
     if (code !== 0) {
       console.error(`${pkg} publish failed`);
     } else {
       console.log(`${pkg} publish success`);
       // // 读取package下的package.json
-      readFile(resolve(__dirname, '../packages', pkg, 'package.json'), 'utf8', (err, data) => {
+      readFile(resolve('packages', pkg, 'package.json'), 'utf8', (err, data) => {
         if (err) {
           console.error(err);
           return;
