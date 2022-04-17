@@ -1,11 +1,14 @@
+import { access, readFileSync, constants } from 'fs';
 import { writeFileRecursive } from './util/file';
 import { generateSchema } from './util/proto';
 import { getApiMap } from '../../../src/core/map';
 import log from './log';
+import { resolve } from 'path';
+import { OpenAPIV3_1 } from 'openapi-types';
 import type { Argv } from 'mri';
 import type { Config } from '../typings/config';
 import type { Map } from '../../../src/core/map';
-import { resolve } from 'path';
+import { cwd } from 'process';
 
 type AccepptProtoName = ['ReqParams', 'ReqQuery', 'Res'];
 
@@ -15,6 +18,7 @@ type Proto = {
   properties?: {
     id: number;
     name: string;
+    optional?: boolean;
     type: {
       type: string;
       comment?: string;
@@ -30,6 +34,7 @@ type PropertiesAstReturn = {
     type: string;
     title?: string;
     desc?: string;
+    optional?: boolean;
   };
 }[];
 
@@ -49,6 +54,41 @@ let apiMap: Record<string, Map> = {};
 // 定义一个以父路由为key，value为markdown文档的对象
 const markdownMap: Record<string, string> = {};
 
+// 读取packagejson信息
+const getPackageJson = () => {
+  return new Promise((r, j) => {
+    // 判断是否存在packagejson
+    access(resolve(cwd(), 'package.json'), constants.F_OK, (err) => {
+      if (err) {
+        // 不存在
+        j('根目录没有package.json文件，生成openapi失败');
+      } else {
+        try {
+          const packageInfo = JSON.parse(readFileSync(resolve(cwd(), 'package.json')).toString());
+          r(packageInfo);
+        } catch (error) {
+          j(error);
+        }
+      }
+    });
+  });
+};
+
+// 定义一个openapi格式的json
+const openApiJson: OpenAPIV3_1.Document = {
+  openapi: '3.0.1',
+  info: {
+    title: '',
+    description: '',
+    version: ''
+  },
+  tags: [],
+  paths: {},
+  components: {
+    schemas: {}
+  }
+};
+
 export default async (args: Argv<Config>) => {
   try {
     log.info('开始生成文档');
@@ -59,7 +99,6 @@ export default async (args: Argv<Config>) => {
     const { protoAst } = await generateSchema(null, {
       keepComment: true
     });
-    // 循环ast中的每一个key
     for (const key in protoAst) {
       // key 为 api
       // 判断parentRoute是否存在
@@ -78,8 +117,29 @@ export default async (args: Argv<Config>) => {
       transAst(protoData, result);
       // 编译markdown文档
       markdownMap[parentRoute] += await compileMarkdown(result, markdownMap[parentRoute]);
+      // 编译openapi文档
+      openApiJson.paths[key] = await compileOpenApi(result, parentRoute);
+      // 给openapi中的tags字段写入parentRoute
+      if (!openApiJson.tags.find((t) => t.name === parentRoute)) {
+        openApiJson.tags.push({
+          name: parentRoute
+        });
+      }
     }
     outputMarkdown();
+    outputOpenApi();
+    // 处理packagejson
+    try {
+      const packageInfo = await getPackageJson();
+      // 给openapi的info赋值
+      for (const key in openApiJson.info) {
+        if (packageInfo[key]) {
+          openApiJson.info[key] = packageInfo[key];
+        }
+      }
+    } catch (error) {
+      log.err(error);
+    }
   } catch (error) {
     log.err('生成文档错误');
     throw new Error(error);
@@ -145,7 +205,8 @@ const parseComment = (proto: Proto, result: transProtoReturn, acceptProtoName: A
         type: {
           type: property.type.type,
           title,
-          desc
+          desc,
+          optional: property.optional
         }
       });
     }
@@ -156,7 +217,12 @@ const parseComment = (proto: Proto, result: transProtoReturn, acceptProtoName: A
 // 编译markdown文档
 const compileMarkdown = async (result: transProtoReturn, markdown: string) => {
   const handleMarkdownTable = (data: PropertiesAstReturn) => {
-    return data.map((item) => `| ${item.name || '暂无'} | ${item.type.type} | ${item.type.title || '暂无'} | ${item.type.desc} |`).join('\n');
+    return data
+      .map(
+        (item) =>
+          `| ${!item.type.optional && item.name ? '*' : ''}${item.name || '暂无'} | ${item.type.type} | ${item.type.title || '暂无'} | ${item.type.desc} |`
+      )
+      .join('\n');
   };
   // 拼接内容
   markdown += `
@@ -184,6 +250,87 @@ const compileMarkdown = async (result: transProtoReturn, markdown: string) => {
   return markdown;
 };
 
+// 编译openapi
+const compileOpenApi = (result: transProtoReturn, parentRoute: string): OpenAPIV3_1.Document['paths'] => {
+  const apiResult: OpenAPIV3_1.Document['paths'] = {};
+  const assignObjArray = (data: Record<string, unknown>[]) => {
+    const res = {};
+    // 循环data
+    for (const item of data) {
+      for (const key in item) {
+        res[key] = item[key];
+      }
+    }
+    return res;
+  };
+  // key为该api的methods
+  apiMap[result.url].method.map((m) => {
+    apiResult[m.toLowerCase()] = {
+      summary: result.title,
+      description: result.desc,
+      parameters: result.ReqQuery.map((query) => {
+        return {
+          name: query.name,
+          title: query.type.title,
+          description: query.type.desc,
+          in: 'query',
+          required: !query.type.optional,
+          schema: {
+            type: query.type.type.toLowerCase() as any
+          }
+        };
+      }),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      requestBody: {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: assignObjArray(
+                result.ReqParams.map((param) => {
+                  return {
+                    [param.name]: {
+                      title: param.type.title,
+                      description: param.type.desc,
+                      type: param.type.type.toLowerCase() as any
+                    }
+                  };
+                })
+              ),
+              required: result.ReqParams.filter((param) => !param.type.optional && param.name).map((param) => param.name)
+            }
+          }
+        }
+      },
+      responses: {
+        '200': {
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: assignObjArray(
+                  result.Res.map((res) => {
+                    return {
+                      [res.name]: {
+                        title: res.type.title,
+                        description: res.type.desc,
+                        type: res.type.type.toLowerCase() as any
+                      }
+                    };
+                  })
+                ),
+                required: result.Res.filter((param) => !param.type.optional && param.name).map((param) => param.name)
+              }
+            }
+          }
+        }
+      }
+    };
+  });
+  return apiResult;
+};
+
 // 输出markdown文档到指定目录
 const outputMarkdown = async () => {
   let str = '';
@@ -193,4 +340,10 @@ const outputMarkdown = async () => {
   }
   writeFileRecursive(resolve(process.cwd(), `docs`, `api.md`), str);
   log.success('生成markdown成功');
+};
+
+// 输出openapi文档到指定目录
+const outputOpenApi = async () => {
+  writeFileRecursive(resolve(process.cwd(), `docs`, `openapi.json`), JSON.stringify(openApiJson));
+  log.success('生成openapi.json成功');
 };

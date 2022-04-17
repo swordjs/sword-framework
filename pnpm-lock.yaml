@@ -71,6 +71,7 @@ importers:
       mri: ^1.2.0
       mv: ^2.1.1
       ohmyfetch: ^0.4.15
+      openapi-types: ^11.0.0
       tsbuffer-proto-generator: ^1.7.0
       typescript: ^4.3.5
       unbuild: ^0.6.9
@@ -90,6 +91,7 @@ importers:
       unconfig: 0.3.2
     devDependencies:
       '@types/download': 8.0.1
+      openapi-types: 11.0.0
       typescript: 4.6.3
       unbuild: 0.6.9
 
@@ -3088,6 +3090,10 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       mimic-fn: 2.1.0
+    dev: true
+
+  /openapi-types/11.0.0:
+    resolution: {integrity: sha512-GB+QO6o1hAtKsb8tP3/FTD5jpkdKrf42L4Gel9UySngMurzr+Q9pO+dtnmySQCzoCEfJr39IH6bveEn71xNcVg==}
     dev: true
 
   /optionator/0.9.1:
