@@ -8,10 +8,15 @@ import error from './error';
 import { isJSON } from '../util/data';
 import { log } from './log';
 import { aggregatePlugin } from './plugin';
+import { parseCommandArgs } from './config';
 import type { App } from 'h3';
 import type { HttpContext, UnPromisify } from '../../typings/index';
 import type { ValidateProto } from './validate';
 import type { InterruptPipelineResult } from './pipeline';
+import type { Map } from './map';
+
+// 获取command args
+const commandArgs = parseCommandArgs();
 
 // 具体的proto schema引用
 let protoSchema: Record<string, Record<string, unknown>> | null = null;
@@ -208,82 +213,18 @@ const readBodyPayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'];
 export const implementApi = async (app: App) => {
   // 获取apimap
   const { apiMap } = await getApiMap();
-  const router = createRouter();
   // 获取proto schema
   getProtoSchema();
-  for (const key in apiMap) {
-    // key: api value: path
-    router.add(
-      key,
-      async (event: CompatibilityEvent) => {
-        const { req, res } = event;
-        logMap.REQUEST_URL(key);
-        // url query参数
-        const query = isJSON(await useQuery(req));
-        // 只有在一些有效的方法中，才能解析body
-        let params = {};
-        if (readBodyPayloadMethods.includes(req.method as string)) {
-          const parserBody = await useBody(req);
-          params = parserBody === '' ? {} : parserBody;
-        }
-        params = isJSON(params);
-        // 构造context
-        let context = createContext({
-          key,
-          query,
-          params,
-          reqHeaders: req.headers,
-          resHeaders: {}, // 返回请求头默认为空
-          method: apiMap[key].method
-        });
-        const _res = apiMap[key];
-        // 校验method
-        const validateMethodResult = handleValidateMethod(context, event, req);
-        if (!validateMethodResult) return validateMethodResult;
-        // 获取符合要求的proto
-        const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
-        // 校验请求proto，如果成功则会执行回调
-        return handleValidateRequestProto(context, { proto: reqParamsProto, data: params }, { proto: reqQueryProto, data: query }, res, async () => {
-          // 执行pipeline
-          const preApiCallExecResult = await exec('preApiCall', context);
-          if (handleExecError(preApiCallExecResult, event)) {
-            // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
-            if (!(preApiCallExecResult instanceof Error)) {
-              // 处理PreApiCall Pipline
-              const { context: preApiCallContext, returnData: preApiCallReturnData } = handlePreApiCall(preApiCallExecResult, context, event);
-              // 判断returndata是否存在, 如果存在，则直接返回
-              if (preApiCallReturnData) return preApiCallReturnData;
-              // 经过pipeline后的context需要重新赋值
-              context = preApiCallContext;
-              logMap.REQUEST_QUERY(JSON.stringify(context.query));
-              logMap.REQUEST_PARAMS(JSON.stringify(context.params));
-              // 执行handler
-              const _handlerRes = await _res.handler(context);
-              // 执行pipeline
-              const postApiCallExecResult = await exec('postApiCall', context);
-              if (handleExecError(postApiCallExecResult, event)) {
-                if (!(postApiCallExecResult instanceof Error)) {
-                  const { returnData: postApiCallReturnData } = handlePostApiCall(postApiCallExecResult, context, event);
-                  if (postApiCallReturnData) return postApiCallReturnData;
-                  // 校验返回结果是否符合预期
-                  const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
-                  if (!resProtoResult.isSucc) {
-                    // 如果返回结果不符合预期，就抛出错误
-                    logMap.RESPONSE_TYPE_ERROR(JSON.stringify(resProtoResult.errMsg));
-                    return sendError(event, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
-                  }
-                }
-              }
-              logMap.RESPONSE_RESULT(typeof _handlerRes === 'undefined' ? '{}' : JSON.stringify(_handlerRes));
-              return _handlerRes;
-            }
-          }
-        });
-      },
-      apiMap[key].method.map((m) => m.toLowerCase()) as any[]
-    );
+  // 判断当前的command args platform
+  // 根据不同的platform
+  if (commandArgs.platform === 'server') {
+    const router = createRouter();
+    for (const key in apiMap) {
+      // key: api value: path
+      router.add(key, async (event: CompatibilityEvent) => routerHandler(key, apiMap, event), apiMap[key].method.map((m) => m.toLowerCase()) as any[]);
+    }
+    app.use(router);
   }
-  app.use(router);
 };
 
 /**
@@ -322,4 +263,78 @@ const getProtoSchema = async () => {
   if (schema) {
     protoSchema = JSON.parse(schema) as any;
   }
+};
+
+/**
+ *
+ * 通用路由处理函数
+ * @param {string} key
+ * @param {Record<string, Map>} apiMap
+ * @param {CompatibilityEvent} event
+ * @return {*}
+ */
+const routerHandler = async (key: string, apiMap: Record<string, Map>, event: CompatibilityEvent) => {
+  const { req, res } = event;
+  logMap.REQUEST_URL(key);
+  // url query参数
+  const query = isJSON(await useQuery(req));
+  // 只有在一些有效的方法中，才能解析body
+  let params = {};
+  if (readBodyPayloadMethods.includes(req.method as string)) {
+    const parserBody = await useBody(req);
+    params = parserBody === '' ? {} : parserBody;
+  }
+  params = isJSON(params);
+  // 构造context
+  let context = createContext({
+    key,
+    query,
+    params,
+    reqHeaders: req.headers,
+    resHeaders: {}, // 返回请求头默认为空
+    method: apiMap[key].method
+  });
+  const _res = apiMap[key];
+  // 校验method
+  const validateMethodResult = handleValidateMethod(context, event, req);
+  if (!validateMethodResult) return validateMethodResult;
+  // 获取符合要求的proto
+  const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
+  // 校验请求proto，如果成功则会执行回调
+  return handleValidateRequestProto(context, { proto: reqParamsProto, data: params }, { proto: reqQueryProto, data: query }, res, async () => {
+    // 执行pipeline
+    const preApiCallExecResult = await exec('preApiCall', context);
+    if (handleExecError(preApiCallExecResult, event)) {
+      // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
+      if (!(preApiCallExecResult instanceof Error)) {
+        // 处理PreApiCall Pipline
+        const { context: preApiCallContext, returnData: preApiCallReturnData } = handlePreApiCall(preApiCallExecResult, context, event);
+        // 判断returndata是否存在, 如果存在，则直接返回
+        if (preApiCallReturnData) return preApiCallReturnData;
+        // 经过pipeline后的context需要重新赋值
+        context = preApiCallContext;
+        logMap.REQUEST_QUERY(JSON.stringify(context.query));
+        logMap.REQUEST_PARAMS(JSON.stringify(context.params));
+        // 执行handler
+        const _handlerRes = await _res.handler(context);
+        // 执行pipeline
+        const postApiCallExecResult = await exec('postApiCall', context);
+        if (handleExecError(postApiCallExecResult, event)) {
+          if (!(postApiCallExecResult instanceof Error)) {
+            const { returnData: postApiCallReturnData } = handlePostApiCall(postApiCallExecResult, context, event);
+            if (postApiCallReturnData) return postApiCallReturnData;
+            // 校验返回结果是否符合预期
+            const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
+            if (!resProtoResult.isSucc) {
+              // 如果返回结果不符合预期，就抛出错误
+              logMap.RESPONSE_TYPE_ERROR(JSON.stringify(resProtoResult.errMsg));
+              return sendError(event, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
+            }
+          }
+        }
+        logMap.RESPONSE_RESULT(typeof _handlerRes === 'undefined' ? '{}' : JSON.stringify(_handlerRes));
+        return _handlerRes;
+      }
+    }
+  });
 };
