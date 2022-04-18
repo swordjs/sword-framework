@@ -5,19 +5,14 @@ import dev from './dev';
 import build from './build';
 import init from './init';
 import doc from './doc';
-import mri from 'mri';
-import type { Config } from '../typings/config';
+import { parseCommandArgs } from '../../../src/core/config';
 
 type commands = 'dev' | 'build' | 'init' | 'doc';
 
 register({});
 
 async function main() {
-  const args = mri<Config>(process.argv.splice(2), {
-    default: {
-      platform: 'server'
-    }
-  });
+  const args = parseCommandArgs();
   const cliHandler = {
     dev,
     build,

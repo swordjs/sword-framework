@@ -6,11 +6,11 @@ import log from './log';
 import { writeFileRecursive } from './util/file';
 import { generateSchema } from './util/proto';
 import type { Argv } from 'mri';
-import type { Config } from '../typings/config';
+import type { CommandConfig } from '../../../typings/config';
 
 // build shim
 
-const build = async (args: Argv<Config>) => {
+const build = async (args: Argv<CommandConfig>) => {
   const buildRootPath = `./.sword/build/${args.platform}`;
   // 将packge.json输出到.sword目录中
   writeFileRecursive(resolve(process.cwd(), `${buildRootPath}/package.json`), readFileSync(resolve(process.cwd(), 'package.json')).toString());
@@ -38,7 +38,7 @@ const build = async (args: Argv<Config>) => {
     });
 };
 
-export default async (args: Argv<Config>) => {
+export default async (args: Argv<CommandConfig>) => {
   try {
     // 清空sword文件夹
     delDir(resolve(process.cwd(), '.sword'));

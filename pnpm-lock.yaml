@@ -17,6 +17,7 @@ importers:
       h3: 0.7.3
       husky: ^7.0.4
       lint-staged: ^11.2.6
+      mri: ^1.2.0
       prettier: ^2.6.2
       rimraf: ^3.0.2
       tsbuffer-validator: ^2.1.0
@@ -28,6 +29,7 @@ importers:
       '@sword-code-practice/sword-plugin-log': link:packages/log
       '@sword-code-practice/sword-plugin-server': link:packages/server
       h3: 0.7.3
+      mri: 1.2.0
       tsbuffer-validator: 2.1.0
     devDependencies:
       '@swc-node/register': 1.4.2
@@ -47,15 +49,17 @@ importers:
       unbuild: 0.7.2
       vitest: 0.9.3
 
-  example:
+  example/server:
     specifiers:
       '@sword-code-practice/backend-cli': latest
       '@sword-code-practice/sword-framework': latest
+      mri: ^1.2.0
       typescript: ^4.6.3
     dependencies:
-      '@sword-code-practice/sword-framework': link:..
+      '@sword-code-practice/sword-framework': link:../..
+      mri: 1.2.0
     devDependencies:
-      '@sword-code-practice/backend-cli': link:../packages/cli
+      '@sword-code-practice/backend-cli': link:../../packages/cli
       typescript: 4.6.3
 
   packages/cli:
@@ -68,7 +72,6 @@ importers:
       download: ^8.0.0
       enquirer: ^2.3.6
       esbuild: ^0.14.27
-      mri: ^1.2.0
       mv: ^2.1.1
       ohmyfetch: ^0.4.15
       openapi-types: ^11.0.0
@@ -84,7 +87,6 @@ importers:
       download: 8.0.0
       enquirer: 2.3.6
       esbuild: 0.14.31
-      mri: 1.2.0
       mv: 2.1.1
       ohmyfetch: 0.4.15
       tsbuffer-proto-generator: 1.7.0
@@ -97,28 +99,38 @@ importers:
 
   packages/cors:
     specifiers:
+      mri: ^1.2.0
       unbuild: ^0.6.9
+    dependencies:
+      mri: 1.2.0
     devDependencies:
       unbuild: 0.6.9
 
   packages/faas-uni:
-    specifiers: {}
+    specifiers:
+      mri: ^1.2.0
+    dependencies:
+      mri: 1.2.0
 
   packages/log:
     specifiers:
       chalk: 4.1.2
+      mri: ^1.2.0
       unbuild: ^0.6.9
     dependencies:
       chalk: 4.1.2
+      mri: 1.2.0
     devDependencies:
       unbuild: 0.6.9
 
   packages/server:
     specifiers:
       '@sword-code-practice/sword-plugin-log': workspace:*
+      mri: ^1.2.0
       unbuild: ^0.6.9
     dependencies:
       '@sword-code-practice/sword-plugin-log': link:../log
+      mri: 1.2.0
     devDependencies:
       unbuild: 0.6.9
 

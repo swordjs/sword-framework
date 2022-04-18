@@ -1,15 +1,15 @@
 import { loadConfig } from 'unconfig';
-import type { Config } from '../typings/config';
+import type { CommandConfig } from '../../../typings/config';
 
-export let configData: Config;
+export let configData: CommandConfig;
 
 // 默认配置的类型是非必选的config
-const defaultConfig: Required<Config> = {
+const defaultConfig: Required<CommandConfig> = {
   platform: 'server'
 };
 
 export const initConfig = async () => {
-  const { config } = await loadConfig<Config>({
+  const { config } = await loadConfig<CommandConfig>({
     sources: [
       {
         files: 'sword.config',
@@ -37,4 +37,4 @@ export const initConfig = async () => {
   configData = config;
 };
 
-export type { Config } from '../typings/config';
+export type { CommandConfig } from '../../../typings/config';
