@@ -12,13 +12,15 @@ type BuildOptions = {
   skipPackageJson?: boolean;
   outPath?: string;
   minify?: boolean;
+  inject?: string[];
 };
 
 // 默认的打包参数
 const defaultBuildOptions: BuildOptions = {
   skipPackageJson: false,
   outPath: `./.sword/build/server`,
-  minify: true
+  minify: true,
+  inject: ['./.sword/shim/process.js']
 };
 
 /**
@@ -60,7 +62,8 @@ export const build = async (
       platform: 'node',
       outdir: `${buildOptions.outPath}/src`,
       mainFields: ['module', 'main'],
-      minify: buildOptions.minify
+      minify: buildOptions.minify,
+      inject: buildOptions.inject
     })
     .then(() => {
       cb.success();
