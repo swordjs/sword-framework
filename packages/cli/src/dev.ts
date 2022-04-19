@@ -15,7 +15,7 @@ let indexcp: ChildProcess | null = null;
 
 /**
  * 使用@swc-node/register执行index.ts
- * @param {ConfigReturn} config
+ * @param {CommandConfigReturn} config
  */
 const start = (args: Argv<CommandConfig>) => {
   // 判断如果platform是server，则执行server端的dev
