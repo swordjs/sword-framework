@@ -5,8 +5,9 @@ import chokidar from 'chokidar';
 import { debounce } from './util';
 import { generateSchema } from './util/proto';
 import { writeFileRecursive } from './util/file';
+import { dev as unicloudDev } from './platform/unicloud';
+
 import log from './log';
-import { dev } from './platform/unicloud';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
 
@@ -17,24 +18,28 @@ let indexcp: ChildProcess | null = null;
  * @param {ConfigReturn} config
  */
 const start = (args: Argv<CommandConfig>) => {
-  // 入口enrty ts 文件
-  indexcp = spawn(`node`, ['-r', '@swc-node/register', 'src/index.ts', '--platform=', args.platform], {
-    stdio: 'inherit'
-  });
-  indexcp.on('exit', (code) => {
-    if (code) {
-      // 错误
-      log.err(`执行入口文件错误`);
-    }
-  });
-  // 运行成功
-  log.info(`启动入口文件: src/index.ts`);
+  // 判断如果platform是server，则执行server端的dev
+  // server端的dev指的就是node直接运行index.ts文件
+  if (args.platform === 'server') {
+    // 入口enrty ts 文件
+    indexcp = spawn(`node`, ['-r', '@swc-node/register', 'src/index.ts', '--platform=', args.platform], {
+      stdio: 'inherit'
+    });
+    indexcp.on('exit', (code) => {
+      if (code) {
+        // 错误
+        log.err(`执行入口文件错误`);
+      }
+    });
+    // 运行成功
+    log.info(`启动入口文件: src/index.ts`);
+  } else if (args.platform === 'unicloud') unicloudDev(args);
 };
 
 // 重启服务器
 const restart = (args: Argv<CommandConfig>) => {
   // 重启服务器
-  log.info('重启服务器...');
+  log.info('重启服务...');
   // 杀掉现在的进程
   indexcp && indexcp.kill();
   setTimeout(() => {
