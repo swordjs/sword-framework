@@ -5,6 +5,7 @@ import dev from './dev';
 import build from './build';
 import init from './init';
 import doc from './doc';
+import { initConfig, configData } from './config';
 import { parseCommandArgs } from '../../../src/core/config';
 
 type commands = 'dev' | 'build' | 'init' | 'doc';
@@ -12,6 +13,9 @@ type commands = 'dev' | 'build' | 'init' | 'doc';
 register({});
 
 async function main() {
+  // 解析config参数
+  await initConfig();
+  // 解析命令行参数
   const args = parseCommandArgs();
   const cliHandler = {
     dev,
