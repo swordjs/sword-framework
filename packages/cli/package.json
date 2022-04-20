@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/backend-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
@@ -61,7 +61,10 @@
     "declaration": true,
     "rollup": {
       "emitCJS": true,
-      "cjsBridge": true
+      "cjsBridge": true,
+      "esbuild": {
+        "target": "node12"
+      }
     }
   }
 }

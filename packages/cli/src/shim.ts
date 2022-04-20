@@ -6,7 +6,7 @@ import { writeFileRecursive } from './util/file';
 export const processShim = () => {
   const shimPath = resolve(process.cwd(), './.sword/shim/process.js');
   const shim = `
-  // unicloud shim
+  // process shim
   process.argv = ${JSON.stringify(process.argv)}
   `;
   writeFileRecursive(shimPath, shim);
