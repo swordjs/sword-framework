@@ -6,6 +6,9 @@ export default defineBuildConfig({
   declaration: true,
   rollup: {
     emitCJS: true,
-    cjsBridge: true
+    cjsBridge: true,
+    esbuild: {
+      target: 'node12'
+    }
   }
 });
