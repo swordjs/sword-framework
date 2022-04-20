@@ -1,4 +1,4 @@
-import { createApp } from 'h3';
+import { createApp } from '@sword-code-practice/h3';
 import { aggregatePluginBehavior } from '../core/plugin';
 import { implementApi } from '../core/api';
 

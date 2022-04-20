@@ -1,4 +1,4 @@
-import { createError } from 'h3';
+import { createError } from '@sword-code-practice/h3';
 
 // 定义不同错误类型以及它们所代表的状态码
 // 定义错误类型

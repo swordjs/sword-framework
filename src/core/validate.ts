@@ -1,4 +1,4 @@
-import { isMethod } from 'h3';
+import { isMethod } from '@sword-code-practice/h3';
 import { useValidateProto } from '../hooks/proto';
 import type { HttpInstructMethod, HttpContext } from '../../typings/index';
 
