@@ -1,4 +1,4 @@
-import { isMethod } from '@sword-code-practice/h3';
+import { h3 } from './index';
 import { useValidateProto } from '../hooks/proto';
 import type { HttpInstructMethod, HttpContext } from '../../typings/index';
 
@@ -10,7 +10,7 @@ import type { HttpInstructMethod, HttpContext } from '../../typings/index';
  * @return {*}  {boolean}
  */
 export const validateMethod = (req: any, expected: HttpInstructMethod | HttpInstructMethod[]): boolean => {
-  return isMethod(req, expected);
+  return h3.isMethod(req, expected);
 };
 
 // 需要校验的proto节点

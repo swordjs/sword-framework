@@ -1,9 +1,6 @@
-import { createApp } from '@sword-code-practice/h3';
+import { h3Setup, h3 } from '../core/';
 import { aggregatePluginBehavior } from '../core/plugin';
 import { implementApi } from '../core/api';
-
-// 新建一个h3实例
-const app = createApp();
 
 /**
  *
@@ -18,7 +15,10 @@ const app = createApp();
  * init()
  * @return {*}
  */
-export const useApp = () => {
+export const useApp = async () => {
+  await h3Setup();
+  // 新建一个h3实例
+  const app = h3.createApp();
   // 整合插件
   const aggregatePlugin = aggregatePluginBehavior();
   // 返回app对象,并且返回一些实例，比如说启动http服务以及实现api

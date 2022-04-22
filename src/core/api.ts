@@ -1,4 +1,4 @@
-import { createRouter, useQuery, useBody, sendError, appendHeader, CompatibilityEvent } from 'h3';
+import { h3 } from './index';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { getApiMap } from './map';
@@ -8,8 +8,8 @@ import error from './error';
 import { isJSON } from '../util/data';
 import { log } from './log';
 import { aggregatePlugin } from './plugin';
-import { parseCommandArgs } from './config';
-import type { App } from 'h3';
+import { parseCommandArgs } from '../util/config';
+import type H3 from '@sword-code-practice/h3';
 import type { HttpContext, UnPromisify } from '../../typings/index';
 import type { ValidateProto } from './validate';
 import type { InterruptPipelineResult } from './pipeline';
@@ -39,10 +39,10 @@ const logMap = {
  * @param {CompatibilityEvent} event
  * @return {*}
  */
-const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event: CompatibilityEvent) => {
+const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event: H3.CompatibilityEvent) => {
   // 判断execresult的类型
   if (execResult instanceof Error) {
-    return sendError(event, error('PIPELINE_ERROR', execResult.message));
+    return h3.sendError(event, error('PIPELINE_ERROR', execResult.message));
   }
   return true;
 };
@@ -55,12 +55,12 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event
  * @param {any} req
  * @return {*}
  */
-const handleValidateMethod = (context: HttpContext, event: CompatibilityEvent, req: any) => {
+const handleValidateMethod = (context: HttpContext, event: H3.CompatibilityEvent, req: any) => {
   if (!validateMethod(req, context.method)) {
     // 如果校验method错误，就返回错误信息
     const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
     logMap.REQUEST_METHOD_ERROR(errMsg);
-    return sendError(event, error('VALIDATE_METHOD', errMsg));
+    return h3.sendError(event, error('VALIDATE_METHOD', errMsg));
   }
   return true;
 };
@@ -71,10 +71,10 @@ const handleValidateMethod = (context: HttpContext, event: CompatibilityEvent, r
  * @param {HttpContext} context
  * @param {CompatibilityEvent} event
  */
-const handleResHeaders = (context: HttpContext, event: CompatibilityEvent) => {
+const handleResHeaders = (context: HttpContext, event: H3.CompatibilityEvent) => {
   if (context.resHeaders) {
     Object.keys(context.resHeaders).forEach((key) => {
-      appendHeader(event, key, context.resHeaders[key] as string);
+      h3.appendHeader(event, key, context.resHeaders[key] as string);
     });
   }
 };
@@ -102,7 +102,7 @@ const handleValidateRequestProto = (context: HttpContext, params: ProtoData, que
   if (errorResult) {
     logMap.REQUEST_TYPE_ERROR(JSON.stringify(errorResult.errMsg));
     handleResHeaders(context, res);
-    return sendError(res, error('VALIDATE_REQUEST', errorResult.errMsg));
+    return h3.sendError(res, error('VALIDATE_REQUEST', errorResult.errMsg));
   } else {
     // proto检测成功的回调
     return cb();
@@ -150,7 +150,7 @@ const pipelineResultTypeMap = (
 const handlePreApiCall = (
   preApiCallExecResult: HttpContext | InterruptPipelineResult,
   context: HttpContext | InterruptPipelineResult,
-  event: CompatibilityEvent
+  event: H3.CompatibilityEvent
 ): { context: HttpContext; returnData: null | unknown } => {
   return pipelineResultTypeMap(preApiCallExecResult, context, {
     return: (context, returnData) => {
@@ -181,7 +181,7 @@ const handlePreApiCall = (
 const handlePostApiCall = (
   postApiCallExecResult: HttpContext | InterruptPipelineResult,
   context: HttpContext | InterruptPipelineResult,
-  event: CompatibilityEvent
+  event: H3.CompatibilityEvent
 ) => {
   return pipelineResultTypeMap(postApiCallExecResult, context, {
     return: (context, returnData) => {
@@ -210,7 +210,7 @@ const readBodyPayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'];
  * @param {App} app
  * @param {string} dirName
  */
-export const implementApi = async (app: App) => {
+export const implementApi = async (app: H3.App) => {
   // 获取apimap
   const { apiMap } = await getApiMap();
   // 获取proto schema
@@ -218,10 +218,10 @@ export const implementApi = async (app: App) => {
   // 判断当前的command args platform
   // 根据不同的platform
   if (commandArgs.platform === 'server') {
-    const router = createRouter();
+    const router = h3.createRouter();
     for (const key in apiMap) {
       // key: api value: path
-      router.add(key, async (event: CompatibilityEvent) => routerHandler(key, apiMap, event), apiMap[key].method.map((m) => m.toLowerCase()) as any[]);
+      router.add(key, async (event: H3.CompatibilityEvent) => routerHandler(key, apiMap, event), apiMap[key].method.map((m) => m.toLowerCase()) as any[]);
     }
     app.use(router);
   }
@@ -273,15 +273,15 @@ const getProtoSchema = async () => {
  * @param {CompatibilityEvent} event
  * @return {*}
  */
-const routerHandler = async (key: string, apiMap: Record<string, Map>, event: CompatibilityEvent) => {
+const routerHandler = async (key: string, apiMap: Record<string, Map>, event: H3.CompatibilityEvent) => {
   const { req, res } = event;
   logMap.REQUEST_URL(key);
   // url query参数
-  const query = isJSON(await useQuery(req));
+  const query = isJSON(await h3.useQuery(req));
   // 只有在一些有效的方法中，才能解析body
   let params = {};
   if (readBodyPayloadMethods.includes(req.method as string)) {
-    const parserBody = await useBody(req);
+    const parserBody = await h3.useBody(req);
     params = parserBody === '' ? {} : parserBody;
   }
   params = isJSON(params);
@@ -328,7 +328,7 @@ const routerHandler = async (key: string, apiMap: Record<string, Map>, event: Co
             if (!resProtoResult.isSucc) {
               // 如果返回结果不符合预期，就抛出错误
               logMap.RESPONSE_TYPE_ERROR(JSON.stringify(resProtoResult.errMsg));
-              return sendError(event, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
+              return h3.sendError(event, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
             }
           }
         }
