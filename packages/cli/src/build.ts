@@ -45,7 +45,8 @@ export const build = async (
 ) => {
   buildOptions = {
     ...defaultBuildOptions,
-    ...buildOptions
+    ...buildOptions,
+    inject: [...defaultBuildOptions.inject, ...buildOptions.inject]
   };
   // 将packge.json输出到.sword目录中
   if (!buildOptions.skipPackageJson) {
