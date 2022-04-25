@@ -32,3 +32,12 @@ export const getFilesByDirPath = (path: string) => {
     return fs.statSync(path + '/' + file);
   });
 };
+
+// 判断是否是软链接
+export const isSymlink = (path: string) => {
+  try {
+    return require.resolve(path);
+  } catch (e) {
+    return false;
+  }
+};
