@@ -73,7 +73,7 @@ const handleValidateMethod = (context: HttpContext, event: H3.CompatibilityEvent
  */
 const handleResHeaders = (context: HttpContext, event: H3.CompatibilityEvent) => {
   if (context.resHeaders) {
-    [...new Set(Object.keys(context.resHeaders))].forEach((key) => {
+    Object.keys(context.resHeaders).forEach((key) => {
       h3.appendHeader(event, key, context.resHeaders[key] as string);
     });
   }
@@ -164,7 +164,6 @@ const handlePreApiCall = (
       return { context };
     },
     cb: (context) => {
-      handleResHeaders(context, event);
       return { context };
     }
   });
