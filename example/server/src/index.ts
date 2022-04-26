@@ -3,9 +3,8 @@ import { useApp, usePipeline, usePlugin } from '@sword-code-practice/sword-frame
 const plugin = usePlugin();
 const pipeline = usePipeline();
 
-const app = useApp();
-
-const init = () => {
+const init = async () => {
+  const app = await useApp();
   app.implementApi();
   // 启动服务器
   app.server.start();

@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/sword-framework-example",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "this is a sword framework example",
   "publishConfig": {
     "access": "public",
@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dev": "sword dev",
-    "build": "sword build && cd .sword",
-    "serve": "node ./src/index.js"
+    "build": "sword build",
+    "server": "cd ./.sword/build/server && node ./src/index.js"
   },
   "author": "",
   "license": "ISC",
