@@ -45,9 +45,12 @@ export const build = async (
 ) => {
   buildOptions = {
     ...defaultBuildOptions,
-    ...buildOptions,
-    inject: [...defaultBuildOptions.inject, ...buildOptions.inject]
+    ...buildOptions
   };
+  // 需要合并默认的inject选项,也需要合并用户的inject选项
+  if (buildOptions && buildOptions.inject) {
+    buildOptions.inject = [...new Set([...defaultBuildOptions.inject, ...buildOptions.inject])];
+  }
   // 将packge.json输出到.sword目录中
   if (!buildOptions.skipPackageJson) {
     writeFileRecursive(resolve(process.cwd(), `${buildOptions.outPath}/package.json`), readFileSync(resolve(process.cwd(), 'package.json')).toString());
