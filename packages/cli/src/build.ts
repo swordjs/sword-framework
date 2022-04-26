@@ -54,24 +54,26 @@ export const build = async (
   }
   // 编译proto，并且把json输出到.sword目录中
   // apiPaths是代表了有效api的index.ts路径，我们只需要把路径传递给esbuild即可
-  const { apiPaths } = await generateSchema(resolve(process.cwd(), `${buildOptions.outPath}/src/proto.json`));
-  // 使用esbuild构建
-  esbuild
-    .build({
-      entryPoints: ['./src/index.ts', ...apiPaths.map((a) => `./src/api${a}/index.ts`)],
-      format: 'cjs',
-      platform: 'node',
-      outdir: `${buildOptions.outPath}/src`,
-      mainFields: ['module', 'main'],
-      minify: buildOptions.minify,
-      inject: buildOptions.inject
-    })
-    .then(() => {
-      cb.success();
-    })
-    .catch(() => {
-      cb.error();
-    });
+  try {
+    const { apiPaths } = await generateSchema(resolve(process.cwd(), `${buildOptions.outPath}/src/proto.json`));
+    // 使用esbuild构建
+    esbuild
+      .build({
+        entryPoints: ['./src/index.ts', ...apiPaths.map((a) => `./src/api${a}/index.ts`)],
+        format: 'cjs',
+        platform: 'node',
+        outdir: `${buildOptions.outPath}/src`,
+        mainFields: ['module', 'main'],
+        minify: buildOptions.minify,
+        inject: buildOptions.inject
+      })
+      .then(() => {
+        cb.success();
+      })
+      .catch(() => {
+        cb.error();
+      });
+  } catch (error) {}
 };
 
 export default async (args: Argv<CommandConfig>) => {
@@ -83,6 +85,6 @@ export default async (args: Argv<CommandConfig>) => {
       error: () => log.err(`[${args.platform}]📦 打包出现未知问题`)
     });
   } catch (e) {
-    throw log.err(new Error(e as any));
+    throw log.err(e);
   }
 };

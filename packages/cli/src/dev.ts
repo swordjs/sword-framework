@@ -133,7 +133,7 @@ const listenApiSource = (args: Argv<CommandConfig>) => {
       }, 500)
     );
   } catch (error) {
-    throw new Error(error);
+    log.err(error);
   }
 };
 
@@ -149,15 +149,10 @@ const listenIndex = (args: Argv<CommandConfig>) => {
 };
 
 export default async (args: Argv<CommandConfig>) => {
-  try {
-    // 生成protoschema到指定目录, proto schema为sword runtime提供验证服务
-    await generateSchema(resolve(process.cwd(), `./src/proto.json`));
-    start(args);
-    listenIndex(args);
-    // 监听资源文件夹下的api文件夹
-    listenApiSource(args);
-  } catch (e) {
-    log.err(e);
-    indexcp && indexcp.kill();
-  }
+  // 生成protoschema到指定目录, proto schema为sword runtime提供验证服务
+  await generateSchema(resolve(process.cwd(), `./src/proto.json`));
+  start(args);
+  listenIndex(args);
+  // 监听资源文件夹下的api文件夹
+  listenApiSource(args);
 };
