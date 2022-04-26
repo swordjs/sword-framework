@@ -1,8 +1,8 @@
 import { h3 } from './index';
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import { getApiMap } from './map';
 import { validateMethod, validateProto, getNeedValidateProto } from './validate';
+import { getSourcePath } from '../platform/index';
 import { exec } from './pipeline';
 import error from './error';
 import { isJSON } from '../util/data';
@@ -209,14 +209,14 @@ const readBodyPayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'];
  * @param {App} app
  * @param {string} dirName
  */
-export const implementApi = async (app: H3.App) => {
+export const implementApi = async (app: H3.App | null) => {
   // 获取apimap
   const { apiMap } = await getApiMap();
   // 获取proto schema
   getProtoSchema();
   // 判断当前的command args platform
   // 根据不同的platform
-  if (commandArgs.platform === 'server') {
+  if (commandArgs.platform === 'server' && app) {
     const router = h3.createRouter();
     for (const key in apiMap) {
       // key: api value: path
@@ -258,7 +258,8 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
  * 加载根目录下的protoschema（由cli生成）
  */
 const getProtoSchema = async () => {
-  const schema = readFileSync(resolve(process.cwd(), './src/proto.json')).toString();
+  const sourcePath = getSourcePath('./src/proto.json');
+  const schema = readFileSync(sourcePath).toString();
   if (schema) {
     protoSchema = JSON.parse(schema) as any;
   }

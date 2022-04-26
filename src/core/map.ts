@@ -2,8 +2,9 @@ import { traverseSourceDir } from '../util/file';
 import { createRequire } from 'module';
 import { resolve } from 'path';
 import { log } from './log';
+import { getSourcePath } from '../platform/index';
 import type { HttpInstructMethod, HttpApiReturn, HttpContext } from '../../typings/index';
-import { cwd } from 'process';
+
 export type Map = {
   sourcePath: string;
   method: HttpInstructMethod[];
@@ -21,10 +22,11 @@ export const getApiMap = async (
 ): Promise<{
   apiMap: Record<string, Map>;
 }> => {
+  const sourcePath = getSourcePath(`${dir}/${apiDir}`);
   const require = createRequire(import.meta.url);
   // 构建API Map
   const apiMap: Record<string, Map> = {};
-  const files = traverseSourceDir(resolve(dir, apiDir));
+  const files = traverseSourceDir(sourcePath);
   for (const key in files) {
     // 解构path和d
     const [path, d] = files[key];
