@@ -73,7 +73,7 @@ const handleValidateMethod = (context: HttpContext, event: H3.CompatibilityEvent
  */
 const handleResHeaders = (context: HttpContext, event: H3.CompatibilityEvent) => {
   if (context.resHeaders) {
-    Object.keys(context.resHeaders).forEach((key) => {
+    [...new Set(Object.keys(context.resHeaders))].forEach((key) => {
       h3.appendHeader(event, key, context.resHeaders[key] as string);
     });
   }
