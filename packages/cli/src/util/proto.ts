@@ -99,7 +99,7 @@ export const generateSchema = async (
       log.success('Proto加载成功');
     }
   } catch (error) {
-    throw new Error('Proto加载错误');
+    log.err(`Proto加载错误: ${error}`);
   }
   return { apiPaths, protoMap: _protoMap, protoAst: result };
 };

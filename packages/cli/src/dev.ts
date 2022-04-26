@@ -5,39 +5,45 @@ import chokidar from 'chokidar';
 import { debounce } from './util';
 import { generateSchema } from './util/proto';
 import { writeFileRecursive } from './util/file';
+import { dev as unicloudDev } from './platform/unicloud';
+
 import log from './log';
 import type { Argv } from 'mri';
-import type { Config } from '../typings/config';
+import type { CommandConfig } from '../../../typings/config';
 
 let indexcp: ChildProcess | null = null;
 
 /**
  * 使用@swc-node/register执行index.ts
- * @param {ConfigReturn} config
+ * @param {CommandConfigReturn} config
  */
-const start = () => {
-  // 入口enrty ts 文件
-  indexcp = spawn(`node`, ['-r', '@swc-node/register', 'src/index.ts'], {
-    stdio: 'inherit'
-  });
-  indexcp.on('exit', (code) => {
-    if (code) {
-      // 错误
-      log.err(`执行入口文件错误`);
-    }
-  });
-  // 运行成功
-  log.info(`启动入口文件: src/index.ts`);
+const start = (args: Argv<CommandConfig>) => {
+  // 判断如果platform是server，则执行server端的dev
+  // server端的dev指的就是node直接运行index.ts文件
+  if (args.platform === 'server') {
+    // 入口enrty ts 文件
+    indexcp = spawn(`node`, ['-r', '@swc-node/register', 'src/index.ts', '--platform=', args.platform], {
+      stdio: 'inherit'
+    });
+    indexcp.on('exit', (code) => {
+      if (code) {
+        // 错误
+        log.err(`执行入口文件错误`);
+      }
+    });
+    // 运行成功
+    log.info(`启动入口文件: src/index.ts`);
+  } else if (args.platform === 'unicloud') unicloudDev(args);
 };
 
 // 重启服务器
-const restart = () => {
+const restart = (args: Argv<CommandConfig>) => {
   // 重启服务器
-  log.info('重启服务器...');
+  log.info('重启服务...');
   // 杀掉现在的进程
   indexcp && indexcp.kill();
   setTimeout(() => {
-    start();
+    start(args);
   }, 300);
 };
 
@@ -94,7 +100,7 @@ export const main = useApi<{
  * 监听资源文件夹
  * @param {Config} config
  */
-const listenApiSource = () => {
+const listenApiSource = (args: Argv<CommandConfig>) => {
   try {
     log.info(`正在监听工程中的src/api文件夹...`);
     const watcher = chokidar.watch(resolve('src', 'api'), {
@@ -106,7 +112,7 @@ const listenApiSource = () => {
       debounce(async (event: any, path: string) => {
         // 重新编译proto.json
         await generateSchema(resolve(process.cwd(), `./src/proto.json`));
-        restart();
+        restart(args);
         switch (event) {
           case 'addDir':
             // 当文件夹约定一个规则，比如下划线开头，那么将会自动生成proto.ts 以及初始化的hook函数
@@ -127,40 +133,26 @@ const listenApiSource = () => {
       }, 500)
     );
   } catch (error) {
-    throw new Error(error);
+    log.err(error);
   }
 };
 
 // 监听入口文件
-const listenIndex = () => {
+const listenIndex = (args: Argv<CommandConfig>) => {
   const watcher = chokidar.watch(resolve('src', 'index.ts'), {
     ignoreInitial: true,
     atomic: 1000
   });
   watcher.on('all', async () => {
-    restart();
+    restart(args);
   });
 };
 
-export default async (args: Argv<Config>) => {
-  try {
-    // 生成protoschema到指定目录, proto schema为sword runtime提供验证服务
-    await generateSchema(resolve(process.cwd(), `./src/proto.json`));
-    // 判断platform
-    switch (args.platform) {
-      case 'server':
-        start();
-        break;
-      case 'unicloud':
-        break;
-      default:
-        break;
-    }
-    listenIndex();
-    // 监听资源文件夹下的api文件夹
-    listenApiSource();
-  } catch (e) {
-    log.err(e);
-    indexcp && indexcp.kill();
-  }
+export default async (args: Argv<CommandConfig>) => {
+  // 生成protoschema到指定目录, proto schema为sword runtime提供验证服务
+  await generateSchema(resolve(process.cwd(), `./src/proto.json`));
+  start(args);
+  listenIndex(args);
+  // 监听资源文件夹下的api文件夹
+  listenApiSource(args);
 };

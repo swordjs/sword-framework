@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/backend-cli",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
@@ -48,7 +48,6 @@
     "download": "^8.0.0",
     "enquirer": "^2.3.6",
     "esbuild": "^0.14.27",
-    "mri": "^1.2.0",
     "mv": "^2.1.1",
     "ohmyfetch": "^0.4.15",
     "tsbuffer-proto-generator": "^1.7.0",
@@ -62,7 +61,10 @@
     "declaration": true,
     "rollup": {
       "emitCJS": true,
-      "cjsBridge": true
+      "cjsBridge": true,
+      "esbuild": {
+        "target": "node12"
+      }
     }
   }
 }

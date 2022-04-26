@@ -1,17 +1,22 @@
-import { createRouter, useQuery, useBody, sendError, appendHeader, CompatibilityEvent } from 'h3';
+import { h3 } from './index';
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import { getApiMap } from './map';
 import { validateMethod, validateProto, getNeedValidateProto } from './validate';
+import { getSourcePath } from '../platform/index';
 import { exec } from './pipeline';
 import error from './error';
 import { isJSON } from '../util/data';
 import { log } from './log';
 import { aggregatePlugin } from './plugin';
-import type { App } from 'h3';
+import { parseCommandArgs } from '../util/config';
+import type H3 from '@sword-code-practice/h3';
 import type { HttpContext, UnPromisify } from '../../typings/index';
 import type { ValidateProto } from './validate';
 import type { InterruptPipelineResult } from './pipeline';
+import type { Map } from './map';
+
+// 获取command args
+const commandArgs = parseCommandArgs();
 
 // 具体的proto schema引用
 let protoSchema: Record<string, Record<string, unknown>> | null = null;
@@ -34,10 +39,10 @@ const logMap = {
  * @param {CompatibilityEvent} event
  * @return {*}
  */
-const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event: CompatibilityEvent) => {
+const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event: H3.CompatibilityEvent) => {
   // 判断execresult的类型
   if (execResult instanceof Error) {
-    return sendError(event, error('PIPELINE_ERROR', execResult.message));
+    return h3.sendError(event, error('PIPELINE_ERROR', execResult.message));
   }
   return true;
 };
@@ -50,12 +55,12 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event
  * @param {any} req
  * @return {*}
  */
-const handleValidateMethod = (context: HttpContext, event: CompatibilityEvent, req: any) => {
+const handleValidateMethod = (context: HttpContext, event: H3.CompatibilityEvent, req: any) => {
   if (!validateMethod(req, context.method)) {
     // 如果校验method错误，就返回错误信息
     const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
     logMap.REQUEST_METHOD_ERROR(errMsg);
-    return sendError(event, error('VALIDATE_METHOD', errMsg));
+    return h3.sendError(event, error('VALIDATE_METHOD', errMsg));
   }
   return true;
 };
@@ -66,10 +71,10 @@ const handleValidateMethod = (context: HttpContext, event: CompatibilityEvent, r
  * @param {HttpContext} context
  * @param {CompatibilityEvent} event
  */
-const handleResHeaders = (context: HttpContext, event: CompatibilityEvent) => {
+const handleResHeaders = (context: HttpContext, event: H3.CompatibilityEvent) => {
   if (context.resHeaders) {
     Object.keys(context.resHeaders).forEach((key) => {
-      appendHeader(event, key, context.resHeaders[key] as string);
+      h3.appendHeader(event, key, context.resHeaders[key] as string);
     });
   }
 };
@@ -97,7 +102,7 @@ const handleValidateRequestProto = (context: HttpContext, params: ProtoData, que
   if (errorResult) {
     logMap.REQUEST_TYPE_ERROR(JSON.stringify(errorResult.errMsg));
     handleResHeaders(context, res);
-    return sendError(res, error('VALIDATE_REQUEST', errorResult.errMsg));
+    return h3.sendError(res, error('VALIDATE_REQUEST', errorResult.errMsg));
   } else {
     // proto检测成功的回调
     return cb();
@@ -145,7 +150,7 @@ const pipelineResultTypeMap = (
 const handlePreApiCall = (
   preApiCallExecResult: HttpContext | InterruptPipelineResult,
   context: HttpContext | InterruptPipelineResult,
-  event: CompatibilityEvent
+  event: H3.CompatibilityEvent
 ): { context: HttpContext; returnData: null | unknown } => {
   return pipelineResultTypeMap(preApiCallExecResult, context, {
     return: (context, returnData) => {
@@ -159,7 +164,6 @@ const handlePreApiCall = (
       return { context };
     },
     cb: (context) => {
-      handleResHeaders(context, event);
       return { context };
     }
   });
@@ -176,7 +180,7 @@ const handlePreApiCall = (
 const handlePostApiCall = (
   postApiCallExecResult: HttpContext | InterruptPipelineResult,
   context: HttpContext | InterruptPipelineResult,
-  event: CompatibilityEvent
+  event: H3.CompatibilityEvent
 ) => {
   return pipelineResultTypeMap(postApiCallExecResult, context, {
     return: (context, returnData) => {
@@ -205,85 +209,21 @@ const readBodyPayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'];
  * @param {App} app
  * @param {string} dirName
  */
-export const implementApi = async (app: App) => {
+export const implementApi = async (app: H3.App | null) => {
   // 获取apimap
   const { apiMap } = await getApiMap();
-  const router = createRouter();
   // 获取proto schema
   getProtoSchema();
-  for (const key in apiMap) {
-    // key: api value: path
-    router.add(
-      key,
-      async (event: CompatibilityEvent) => {
-        const { req, res } = event;
-        logMap.REQUEST_URL(key);
-        // url query参数
-        const query = isJSON(await useQuery(req));
-        // 只有在一些有效的方法中，才能解析body
-        let params = {};
-        if (readBodyPayloadMethods.includes(req.method as string)) {
-          const parserBody = await useBody(req);
-          params = parserBody === '' ? {} : parserBody;
-        }
-        params = isJSON(params);
-        // 构造context
-        let context = createContext({
-          key,
-          query,
-          params,
-          reqHeaders: req.headers,
-          resHeaders: {}, // 返回请求头默认为空
-          method: apiMap[key].method
-        });
-        const _res = apiMap[key];
-        // 校验method
-        const validateMethodResult = handleValidateMethod(context, event, req);
-        if (!validateMethodResult) return validateMethodResult;
-        // 获取符合要求的proto
-        const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
-        // 校验请求proto，如果成功则会执行回调
-        return handleValidateRequestProto(context, { proto: reqParamsProto, data: params }, { proto: reqQueryProto, data: query }, res, async () => {
-          // 执行pipeline
-          const preApiCallExecResult = await exec('preApiCall', context);
-          if (handleExecError(preApiCallExecResult, event)) {
-            // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
-            if (!(preApiCallExecResult instanceof Error)) {
-              // 处理PreApiCall Pipline
-              const { context: preApiCallContext, returnData: preApiCallReturnData } = handlePreApiCall(preApiCallExecResult, context, event);
-              // 判断returndata是否存在, 如果存在，则直接返回
-              if (preApiCallReturnData) return preApiCallReturnData;
-              // 经过pipeline后的context需要重新赋值
-              context = preApiCallContext;
-              logMap.REQUEST_QUERY(JSON.stringify(context.query));
-              logMap.REQUEST_PARAMS(JSON.stringify(context.params));
-              // 执行handler
-              const _handlerRes = await _res.handler(context);
-              // 执行pipeline
-              const postApiCallExecResult = await exec('postApiCall', context);
-              if (handleExecError(postApiCallExecResult, event)) {
-                if (!(postApiCallExecResult instanceof Error)) {
-                  const { returnData: postApiCallReturnData } = handlePostApiCall(postApiCallExecResult, context, event);
-                  if (postApiCallReturnData) return postApiCallReturnData;
-                  // 校验返回结果是否符合预期
-                  const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
-                  if (!resProtoResult.isSucc) {
-                    // 如果返回结果不符合预期，就抛出错误
-                    logMap.RESPONSE_TYPE_ERROR(JSON.stringify(resProtoResult.errMsg));
-                    return sendError(event, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
-                  }
-                }
-              }
-              logMap.RESPONSE_RESULT(typeof _handlerRes === 'undefined' ? '{}' : JSON.stringify(_handlerRes));
-              return _handlerRes;
-            }
-          }
-        });
-      },
-      apiMap[key].method.map((m) => m.toLowerCase()) as any[]
-    );
+  // 判断当前的command args platform
+  // 根据不同的platform
+  if (commandArgs.platform === 'server' && app) {
+    const router = h3.createRouter();
+    for (const key in apiMap) {
+      // key: api value: path
+      router.add(key, async (event: H3.CompatibilityEvent) => routerHandler(key, apiMap, event), apiMap[key].method.map((m) => m.toLowerCase()) as any[]);
+    }
+    app.use(router);
   }
-  app.use(router);
 };
 
 /**
@@ -318,8 +258,83 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
  * 加载根目录下的protoschema（由cli生成）
  */
 const getProtoSchema = async () => {
-  const schema = readFileSync(resolve(process.cwd(), './src/proto.json')).toString();
+  const sourcePath = getSourcePath('./src/proto.json');
+  const schema = readFileSync(sourcePath).toString();
   if (schema) {
     protoSchema = JSON.parse(schema) as any;
   }
+};
+
+/**
+ *
+ * 通用路由处理函数
+ * @param {string} key
+ * @param {Record<string, Map>} apiMap
+ * @param {CompatibilityEvent} event
+ * @return {*}
+ */
+const routerHandler = async (key: string, apiMap: Record<string, Map>, event: H3.CompatibilityEvent) => {
+  const { req, res } = event;
+  logMap.REQUEST_URL(key);
+  // url query参数
+  const query = isJSON(await h3.useQuery(req));
+  // 只有在一些有效的方法中，才能解析body
+  let params = {};
+  if (readBodyPayloadMethods.includes(req.method as string)) {
+    const parserBody = await h3.useBody(req);
+    params = parserBody === '' ? {} : parserBody;
+  }
+  params = isJSON(params);
+  // 构造context
+  let context = createContext({
+    key,
+    query,
+    params,
+    reqHeaders: req.headers,
+    resHeaders: {}, // 返回请求头默认为空
+    method: apiMap[key].method
+  });
+  const _res = apiMap[key];
+  // 校验method
+  const validateMethodResult = handleValidateMethod(context, event, req);
+  if (!validateMethodResult) return validateMethodResult;
+  // 获取符合要求的proto
+  const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
+  // 校验请求proto，如果成功则会执行回调
+  return handleValidateRequestProto(context, { proto: reqParamsProto, data: params }, { proto: reqQueryProto, data: query }, res, async () => {
+    // 执行pipeline
+    const preApiCallExecResult = await exec('preApiCall', context);
+    if (handleExecError(preApiCallExecResult, event)) {
+      // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
+      if (!(preApiCallExecResult instanceof Error)) {
+        // 处理PreApiCall Pipline
+        const { context: preApiCallContext, returnData: preApiCallReturnData } = handlePreApiCall(preApiCallExecResult, context, event);
+        // 判断returndata是否存在, 如果存在，则直接返回
+        if (preApiCallReturnData) return preApiCallReturnData;
+        // 经过pipeline后的context需要重新赋值
+        context = preApiCallContext;
+        logMap.REQUEST_QUERY(JSON.stringify(context.query));
+        logMap.REQUEST_PARAMS(JSON.stringify(context.params));
+        // 执行handler
+        const _handlerRes = await _res.handler(context);
+        // 执行pipeline
+        const postApiCallExecResult = await exec('postApiCall', context);
+        if (handleExecError(postApiCallExecResult, event)) {
+          if (!(postApiCallExecResult instanceof Error)) {
+            const { returnData: postApiCallReturnData } = handlePostApiCall(postApiCallExecResult, context, event);
+            if (postApiCallReturnData) return postApiCallReturnData;
+            // 校验返回结果是否符合预期
+            const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
+            if (!resProtoResult.isSucc) {
+              // 如果返回结果不符合预期，就抛出错误
+              logMap.RESPONSE_TYPE_ERROR(JSON.stringify(resProtoResult.errMsg));
+              return h3.sendError(event, error('VALIDATE_RESPONSE', resProtoResult.errMsg));
+            }
+          }
+        }
+        logMap.RESPONSE_RESULT(typeof _handlerRes === 'undefined' ? '{}' : JSON.stringify(_handlerRes));
+        return _handlerRes;
+      }
+    }
+  });
 };

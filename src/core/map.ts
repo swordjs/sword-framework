@@ -2,7 +2,9 @@ import { traverseSourceDir } from '../util/file';
 import { createRequire } from 'module';
 import { resolve } from 'path';
 import { log } from './log';
+import { getSourcePath } from '../platform/index';
 import type { HttpInstructMethod, HttpApiReturn, HttpContext } from '../../typings/index';
+
 export type Map = {
   sourcePath: string;
   method: HttpInstructMethod[];
@@ -15,15 +17,16 @@ export type Map = {
  * @return {*}
  */
 export const getApiMap = async (
-  apiDir = 'api',
-  dir = 'src'
+  dir = 'src',
+  apiDir = 'api'
 ): Promise<{
   apiMap: Record<string, Map>;
 }> => {
+  const sourcePath = getSourcePath(`${dir}/${apiDir}`);
   const require = createRequire(import.meta.url);
   // 构建API Map
   const apiMap: Record<string, Map> = {};
-  const files = traverseSourceDir(resolve(dir, apiDir));
+  const files = traverseSourceDir(sourcePath);
   for (const key in files) {
     // 解构path和d
     const [path, d] = files[key];
@@ -33,18 +36,21 @@ export const getApiMap = async (
       const apiPath = path.substring(path.lastIndexOf(apiDir)).substring(apiDir.length);
       // 执行函数，获取instruct指示器
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { instruct, handler } = require(path).main as HttpApiReturn<any>;
-      const currentPath = getKey(`/${apiDir}`, apiPath, instruct.path);
-      // 判断apiMap中已存在某个apikey，那么就提示api被占用，那么此时默认将不会按照指示器中的path进行替换赋值
-      if (apiMap[currentPath]) {
-        log().err(`${currentPath}路由已被占用，已跳过`);
-        continue;
-      } else {
-        apiMap[currentPath] = {
-          sourcePath: resolve(path, d),
-          method: instruct.method,
-          handler
-        };
+      const module = require(path);
+      if (module.main) {
+        const { instruct, handler } = module.main as HttpApiReturn<any>;
+        const currentPath = getKey(`/${apiDir}`, apiPath, instruct.path);
+        // 判断apiMap中已存在某个apikey，那么就提示api被占用，那么此时默认将不会按照指示器中的path进行替换赋值
+        if (apiMap[currentPath]) {
+          log().err(`${currentPath}路由已被占用，已跳过`);
+          continue;
+        } else {
+          apiMap[currentPath] = {
+            sourcePath: resolve(path, d),
+            method: instruct.method,
+            handler
+          };
+        }
       }
     }
   }

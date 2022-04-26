@@ -1,9 +1,8 @@
-import { createApp } from 'h3';
+import { h3Setup, h3 } from '../core/';
+import { parseCommandArgs } from '../util/config';
 import { aggregatePluginBehavior } from '../core/plugin';
 import { implementApi } from '../core/api';
-
-// 新建一个h3实例
-const app = createApp();
+import type { App } from '@sword-code-practice/h3';
 
 /**
  *
@@ -18,7 +17,13 @@ const app = createApp();
  * init()
  * @return {*}
  */
-export const useApp = () => {
+export const useApp = async () => {
+  // 新建一个h3实例
+  let app: App | null = null;
+  if (['server'].includes(parseCommandArgs().platform)) {
+    await h3Setup();
+    app = h3.createApp();
+  }
   // 整合插件
   const aggregatePlugin = aggregatePluginBehavior();
   // 返回app对象,并且返回一些实例，比如说启动http服务以及实现api

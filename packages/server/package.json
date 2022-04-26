@@ -1,6 +1,6 @@
 {
   "name": "@sword-code-practice/sword-plugin-server",
-  "version": "0.0.1-rc.5",
+  "version": "1.0.0",
   "description": "",
   "types": "./lib/index.d.ts",
   "publishConfig": {
@@ -43,7 +43,10 @@
     "declaration": true,
     "rollup": {
       "emitCJS": true,
-      "cjsBridge": true
+      "cjsBridge": true,
+      "esbuild": {
+        "target": "node12"
+      }
     }
   }
 }

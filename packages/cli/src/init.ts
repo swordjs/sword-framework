@@ -6,9 +6,9 @@ import { spawnSync } from 'child_process';
 import consola from 'consola';
 import { existsSync } from 'fs';
 import type { Argv } from 'mri';
-import type { Config } from '../typings/config';
+import type { CommandConfig } from '../../../typings/config';
 
-export default async (args: Argv<Config>) => {
+export default async (args: Argv<CommandConfig>) => {
   const project = await prompt({
     type: 'input',
     name: 'value',

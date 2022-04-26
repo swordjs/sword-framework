@@ -6,44 +6,88 @@ import log from './log';
 import { writeFileRecursive } from './util/file';
 import { generateSchema } from './util/proto';
 import type { Argv } from 'mri';
-import type { Config } from '../typings/config';
+import type { CommandConfig } from '../../../typings/config';
 
-// build shim
-
-const build = async (args: Argv<Config>) => {
-  const buildRootPath = `./.sword/build/${args.platform}`;
-  // 将packge.json输出到.sword目录中
-  writeFileRecursive(resolve(process.cwd(), `${buildRootPath}/package.json`), readFileSync(resolve(process.cwd(), 'package.json')).toString());
-  // 编译proto，并且把json输出到.sword目录中
-  // apiPaths是代表了有效api的index.ts路径，我们只需要把路径传递给esbuild即可
-  const { apiPaths } = await generateSchema(resolve(process.cwd(), `${buildRootPath}/src/proto.json`));
-  // 使用esbuild构建
-  esbuild
-    .build({
-      entryPoints: ['./src/index.ts', ...apiPaths.map((a) => `./src/api${a}/index.ts`)],
-      format: 'cjs',
-      platform: 'node',
-      outdir: `${buildRootPath}/src`,
-      mainFields: ['module', 'main'],
-      minify: true
-    })
-    .then(() => {
-      log.success(`[${args.platform}]📦 打包成功`);
-    })
-    .catch(() => {
-      log.err(`[${args.platform}]📦 打包出现未知问题`);
-    })
-    .finally(() => {
-      process.exit();
-    });
+type BuildOptions = {
+  skipPackageJson?: boolean;
+  outPath?: string;
+  minify?: boolean;
+  inject?: string[];
 };
 
-export default async (args: Argv<Config>) => {
+// 默认的打包参数
+const defaultBuildOptions: BuildOptions = {
+  skipPackageJson: false,
+  outPath: `./.sword/build/server`,
+  minify: true,
+  inject: ['./.sword/shim/process.js']
+};
+
+/**
+ *
+ * 抽象build函数
+ * @description 抽象build函数的目的主要是，不仅让外部可以引入，还可以让外部有更多的控制权，所以主要抽象了option
+ * @param {Argv<CommandConfig>} args
+ * @param {{
+ *     success: () => void;
+ *     error: () => void;
+ *   }} cb
+ * @param {BuildOptions} [buildOptions]
+ */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const build = async (
+  args: Argv<CommandConfig>,
+  cb: {
+    success: () => void;
+    error: () => void;
+  },
+  buildOptions?: BuildOptions
+) => {
+  buildOptions = {
+    ...defaultBuildOptions,
+    ...buildOptions
+  };
+  // 需要合并默认的inject选项,也需要合并用户的inject选项
+  if (buildOptions && buildOptions.inject) {
+    buildOptions.inject = [...new Set([...defaultBuildOptions.inject, ...buildOptions.inject])];
+  }
+  // 将packge.json输出到.sword目录中
+  if (!buildOptions.skipPackageJson) {
+    writeFileRecursive(resolve(process.cwd(), `${buildOptions.outPath}/package.json`), readFileSync(resolve(process.cwd(), 'package.json')).toString());
+  }
+  // 编译proto，并且把json输出到.sword目录中
+  // apiPaths是代表了有效api的index.ts路径，我们只需要把路径传递给esbuild即可
   try {
-    // 清空sword文件夹
-    delDir(resolve(process.cwd(), '.sword'));
-    build(args);
+    const { apiPaths } = await generateSchema(resolve(process.cwd(), `${buildOptions.outPath}/src/proto.json`));
+    // 使用esbuild构建
+    esbuild
+      .build({
+        entryPoints: ['./src/index.ts', ...apiPaths.map((a) => `./src/api${a}/index.ts`)],
+        format: 'cjs',
+        platform: 'node',
+        outdir: `${buildOptions.outPath}/src`,
+        mainFields: ['module', 'main'],
+        minify: buildOptions.minify,
+        inject: buildOptions.inject
+      })
+      .then(() => {
+        cb.success();
+      })
+      .catch(() => {
+        cb.error();
+      });
+  } catch (error) {}
+};
+
+export default async (args: Argv<CommandConfig>) => {
+  try {
+    // 清空sword文件夹,需要根据platform条件进行清空
+    delDir(resolve(process.cwd(), `.sword/dev/${args.platform}`));
+    build(args, {
+      success: () => log.success(`[${args.platform}]📦 打包成功`),
+      error: () => log.err(`[${args.platform}]📦 打包出现未知问题`)
+    });
   } catch (e) {
-    throw log.err(new Error(e as any));
+    throw log.err(e);
   }
 };

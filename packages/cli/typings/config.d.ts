@@ -1,5 +1,5 @@
-export type Config = {
-  platform: 'server' | 'unicloud';
-};
-
-export type ConfigReturn = Required<Config>;
+export interface Config {
+  unicloud?: {
+    link: string;
+  };
+}

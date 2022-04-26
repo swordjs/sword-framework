@@ -4,9 +4,7 @@ import type { Config } from '../typings/config';
 export let configData: Config;
 
 // 默认配置的类型是非必选的config
-const defaultConfig: Required<Config> = {
-  platform: 'server'
-};
+const defaultConfig: Config = {};
 
 export const initConfig = async () => {
   const { config } = await loadConfig<Config>({
