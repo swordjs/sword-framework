@@ -4,6 +4,7 @@ importers:
 
   .:
     specifiers:
+      '@dcloudio/types': ^2.6.6
       '@swc-node/register': ^1.4.2
       '@sword-code-practice/h3': 0.7.4
       '@sword-code-practice/sword-plugin-log': workspace:*
@@ -32,6 +33,7 @@ importers:
       mri: 1.2.0
       tsbuffer-validator: 2.1.0
     devDependencies:
+      '@dcloudio/types': 2.6.6
       '@swc-node/register': 1.4.2
       '@types/node': 14.18.13
       '@typescript-eslint/eslint-plugin': 4.33.0_0c49e12669280545a7ea3f36dba6eb0a
@@ -51,17 +53,20 @@ importers:
 
   example/server:
     specifiers:
+      '@dcloudio/types': ^2.6.6
       '@sword-code-practice/backend-cli': latest
       '@sword-code-practice/sword-framework': latest
       typescript: ^4.6.3
     dependencies:
       '@sword-code-practice/sword-framework': link:../..
     devDependencies:
+      '@dcloudio/types': 2.6.6
       '@sword-code-practice/backend-cli': link:../../packages/cli
       typescript: 4.6.3
 
   packages/cli:
     specifiers:
+      '@dcloudio/types': ^2.6.6
       '@swc-node/register': ^1.4.2
       '@types/download': ^8.0.1
       chalk: ^4.1.2
@@ -90,6 +95,7 @@ importers:
       tsbuffer-proto-generator: 1.7.1
       unconfig: 0.3.3
     devDependencies:
+      '@dcloudio/types': 2.6.6
       '@types/download': 8.0.1
       openapi-types: 11.0.0
       typescript: 4.6.3
@@ -97,29 +103,38 @@ importers:
 
   packages/cors:
     specifiers:
+      '@dcloudio/types': ^2.6.6
       unbuild: ^0.6.9
     devDependencies:
+      '@dcloudio/types': 2.6.6
       unbuild: 0.6.9
 
   packages/faas-uni:
-    specifiers: {}
+    specifiers:
+      '@dcloudio/types': ^2.6.6
+    devDependencies:
+      '@dcloudio/types': 2.6.6
 
   packages/log:
     specifiers:
+      '@dcloudio/types': ^2.6.6
       chalk: 4.1.2
       unbuild: ^0.6.9
     dependencies:
       chalk: 4.1.2
     devDependencies:
+      '@dcloudio/types': 2.6.6
       unbuild: 0.6.9
 
   packages/server:
     specifiers:
+      '@dcloudio/types': ^2.6.6
       '@sword-code-practice/sword-plugin-log': workspace:*
       unbuild: ^0.6.9
     dependencies:
       '@sword-code-practice/sword-plugin-log': link:../log
     devDependencies:
+      '@dcloudio/types': 2.6.6
       unbuild: 0.6.9
 
 packages:
@@ -331,6 +346,10 @@ packages:
     dependencies:
       '@babel/helper-validator-identifier': 7.16.7
       to-fast-properties: 2.0.0
+    dev: true
+
+  /@dcloudio/types/2.6.6:
+    resolution: {integrity: sha512-ChLbkLuXfWxaj6VcsCcspIyC9+xIYKAJX++f50oCzUWbApslGwRpJ12wqS9k5Eg5euaHSzmyE0JfpZlNFpBk6w==}
     dev: true
 
   /@eslint/eslintrc/0.4.3:

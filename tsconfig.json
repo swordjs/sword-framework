@@ -11,7 +11,7 @@
     "esModuleInterop": true,
     "baseUrl": "src",
     "noImplicitAny": true,
-    "noImplicitThis": true
+    "noImplicitThis": true,
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": ["node_modules", "dist", "lib"]
