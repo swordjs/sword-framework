@@ -2,7 +2,7 @@ import { h3 } from './index';
 import { readFileSync } from 'fs';
 import { getApiMap } from './map';
 import { validateMethod, validateProto, getNeedValidateProto } from './validate';
-import { getSourcePath } from '../platform/index';
+import { getSourcePath } from '../util/path';
 import { exec } from './pipeline';
 import error from './error';
 import { isJSON } from '../util/data';
