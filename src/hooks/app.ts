@@ -17,22 +17,30 @@ import type { App } from '@sword-code-practice/h3';
  * init()
  * @return {*}
  */
-export const useApp = async () => {
+type AppReturn = {
+  implementApi: () => Promise<void>;
+  server?: {
+    start: () => void;
+  };
+};
+export const useApp = async (): Promise<AppReturn> => {
+  // 初始化返回
+  const returnData: AppReturn = {
+    implementApi: () => implementApi(app)
+  };
   // 新建一个h3实例
   let app: App | null = null;
   if (['server'].includes(parseCommandArgs().platform)) {
     await h3Setup();
     app = h3.createApp();
+    returnData.server = {
+      start: () => {
+        if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);
+      }
+    };
   }
   // 整合插件
   const aggregatePlugin = aggregatePluginBehavior();
   // 返回app对象,并且返回一些实例，比如说启动http服务以及实现api
-  return {
-    implementApi: () => implementApi(app),
-    server: {
-      start: () => {
-        if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);
-      }
-    }
-  };
+  return returnData;
 };
