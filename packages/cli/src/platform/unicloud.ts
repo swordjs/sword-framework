@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { symlink, existsSync, lstatSync } from 'fs';
+import { symlink, existsSync, lstatSync, readFileSync } from 'fs';
 import log from '../log';
 import { build } from '../build';
 import { delDir, writeFileRecursive } from '../util/file';
@@ -20,7 +20,12 @@ export const dev = (args: Argv<CommandConfig>) => {
   build(
     args,
     {
-      success: () => log.success(`[unicloud:dev]📦 编译成功`),
+      success: () => {
+        const path = `.sword/dev/unicloud/src/index.js`;
+        log.success(`[unicloud:dev]📦 编译成功`);
+        // 在源代码中添加默认导出的代码片段
+        writeFileRecursive(resolve(process.cwd(), path), `${readFileSync(resolve(process.cwd(), path)).toString()}module.exports = import_sword_framework`);
+      },
       error: () => log.err(`[unicloud:dev]📦 编译出现未知问题`)
     },
     {
@@ -60,7 +65,7 @@ export const shim = (params: { sourcePath: string }) => {
   const shimPath = resolve(process.cwd(), './.sword/shim/unicloud.js');
   const shim = `
   // unicloud shim
-process.env._unicloud_shim_symlink_source_path = '${params.sourcePath}'
+process.env._unicloud_shim_symlink_source_path = '${params.sourcePath}';
   `;
   writeFileRecursive(shimPath, shim);
   log.success(`[shim:unicloud]创建shim成功`);
