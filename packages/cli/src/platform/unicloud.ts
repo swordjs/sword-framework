@@ -24,7 +24,10 @@ export const dev = (args: Argv<CommandConfig>) => {
         const path = `.sword/dev/unicloud/src/index.js`;
         log.success(`[unicloud:dev]📦 编译成功`);
         // 在源代码中添加默认导出的代码片段
-        writeFileRecursive(resolve(process.cwd(), path), `${readFileSync(resolve(process.cwd(), path)).toString()}module.exports = import_sword_framework`);
+        writeFileRecursive(
+          resolve(process.cwd(), path),
+          `${readFileSync(resolve(process.cwd(), path)).toString()}module.exports = import_sword_framework.useUnicloudApp`
+        );
       },
       error: () => log.err(`[unicloud:dev]📦 编译出现未知问题`)
     },
