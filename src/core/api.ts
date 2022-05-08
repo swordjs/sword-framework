@@ -9,6 +9,8 @@ import { isJSON } from '../util/data';
 import { log } from './log';
 import { aggregatePlugin } from './plugin';
 import { parseCommandArgs } from '../util/config';
+import { event as unicloudEvent, context as unicloudContext } from "./platform/unicloud"
+import { triggerApi as unicloudTriggerApi } from "@sword-code-practice/sword-plugin-faas-uni"
 import type H3 from '@sword-code-practice/h3';
 import type { HttpContext, UnPromisify } from '../../typings/index';
 import type { ValidateProto } from './validate';
@@ -223,6 +225,8 @@ export const implementApi = async (app: H3.App | null) => {
       router.add(key, async (event: H3.CompatibilityEvent) => routerHandler(key, apiMap, event), apiMap[key].method.map((m) => m.toLowerCase()) as any[]);
     }
     app.use(router);
+  }else if(commandArgs.platform === "unicloud" && unicloudEvent && unicloudContext){
+    unicloudTriggerApi(unicloudEvent, unicloudContext);
   }
 };
 
