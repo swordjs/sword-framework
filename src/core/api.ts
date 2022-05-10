@@ -6,11 +6,11 @@ import { getSourcePath } from '../util/path';
 import { exec } from './pipeline';
 import error from './error';
 import { isJSON } from '../util/data';
-import { log } from './log';
+import { getLogger } from './log';
 import { aggregatePlugin } from './plugin';
 import { parseCommandArgs } from '../util/config';
-import { event as unicloudEvent, context as unicloudContext } from "./platform/unicloud"
-import { triggerApi as unicloudTriggerApi } from "@sword-code-practice/sword-plugin-faas-uni"
+import { event as unicloudEvent, context as unicloudContext } from './platform/unicloud';
+import { triggerApi as unicloudTriggerApi } from '@sword-code-practice/sword-plugin-faas-uni';
 import type H3 from '@sword-code-practice/h3';
 import type { HttpContext, UnPromisify } from '../../typings/index';
 import type { ValidateProto } from './validate';
@@ -23,16 +23,7 @@ const commandArgs = parseCommandArgs();
 // 具体的proto schema引用
 let protoSchema: Record<string, Record<string, unknown>> | null = null;
 
-// 定义log集合
-const logMap = {
-  REQUEST_URL: (key: string) => log().info(`[请求URL]: ${key}`),
-  REQUEST_METHOD_ERROR: (msg: string) => log().err(`[请求方法错误]: ${msg}`),
-  REQUEST_TYPE_ERROR: (msg: string) => log().err(`[请求类型校验错误]:${msg}`),
-  REQUEST_QUERY: (query: string) => log().info(`[请求参数-query]: ${query}`),
-  REQUEST_PARAMS: (query: string) => log().info(`[请求参数-params]: ${query}`),
-  RESPONSE_RESULT: (msg: string, suffix = '') => log().info(`[返回结果${suffix}]: ${msg}`),
-  RESPONSE_TYPE_ERROR: (msg: string) => log().err(`[返回类型校验错误]:${msg}`)
-};
+const logMap = getLogger(commandArgs.platform);
 
 /**
  *
@@ -225,8 +216,8 @@ export const implementApi = async (app: H3.App | null) => {
       router.add(key, async (event: H3.CompatibilityEvent) => routerHandler(key, apiMap, event), apiMap[key].method.map((m) => m.toLowerCase()) as any[]);
     }
     app.use(router);
-  }else if(commandArgs.platform === "unicloud" && unicloudEvent && unicloudContext){
-    unicloudTriggerApi(unicloudEvent, unicloudContext);
+  } else if (commandArgs.platform === 'unicloud' && unicloudEvent && unicloudContext) {
+    unicloudTriggerApi(unicloudEvent, unicloudContext, apiMap);
   }
 };
 
