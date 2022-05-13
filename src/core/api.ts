@@ -19,11 +19,15 @@ import type { Map } from './map';
 
 // 获取command args
 const commandArgs = parseCommandArgs();
+const logMap = getLogger(commandArgs.platform);
 
 // 具体的proto schema引用
 let protoSchema: Record<string, Record<string, unknown>> | null = null;
 
-const logMap = getLogger(commandArgs.platform);
+// 根据不同平台, 传入不同的函数, 并且返回
+const usePlatformHook = (params: Record<typeof commandArgs.platform, () => void>) => {
+  return params[commandArgs.platform]();
+};
 
 /**
  *
@@ -32,10 +36,18 @@ const logMap = getLogger(commandArgs.platform);
  * @param {CompatibilityEvent} event
  * @return {*}
  */
-const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event: H3.CompatibilityEvent) => {
+const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event?: H3.CompatibilityEvent) => {
   // 判断execresult的类型
   if (execResult instanceof Error) {
-    return h3.sendError(event, error('PIPELINE_ERROR', execResult.message));
+    const errorReturn = error('PIPELINE_ERROR', execResult.message);
+    return usePlatformHook({
+      server: () => {
+        if (event) {
+          return h3.sendError(event, errorReturn);
+        }
+      },
+      unicloud: () => errorReturn
+    });
   }
   return true;
 };
@@ -48,12 +60,20 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event
  * @param {any} req
  * @return {*}
  */
-const handleValidateMethod = (context: HttpContext, event: H3.CompatibilityEvent, req: any) => {
+const handleValidateMethod = (context: HttpContext, req: any, event?: H3.CompatibilityEvent) => {
   if (!validateMethod(req, context.method)) {
     // 如果校验method错误，就返回错误信息
     const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
     logMap.REQUEST_METHOD_ERROR(errMsg);
-    return h3.sendError(event, error('VALIDATE_METHOD', errMsg));
+    const errorReturn = error('VALIDATE_METHOD', errMsg);
+    return usePlatformHook({
+      server: () => {
+        if (event) {
+          return h3.sendError(event, errorReturn);
+        }
+      },
+      unicloud: () => errorReturn
+    });
   }
   return true;
 };
@@ -64,10 +84,18 @@ const handleValidateMethod = (context: HttpContext, event: H3.CompatibilityEvent
  * @param {HttpContext} context
  * @param {CompatibilityEvent} event
  */
-const handleResHeaders = (context: HttpContext, event: H3.CompatibilityEvent) => {
+const handleResHeaders = (context: HttpContext, event?: H3.CompatibilityEvent) => {
   if (context.resHeaders) {
-    Object.keys(context.resHeaders).forEach((key) => {
-      h3.appendHeader(event, key, context.resHeaders[key] as string);
+    return usePlatformHook({
+      server: () => {
+        if (event) {
+          Object.keys(context.resHeaders).forEach((key) => {
+            h3.appendHeader(event, key, context.resHeaders[key] as string);
+          });
+        }
+      },
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      unicloud: () => {}
     });
   }
 };
@@ -95,7 +123,13 @@ const handleValidateRequestProto = (context: HttpContext, params: ProtoData, que
   if (errorResult) {
     logMap.REQUEST_TYPE_ERROR(JSON.stringify(errorResult.errMsg));
     handleResHeaders(context, res);
-    return h3.sendError(res, error('VALIDATE_REQUEST', errorResult.errMsg));
+    const errorReturn = error('VALIDATE_REQUEST', errorResult.errMsg);
+    return usePlatformHook({
+      server: () => {
+        return h3.sendError(res, errorReturn);
+      },
+      unicloud: () => errorReturn
+    });
   } else {
     // proto检测成功的回调
     return cb();
@@ -143,7 +177,7 @@ const pipelineResultTypeMap = (
 const handlePreApiCall = (
   preApiCallExecResult: HttpContext | InterruptPipelineResult,
   context: HttpContext | InterruptPipelineResult,
-  event: H3.CompatibilityEvent
+  event?: H3.CompatibilityEvent
 ): { context: HttpContext; returnData: null | unknown } => {
   return pipelineResultTypeMap(preApiCallExecResult, context, {
     return: (context, returnData) => {
@@ -173,7 +207,7 @@ const handlePreApiCall = (
 const handlePostApiCall = (
   postApiCallExecResult: HttpContext | InterruptPipelineResult,
   context: HttpContext | InterruptPipelineResult,
-  event: H3.CompatibilityEvent
+  event?: H3.CompatibilityEvent
 ) => {
   return pipelineResultTypeMap(postApiCallExecResult, context, {
     return: (context, returnData) => {
@@ -207,18 +241,23 @@ export const implementApi = async (app: H3.App | null) => {
   const { apiMap } = await getApiMap();
   // 获取proto schema
   getProtoSchema();
-  // 判断当前的command args platform
-  // 根据不同的platform
-  if (commandArgs.platform === 'server' && app) {
-    const router = h3.createRouter();
-    for (const key in apiMap) {
-      // key: api value: path
-      router.add(key, async (event: H3.CompatibilityEvent) => routerHandler(key, apiMap, event), apiMap[key].method.map((m) => m.toLowerCase()) as any[]);
+  usePlatformHook({
+    server: () => {
+      if (app) {
+        const router = h3.createRouter();
+        for (const key in apiMap) {
+          // key: api value: path
+          router.add(key, async (event: H3.CompatibilityEvent) => routerHandler(key, apiMap, event), apiMap[key].method.map((m) => m.toLowerCase()) as any[]);
+        }
+        app.use(router);
+      }
+    },
+    unicloud: () => {
+      if (unicloudEvent && unicloudContext) {
+        unicloudTriggerApi(unicloudEvent, unicloudContext, apiMap);
+      }
     }
-    app.use(router);
-  } else if (commandArgs.platform === 'unicloud' && unicloudEvent && unicloudContext) {
-    unicloudTriggerApi(unicloudEvent, unicloudContext, apiMap);
-  }
+  });
 };
 
 /**
@@ -291,7 +330,7 @@ const routerHandler = async (key: string, apiMap: Record<string, Map>, event: H3
   });
   const _res = apiMap[key];
   // 校验method
-  const validateMethodResult = handleValidateMethod(context, event, req);
+  const validateMethodResult = handleValidateMethod(context, req, event);
   if (!validateMethodResult) return validateMethodResult;
   // 获取符合要求的proto
   const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
