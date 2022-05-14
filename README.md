@@ -5,14 +5,8 @@
 
 ## Sword.js
 
-<div style="display: flex;justify-content: flex-start;">
 
-<a>[中文说明](https://github.com/swordCodePractice/sword-framework/tree/master/docs/README-CN.md)</a>
-
-<span>/</span>
-
-<a>[中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)</a>
-</div>
+[中文说明](https://github.com/swordCodePractice/sword-framework/tree/master/docs/README-CN.md) / [中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
 
 
 This is the first serverless framework in [sword.org](https://github.com/swordCodePractice) for nodejs. No doubt it is fully developed based on Typescript. Except for framework core, have a toolkit for developer, make it easy to use same as developing common nodejs application, you can use it develop different company serverless application, like AWS, Dcloud, Tencent, Alibaba, etc.
