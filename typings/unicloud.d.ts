@@ -1,3 +1,5 @@
+import type { HttpInstructMethod } from './index';
+
 export type UnicloudContext = {
   APPID?: string;
   SOURCE: string;
@@ -16,6 +18,7 @@ export type UnicloudContext = {
 
 export type UnicloudEvent = {
   route: string;
+  method: HttpInstructMethod;
   query: Record<string, unknown>;
   params: Record<string, unknown>;
 };

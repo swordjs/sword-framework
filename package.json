@@ -63,6 +63,7 @@
     "@sword-code-practice/sword-plugin-log": "workspace:*",
     "@sword-code-practice/sword-plugin-server": "workspace:*",
     "mri": "^1.2.0",
-    "tsbuffer-validator": "^2.1.0"
+    "tsbuffer-validator": "^2.1.0",
+    "ufo": "^0.8.4"
   }
 }
