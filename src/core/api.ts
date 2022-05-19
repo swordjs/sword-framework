@@ -38,13 +38,12 @@ const usePlatformHook = async (params: Record<typeof commandArgs.platform, () =>
 };
 
 /**
- *
  * event需要在不同平台之间进行适配
  * @param {Event} event
  * @return {*}  {Promise<{ req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }>}
  */
-const adaptEvent = async (event: Event): Promise<{ req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }> => {
-  const result = usePlatformHook({
+export const adaptEvent = async (event: Event): Promise<{ req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }> => {
+  const result = (await usePlatformHook({
     server: async () => {
       const {
         req,
@@ -62,7 +61,7 @@ const adaptEvent = async (event: Event): Promise<{ req: any; res: any; url: stri
       const { route: url, method, params } = event as UnicloudEvent;
       return { req: event, res: null, url, method, params };
     }
-  }) as any;
+  })) as any;
   return {
     ...result,
     query: isJSON(await useQuery(result['url']))
@@ -70,7 +69,6 @@ const adaptEvent = async (event: Event): Promise<{ req: any; res: any; url: stri
 };
 
 /**
- *
  * 处理exec (middleware pipeline)
  * @param {UnPromisify<ReturnType<typeof exec>>} execResult
  * @param {CompatibilityEvent} event
@@ -92,7 +90,13 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event
   return true;
 };
 
-const handleValidateResponse = (validateResult: ReturnType<typeof validateProto>, event?: Event) => {
+/**
+ * 处理错误的返回
+ * @param {ReturnType<typeof validateProto>} validateResult
+ * @param {Event} [event]
+ * @return {*}
+ */
+const handleErrorResponse = (validateResult: ReturnType<typeof validateProto>, event?: Event) => {
   const errorReturn = error('VALIDATE_RESPONSE', validateResult.errMsg as string);
   logMap.RESPONSE_TYPE_ERROR(JSON.stringify(validateResult.errMsg));
   return usePlatformHook({
@@ -408,7 +412,7 @@ const routerHandler = async (key: string, apiMap: Record<string, Map>, event: Ev
             const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
             if (!resProtoResult.isSucc) {
               // 如果返回结果不符合预期，就抛出错误
-              return handleValidateResponse(resProtoResult, event);
+              return handleErrorResponse(resProtoResult, event);
             }
           }
         }
