@@ -22,7 +22,7 @@ import type { Map } from './map';
 type Event = H3.CompatibilityEvent | UnicloudEvent;
 
 // 获取command args
-const commandArgs = parseCommandArgs();
+let commandArgs = parseCommandArgs();
 const logMap = getLogger(commandArgs.platform);
 
 // 具体的proto schema引用
@@ -43,6 +43,12 @@ const usePlatformHook = async (params: Record<typeof commandArgs.platform, () =>
  * @return {*}  {Promise<{ req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }>}
  */
 export const adaptEvent = async (event: Event): Promise<{ req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }> => {
+  // 兼容vitest测试环境, 我们需要重新获取正确的command args
+  // 在这里需要重新获取的原因是, 我们的adaptEvent测试用例, 显式地传递了command args, 但是在我们开发/生产环境中, commandArgs是一个全局变量, 它只运行一次, 但是测试环境需要获取多次, 所以我们需要重新获取
+  // 参考测试用例, test/core/platform.test.ts
+  if (process.env.VITEST) {
+    commandArgs = parseCommandArgs();
+  }
   const result = (await usePlatformHook({
     server: async () => {
       const {
