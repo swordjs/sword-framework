@@ -8,7 +8,7 @@ import type { Map } from '../../../src/core/map';
  * @param {UnicloudContext} context
  * @return {*}
  */
-export const triggerApi = (event: UnicloudEvent, context: UnicloudContext, apiMap: Map) => {
+export const triggerApi = (event: UnicloudEvent, context: UnicloudContext, apiMap: Record<string, Map>) => {
   console.log(apiMap);
   return '';
 };

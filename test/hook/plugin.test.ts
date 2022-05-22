@@ -20,38 +20,21 @@ describe('plugin', () => {
       log: {
         info: (val: string) => {
           console.log(val);
-        }
-      }
-    };
-    const plugin2: Plugin = {
-      name: 'test2',
-      log: {
+        },
         success: (val: string) => {
           console.log(val);
-        }
-      }
-    };
-    const plugin3: Plugin = {
-      name: 'test3',
-      server: {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        start: () => {}
-      },
-      log: {
-        success: (val: string) => {
+        },
+        err: (val: string | Error) => {
           console.log(val);
         }
       }
     };
     plugin.add(plugin1);
-    plugin.add(plugin2);
-    plugin.add(plugin3);
     const behavior = aggregatePluginBehavior();
-    console.log(behavior);
-    expect(Object.keys(behavior)).toEqual(['name', 'log', 'server']);
+    expect(Object.keys(behavior)).toEqual(['log', 'server']);
   });
 
-  it('测试预设插件', () => {
+  it('preset plugins', () => {
     console.log(plugins);
   });
 });
