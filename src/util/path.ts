@@ -1,4 +1,4 @@
-import { parseCommandArgs } from '../util/config';
+import { parseCommandArgs } from './config';
 import { env as uniclouEnv } from '../env/unicloud';
 import type { CommandConfig } from '../../typings/config';
 import { resolve } from 'path';

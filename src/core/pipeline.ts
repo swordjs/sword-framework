@@ -16,6 +16,26 @@ export const push =
     return cb;
   };
 
+/**
+ *
+ * 清空队列对应管道的队列
+ * @param {PipelineTypeKeys} type
+ */
+export const clear = (type: PipelineTypeKeys): void => {
+  pipelineMap[type] = [];
+};
+
+/**
+ * 清空全部管道的队列
+ *
+ */
+export const clearAll = (): void => {
+  let key: keyof typeof pipelineMap;
+  for (key in pipelineMap) {
+    pipelineMap[key] = [];
+  }
+};
+
 // 中断对象（管道返回）
 export type InterruptPipelineResult = { type: 'return' | 'stop'; last: HttpContext; current: HttpContext };
 /**

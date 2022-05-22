@@ -39,6 +39,7 @@
   },
   "homepage": "https://github.com/swordCodePractice/sword-framework#readme",
   "devDependencies": {
+    "@dcloudio/types": "^2.6.6",
     "@swc-node/register": "^1.4.2",
     "@types/node": "^14.18.12",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
@@ -57,10 +58,12 @@
     "vitest": "latest"
   },
   "dependencies": {
+    "@sword-code-practice/h3": "0.7.4",
+    "@sword-code-practice/sword-plugin-faas-uni": "workspace:*",
     "@sword-code-practice/sword-plugin-log": "workspace:*",
     "@sword-code-practice/sword-plugin-server": "workspace:*",
-    "@sword-code-practice/h3": "0.7.4",
     "mri": "^1.2.0",
-    "tsbuffer-validator": "^2.1.0"
+    "tsbuffer-validator": "^2.1.0",
+    "ufo": "^0.8.4"
   }
 }
