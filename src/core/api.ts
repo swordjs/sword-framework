@@ -9,9 +9,8 @@ import { isJSON } from '../util/data';
 import { getLogger } from './log';
 import { aggregatePlugin } from './plugin';
 import { parseCommandArgs } from '../util/config';
-import { event as unicloudEvent, context as unicloudContext } from './platform/unicloud';
-import { triggerApi as unicloudTriggerApi } from './platform/unicloud';
 import { useQuery } from '../util/route';
+import { platformHook } from './platform';
 import type H3 from '@sword-code-practice/h3';
 import type { UnicloudEvent } from '../../typings/unicloud';
 import type { HttpContext, HttpInstructMethod, UnPromisify } from '../../typings/index';
@@ -28,15 +27,6 @@ const logMap = getLogger(commandArgs.platform);
 // 具体的proto schema引用
 let protoSchema: Record<string, Record<string, unknown>> | null = null;
 
-/**
- * 根据不同平台, 传入不同的函数, 并且返回
- * @param {(Record<typeof commandArgs.platform, () => Promise<any> | any>)} params
- * @return {*}
- */
-const usePlatformHook = async (params: Record<typeof commandArgs.platform, () => Promise<any> | any>) => {
-  return await params[commandArgs.platform]();
-};
-
 // 支持的methods数组
 export const methods: HttpInstructMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'CONNECT', 'OPTIONS', 'TRACE'];
 
@@ -52,7 +42,7 @@ export const adaptEvent = async (event: Event): Promise<{ req: any; res: any; ur
   if (process.env.VITEST) {
     commandArgs = parseCommandArgs();
   }
-  const result = (await usePlatformHook({
+  const result = (await platformHook({
     server: async () => {
       const {
         req,
@@ -87,7 +77,7 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event
   // 判断execresult的类型
   if (execResult instanceof Error) {
     const errorReturn = error('PIPELINE_ERROR', execResult.message);
-    return usePlatformHook({
+    return platformHook({
       server: () => {
         if (event) {
           return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
@@ -108,7 +98,7 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event
 const handleErrorResponse = (validateResult: ReturnType<typeof validateProto>, event?: Event) => {
   const errorReturn = error('VALIDATE_RESPONSE', validateResult.errMsg as string);
   logMap.RESPONSE_TYPE_ERROR(JSON.stringify(validateResult.errMsg));
-  return usePlatformHook({
+  return platformHook({
     server: () => {
       if (event) {
         return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
@@ -132,7 +122,7 @@ const handleValidateMethod = (context: HttpContext, req: any, event?: Event) => 
     const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
     logMap.REQUEST_METHOD_ERROR(errMsg);
     const errorReturn = error('VALIDATE_METHOD', errMsg);
-    return usePlatformHook({
+    return platformHook({
       server: () => {
         if (event) {
           return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
@@ -152,7 +142,7 @@ const handleValidateMethod = (context: HttpContext, req: any, event?: Event) => 
  */
 const handleResHeaders = (context: HttpContext, event?: Event) => {
   if (context.resHeaders) {
-    return usePlatformHook({
+    return platformHook({
       server: () => {
         if (event) {
           Object.keys(context.resHeaders).forEach((key) => {
@@ -190,7 +180,7 @@ const handleValidateRequestProto = (context: HttpContext, params: ProtoData, que
     logMap.REQUEST_TYPE_ERROR(JSON.stringify(errorResult.errMsg));
     handleResHeaders(context, res);
     const errorReturn = error('VALIDATE_REQUEST', errorResult.errMsg);
-    return usePlatformHook({
+    return platformHook({
       server: () => {
         return h3.sendError(res, errorReturn as H3.H3Error);
       },
@@ -299,13 +289,13 @@ const readBodyPayloadMethods: HttpInstructMethod[] = ['POST', 'PUT', 'DELETE'];
  * @param {string} dirName
  */
 export const implementApi = async (app: H3.App | null) => {
-  // 获取apimap
-  const { apiMap } = await getApiMap();
   // 获取proto schema
   getProtoSchema();
-  usePlatformHook({
-    server: () => {
+  return platformHook({
+    server: async () => {
       if (app) {
+        // 获取apimap
+        const { apiMap } = await getApiMap();
         const router = h3.createRouter();
         for (const key in apiMap) {
           // key: api value: path
@@ -318,11 +308,8 @@ export const implementApi = async (app: H3.App | null) => {
         app.use(router);
       }
     },
-    unicloud: () => {
-      if (unicloudEvent && unicloudContext) {
-        unicloudTriggerApi(unicloudEvent, apiMap);
-      }
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    unicloud: () => {}
   });
 };
 

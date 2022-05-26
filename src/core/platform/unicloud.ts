@@ -4,14 +4,6 @@ import error from '../error';
 import type { UnicloudContext, UnicloudEvent } from '../../../typings/unicloud';
 import type { Map } from '../map';
 
-export const setEvent = (_event: UnicloudEvent): void => {
-  event = _event;
-};
-
-export const setContext = (_context: UnicloudContext): void => {
-  context = _context;
-};
-
 /**
  *
  * unicloud 平台触发api
@@ -19,7 +11,7 @@ export const setContext = (_context: UnicloudContext): void => {
  * @param {Record<string, Map>} apiMap
  * @return {*}
  */
-export const triggerApi = (event: UnicloudEvent, apiMap: Record<string, Map>) => {
+export const triggerApi = (event: UnicloudEvent, context: UnicloudContext, apiMap: Record<string, Map>) => {
   const validateResult = validateEvent()(event);
   if (!validateResult) {
     return error('VALIDATE_REQUEST', 'event is not valid (unicloud)');
@@ -47,6 +39,3 @@ export const validateEvent = (): ValidateFunction<UnicloudEvent> => {
   };
   return ajv.compile(schema);
 };
-
-export let event: UnicloudEvent | null = null;
-export let context: UnicloudContext | null = null;
