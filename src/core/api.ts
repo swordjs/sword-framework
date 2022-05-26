@@ -10,7 +10,7 @@ import { getLogger } from './log';
 import { aggregatePlugin } from './plugin';
 import { parseCommandArgs } from '../util/config';
 import { event as unicloudEvent, context as unicloudContext } from './platform/unicloud';
-import { triggerApi as unicloudTriggerApi } from '@sword-code-practice/sword-plugin-faas-uni';
+import { triggerApi as unicloudTriggerApi } from './platform/unicloud';
 import { useQuery } from '../util/route';
 import type H3 from '@sword-code-practice/h3';
 import type { UnicloudEvent } from '../../typings/unicloud';
@@ -37,6 +37,9 @@ const usePlatformHook = async (params: Record<typeof commandArgs.platform, () =>
   return await params[commandArgs.platform]();
 };
 
+// 支持的methods数组
+export const methods: HttpInstructMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'CONNECT', 'OPTIONS', 'TRACE'];
+
 /**
  * event需要在不同平台之间进行适配
  * @param {Event} event
@@ -58,7 +61,7 @@ export const adaptEvent = async (event: Event): Promise<{ req: any; res: any; ur
       } = event as H3.CompatibilityEvent;
       let params = {};
       // 只有在一些有效的方法中，才能解析body
-      if (readBodyPayloadMethods.includes(method as unknown as string)) {
+      if (readBodyPayloadMethods.includes(method as unknown as any)) {
         params = (await h3.useBody(req)) ?? {};
       }
       return { req, res, url, method, params };
@@ -87,7 +90,7 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event
     return usePlatformHook({
       server: () => {
         if (event) {
-          return h3.sendError(event as H3.CompatibilityEvent, errorReturn);
+          return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
         }
       },
       unicloud: () => errorReturn
@@ -108,7 +111,7 @@ const handleErrorResponse = (validateResult: ReturnType<typeof validateProto>, e
   return usePlatformHook({
     server: () => {
       if (event) {
-        return h3.sendError(event as H3.CompatibilityEvent, errorReturn);
+        return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
       }
     },
     unicloud: () => errorReturn
@@ -132,7 +135,7 @@ const handleValidateMethod = (context: HttpContext, req: any, event?: Event) => 
     return usePlatformHook({
       server: () => {
         if (event) {
-          return h3.sendError(event as H3.CompatibilityEvent, errorReturn);
+          return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
         }
       },
       unicloud: () => errorReturn
@@ -189,7 +192,7 @@ const handleValidateRequestProto = (context: HttpContext, params: ProtoData, que
     const errorReturn = error('VALIDATE_REQUEST', errorResult.errMsg);
     return usePlatformHook({
       server: () => {
-        return h3.sendError(res, errorReturn);
+        return h3.sendError(res, errorReturn as H3.H3Error);
       },
       unicloud: () => errorReturn
     });
@@ -287,7 +290,7 @@ const handlePostApiCall = (postApiCallExecResult: HttpContext | InterruptPipelin
 };
 
 // 在核心程序中，读取usebody的时候，需要进行判断，只有在几个method的请求上才可以对body进行解析
-const readBodyPayloadMethods = ['PATCH', 'POST', 'PUT', 'DELETE'];
+const readBodyPayloadMethods: HttpInstructMethod[] = ['POST', 'PUT', 'DELETE'];
 
 /**
  *
@@ -317,7 +320,7 @@ export const implementApi = async (app: H3.App | null) => {
     },
     unicloud: () => {
       if (unicloudEvent && unicloudContext) {
-        unicloudTriggerApi(unicloudEvent, unicloudContext, apiMap);
+        unicloudTriggerApi(unicloudEvent, apiMap);
       }
     }
   });
@@ -370,7 +373,7 @@ const getProtoSchema = async () => {
  * @param {CompatibilityEvent} event
  * @return {*}
  */
-const routerHandler = async (key: string, apiMap: Record<string, Map>, event: Event) => {
+export const routerHandler = async (key: string, event: Event, apiMap: Record<string, Map>) => {
   // eslint-disable-next-line prefer-const
   let { req, res, params, query } = await adaptEvent(event);
   // 日志-请求url
@@ -438,5 +441,5 @@ const routerHandler = async (key: string, apiMap: Record<string, Map>, event: Ev
  * @return {*}
  */
 const serverRouterHandler = (key: string, apiMap: Record<string, Map>, event: H3.CompatibilityEvent) => {
-  return routerHandler(key, apiMap, event);
+  return routerHandler(key, event, apiMap);
 };
