@@ -16,6 +16,11 @@ export const triggerApi = (event: UnicloudEvent, context: UnicloudContext, apiMa
   if (!validateResult) {
     return error('VALIDATE_REQUEST', 'event is not valid (unicloud)');
   }
+  // 判断apimap是否存在指定的route
+  const route = event.route;
+  if (!apiMap[route]) {
+    return error('NOT_FOUND', `route ${route} not found`);
+  }
   return routerHandler(event.route, event, apiMap);
 };
 

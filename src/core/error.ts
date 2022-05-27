@@ -7,6 +7,8 @@ const commandArgs = parseCommandArgs();
 // 定义不同错误类型以及它们所代表的状态码
 // 定义错误类型
 enum ErrorType {
+  // 未找到
+  NOT_FOUND = 404,
   // 请求
   VALIDATE_REQUEST = 400,
   // 返回
