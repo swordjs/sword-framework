@@ -7,7 +7,7 @@ const commandArgs = parseCommandArgs();
  * @param {(Record<typeof commandArgs.platform, () => Promise<any> | any>)} params
  * @return {*}
  */
-export const platformHook = async (params: Record<typeof commandArgs.platform, () => Promise<any> | any>) => {
+export const platformHook = async <R = any>(params: Record<typeof commandArgs.platform, () => Promise<R> | R>): Promise<R | undefined> => {
   // 判断存在且是函数
   if (params[commandArgs.platform] && typeof params[commandArgs.platform] === 'function') {
     return await params[commandArgs.platform]();

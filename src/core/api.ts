@@ -17,6 +17,7 @@ import type { HttpContext, HttpInstructMethod, UnPromisify } from '../../typings
 import type { ValidateProto } from './validate';
 import type { InterruptPipelineResult } from './pipeline';
 import type { Map } from './map';
+import type { ErrorReturn } from './error';
 
 type Event = H3.CompatibilityEvent | UnicloudEvent;
 
@@ -35,14 +36,16 @@ export const methods: HttpInstructMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'H
  * @param {Event} event
  * @return {*}  {Promise<{ req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }>}
  */
-export const adaptEvent = async (event: Event): Promise<{ req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }> => {
+type AdaptEventReturn = Promise<{ key: string; req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }>;
+export const adaptEvent = async (event: Event): AdaptEventReturn => {
   // 兼容vitest测试环境, 我们需要重新获取正确的command args
   // 在这里需要重新获取的原因是, 我们的adaptEvent测试用例, 显式地传递了command args, 但是在我们开发/生产环境中, commandArgs是一个全局变量, 它只运行一次, 但是测试环境需要获取多次, 所以我们需要重新获取
   // 参考测试用例, test/core/platform.test.ts
   if (process.env.VITEST) {
     commandArgs = parseCommandArgs();
   }
-  const result = (await platformHook({
+  type Return = Record<Exclude<keyof UnPromisify<AdaptEventReturn>, 'query' | 'key'>, any>;
+  const result: Return = (await platformHook<Return>({
     server: async () => {
       const {
         req,
@@ -63,7 +66,9 @@ export const adaptEvent = async (event: Event): Promise<{ req: any; res: any; ur
   })) as any;
   return {
     ...result,
-    query: isJSON(await useQuery(result['url']))
+    query: isJSON(await useQuery(result['url'])),
+    // key 就是 url, 在这里需要去掉?号之后部分
+    key: result['url'].split('?')[0]
   };
 };
 
@@ -77,7 +82,7 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event
   // 判断execresult的类型
   if (execResult instanceof Error) {
     const errorReturn = error('PIPELINE_ERROR', execResult.message);
-    return platformHook({
+    return platformHook<ErrorReturn | void>({
       server: () => {
         if (event) {
           return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
@@ -98,7 +103,7 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event
 const handleErrorResponse = (validateResult: ReturnType<typeof validateProto>, event?: Event) => {
   const errorReturn = error('VALIDATE_RESPONSE', validateResult.errMsg as string);
   logMap.RESPONSE_TYPE_ERROR(JSON.stringify(validateResult.errMsg));
-  return platformHook({
+  return platformHook<ErrorReturn | void>({
     server: () => {
       if (event) {
         return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
@@ -116,13 +121,13 @@ const handleErrorResponse = (validateResult: ReturnType<typeof validateProto>, e
  * @param {any} req
  * @return {*}
  */
-const handleValidateMethod = (context: HttpContext, req: any, event?: Event) => {
-  if (!validateMethod(req, context.method)) {
+const handleValidateMethod = async (req: any, event: Event, context: HttpContext) => {
+  if (!(await validateMethod(req, context.method))) {
     // 如果校验method错误，就返回错误信息
     const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
     logMap.REQUEST_METHOD_ERROR(errMsg);
     const errorReturn = error('VALIDATE_METHOD', errMsg);
-    return platformHook({
+    return await platformHook<ErrorReturn | void>({
       server: () => {
         if (event) {
           return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
@@ -180,7 +185,7 @@ const handleValidateRequestProto = (context: HttpContext, params: ProtoData, que
     logMap.REQUEST_TYPE_ERROR(JSON.stringify(errorResult.errMsg));
     handleResHeaders(context, res);
     const errorReturn = error('VALIDATE_REQUEST', errorResult.errMsg);
-    return platformHook({
+    return platformHook<ErrorReturn | void>({
       server: () => {
         return h3.sendError(res, errorReturn as H3.H3Error);
       },
@@ -362,7 +367,9 @@ const getProtoSchema = async () => {
  */
 export const routerHandler = async (key: string, event: Event, apiMap: Record<string, Map>) => {
   // eslint-disable-next-line prefer-const
-  let { req, res, params, query } = await adaptEvent(event);
+  let { key: _key, req, res, params, query } = await adaptEvent(event);
+  // 将重新处理的key替换
+  key = _key;
   // 日志-请求url
   logMap.REQUEST_URL(key);
   params = isJSON(params);
@@ -377,8 +384,8 @@ export const routerHandler = async (key: string, event: Event, apiMap: Record<st
   });
   const _res = apiMap[key];
   // 校验method
-  const validateMethodResult = handleValidateMethod(context, req, event);
-  if (!validateMethodResult) return validateMethodResult;
+  const validateMethodResult = await handleValidateMethod(req, event, context);
+  if (validateMethodResult !== true) return validateMethodResult;
   // 获取符合要求的proto
   const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
   // 校验请求proto，如果成功则会执行回调

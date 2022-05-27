@@ -23,6 +23,7 @@ export type ErrorResponse = {
   statusCode: number;
   statusMessage: string;
 };
+export type ErrorReturn = H3Error | ErrorResponse;
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default (type: keyof typeof ErrorType, message: string): H3Error | ErrorResponse => {
   const platform = commandArgs.platform;

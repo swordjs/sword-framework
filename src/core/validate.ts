@@ -1,16 +1,28 @@
 import { h3 } from './index';
+import { platformHook } from './platform';
 import { useValidateProto } from '../hooks/proto';
 import type { HttpInstructMethod, HttpContext } from '../../typings/index';
+import type H3 from '@sword-code-practice/h3';
+import type { UnicloudEvent } from '../../typings/unicloud';
 
 /**
  *
  * 校验method是否合法
- * @param {*} req
+ * @param {(H3.CompatibilityEvent | UnicloudEvent)} req
  * @param {(HttpInstructMethod | HttpInstructMethod[])} expected
- * @return {*}  {boolean}
+ * @return {*}  {Promise<boolean>}
  */
-export const validateMethod = (req: any, expected: HttpInstructMethod | HttpInstructMethod[]): boolean => {
-  return h3.isMethod(req, expected);
+export const validateMethod = async (req: H3.CompatibilityEvent | UnicloudEvent, expected: HttpInstructMethod | HttpInstructMethod[]): Promise<boolean> => {
+  return (await platformHook<boolean>({
+    server: () => {
+      return h3.isMethod(req as H3.CompatibilityEvent, expected);
+    },
+    unicloud: () => {
+      const _req = req as UnicloudEvent;
+      // 在unicloud环境下, req即unicloud event
+      return expected.includes(_req.method);
+    }
+  })) as boolean;
 };
 
 // 需要校验的proto节点

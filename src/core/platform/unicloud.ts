@@ -17,7 +17,8 @@ export const triggerApi = (event: UnicloudEvent, context: UnicloudContext, apiMa
     return error('VALIDATE_REQUEST', 'event is not valid (unicloud)');
   }
   // 判断apimap是否存在指定的route
-  const route = event.route;
+  // route需要取问号之前有效的路径
+  const route = event.route.split('?')[0];
   if (!apiMap[route]) {
     return error('NOT_FOUND', `route ${route} not found`);
   }
