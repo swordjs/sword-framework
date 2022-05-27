@@ -1,4 +1,3 @@
-import { logger as unicloudLogger } from '@sword-code-practice/sword-plugin-faas-uni';
 import { aggregatePlugin } from './plugin';
 import type { Plugin } from './../../typings/index';
 import type { Logger } from '../../typings/log';
@@ -29,4 +28,14 @@ export const getLogger = (platform: CommandConfig['platform']): Logger => {
     unicloud: unicloudLogger
   };
   return map[platform];
+};
+
+export const unicloudLogger: Logger = {
+  REQUEST_URL: (key: string) => console.log(`[请求URL]: ${key}`),
+  REQUEST_METHOD_ERROR: (msg: string) => console.log(`[请求方法错误]: ${msg}`),
+  REQUEST_TYPE_ERROR: (msg: string) => console.log(`[请求类型校验错误]:${msg}`),
+  REQUEST_QUERY: (query: string) => console.log(`[请求参数-query]: ${query}`),
+  REQUEST_PARAMS: (query: string) => console.log(`[请求参数-params]: ${query}`),
+  RESPONSE_RESULT: (msg: string, suffix = '') => console.log(`[返回结果${suffix}]: ${msg}`),
+  RESPONSE_TYPE_ERROR: (msg: string) => console.log(`[返回类型校验错误]:${msg}`)
 };

@@ -26,7 +26,11 @@ export const dev = (args: Argv<CommandConfig>) => {
         // 在源代码中添加默认导出的代码片段
         writeFileRecursive(
           resolve(process.cwd(), path),
-          `${readFileSync(resolve(process.cwd(), path)).toString()}module.exports = import_sword_framework.useUnicloudApp`
+          `${readFileSync(resolve(process.cwd(), path)).toString()}
+module.exports = async (event, context) => {
+  const { apiMap } = await import_sword_framework.useGetApiMap()
+  return import_sword_framework.useUnicloudTriggerApi(event, context, apiMap)
+}`
         );
       },
       error: () => log.err(`[unicloud:dev]📦 编译出现未知问题`)

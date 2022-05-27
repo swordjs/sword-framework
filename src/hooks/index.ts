@@ -5,3 +5,4 @@ export * from './pipeline';
 export * from './plugin';
 export * from './unicloud';
 export * from './platform';
+export * from './map';

@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { useUnicloudApp } from '../../src/hooks/unicloud';
 import { adaptEvent } from '../../src/core/api';
 import type { UnicloudEvent } from '../../typings/unicloud';
 

@@ -59,9 +59,9 @@
   },
   "dependencies": {
     "@sword-code-practice/h3": "0.7.4",
-    "@sword-code-practice/sword-plugin-faas-uni": "workspace:*",
     "@sword-code-practice/sword-plugin-log": "workspace:*",
     "@sword-code-practice/sword-plugin-server": "workspace:*",
+    "ajv": "^8.11.0",
     "mri": "^1.2.0",
     "tsbuffer-validator": "^2.1.0",
     "ufo": "^0.8.4"
