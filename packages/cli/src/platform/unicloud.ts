@@ -27,8 +27,8 @@ export const dev = (args: Argv<CommandConfig>) => {
         writeFileRecursive(
           resolve(process.cwd(), path),
           `${readFileSync(resolve(process.cwd(), path)).toString()}
-module.exports = (event, context) => {
-  const { apiMap } = import_sword_framework.useGetApiMap()
+module.exports = async (event, context) => {
+  const { apiMap } = await import_sword_framework.useGetApiMap()
   return import_sword_framework.useUnicloudTriggerApi(event, context, apiMap)
 }`
         );
