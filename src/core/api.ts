@@ -55,7 +55,9 @@ export const adaptEvent = async (event: Event): AdaptEventReturn => {
       let params = {};
       // 只有在一些有效的方法中，才能解析body
       if (readBodyPayloadMethods.includes(method as unknown as any)) {
-        params = (await h3.useBody(req)) ?? {};
+        const parseResult = (await h3.useBody(req)) ?? {};
+        // 当params是空对象时, 使用usebody解析出来的数据是空字符串, 所以为了validate, 我们需要将空字符串转换为空对象
+        if (parseResult !== '') params = parseResult;
       }
       return { req, res, url, method, params };
     },
@@ -177,6 +179,7 @@ const handleValidateRequestProto = (context: HttpContext, params: ProtoData, que
   const requestParamsProtoResult = validateProto(params.proto, params.data);
   // 检查请求query的proto
   const requestQueryProtoResult = validateProto(query.proto, query.data);
+  console.log(typeof params.data);
   // 查看请求的参数校验结果，是否有错误
   const errorResult = [requestParamsProtoResult, requestQueryProtoResult].find((v: null | { isSucc: boolean }) => {
     return v && !v.isSucc;
