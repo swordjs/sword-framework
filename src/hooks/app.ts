@@ -19,24 +19,27 @@ import type { App } from '@sword-code-practice/h3';
  */
 type AppReturn = {
   implementApi: () => Promise<void>;
-  server?: {
+  server: {
     start: () => void;
   };
 };
 export const useApp = async (): Promise<AppReturn> => {
   // 初始化返回
   const returnData: AppReturn = {
-    implementApi: () => implementApi(app)
+    implementApi: () => implementApi(app),
+    server: {
+      // 这里默认返回useapp对象. 因为为了抹平各端的差异, 在各端都需要实现start函数, 如果是server环境就是启动服务器
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      start: () => {}
+    }
   };
   // 新建一个h3实例
   let app: App | null = null;
   if (['server'].includes(parseCommandArgs().platform)) {
     await h3Setup();
     app = h3.createApp();
-    returnData.server = {
-      start: () => {
-        if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);
-      }
+    returnData.server.start = () => {
+      if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);
     };
   }
   // 整合插件
