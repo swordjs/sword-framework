@@ -1,5 +1,6 @@
 import './pipeline';
 import './hook';
+import type { LogType } from './log';
 
 export type UnPromisify<T> = T extends Promise<infer U> ? U : never;
 
@@ -60,10 +61,6 @@ export type Plugin = {
   server?: {
     start: (...args: any[]) => Promise<void> | void;
   };
-  log?: {
-    err: (v: string | Error) => void;
-    info: (v: string) => void;
-    success: (v: string) => void;
-  };
+  log?: LogType;
   context?: (context: HttpContext) => HttpContext;
 };

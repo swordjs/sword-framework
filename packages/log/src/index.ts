@@ -1,12 +1,13 @@
 import chalk from 'chalk';
 import type { Plugin } from '../../../typings/index';
+import type { LogType } from '../../../typings/log';
 
 const now = () => {
   const _ = new Date();
   return `${_.getFullYear()}-${_.getMonth() + 1}-${_.getDate()} ${_.getHours()}:${_.getMinutes()}:${_.getSeconds()}`;
 };
 
-export const log = {
+export const log: LogType = {
   err: (v: string | Error): void => {
     console.log(`${chalk.gray(now())} ${v}`);
   },
