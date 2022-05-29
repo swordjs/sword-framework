@@ -1,4 +1,4 @@
-import { parseCommandArgs } from '../util/config';
+import { commandArgs } from '../util/config';
 import { platformHook } from '../core/platform';
 import type { CommandConfig } from '../../typings/config';
 
@@ -11,7 +11,7 @@ import type { CommandConfig } from '../../typings/config';
  * @return {*}  {CommandConfig['platform']}
  */
 export const usePlatform = (): CommandConfig['platform'] => {
-  return parseCommandArgs().platform;
+  return commandArgs.platform;
 };
 
 export const usePlatformHook = platformHook;

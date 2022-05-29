@@ -7,7 +7,7 @@ import init from './init';
 import doc from './doc';
 import { processShim } from './shim';
 import { initConfig } from './config';
-import { parseCommandArgs } from '../../../src/util/config';
+import { commandArgs as args } from '../../../src/util/config';
 
 type commands = 'dev' | 'build' | 'init' | 'doc';
 
@@ -19,7 +19,6 @@ async function main() {
   // 加载shim
   processShim();
   // 解析命令行参数
-  const args = parseCommandArgs();
   const cliHandler = {
     dev,
     build,

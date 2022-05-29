@@ -29,3 +29,5 @@ export const parseCommandArgs = (): Argv<CommandConfig> => {
   }
   return argv;
 };
+
+export const commandArgs = parseCommandArgs();

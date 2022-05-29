@@ -1,7 +1,4 @@
-import { parseCommandArgs } from '../../util/config';
-
-const commandArgs = parseCommandArgs();
-
+import { commandArgs } from '../../util/config';
 /**
  * 根据不同平台, 传入不同的函数, 并且返回
  * @param {(Record<typeof commandArgs.platform, () => Promise<any> | any>)} params

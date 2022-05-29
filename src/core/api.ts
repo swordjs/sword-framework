@@ -1,5 +1,5 @@
 import { h3 } from './index';
-import { readFileSync, unlink } from 'fs';
+import { readFileSync } from 'fs';
 import { getApiMap } from './map';
 import { validateMethod, validateProto, getNeedValidateProto } from './validate';
 import { getSourcePath } from '../util/path';
@@ -8,7 +8,7 @@ import error from './error';
 import { isJSON } from '../util/data';
 import { getLogger } from './log';
 import { aggregatePlugin } from './plugin';
-import { parseCommandArgs } from '../util/config';
+import { parseCommandArgs, commandArgs as _commandArgs } from '../util/config';
 import { useQuery } from '../util/route';
 import { platformHook } from './platform';
 import type H3 from '@sword-code-practice/h3';
@@ -21,8 +21,9 @@ import type { ErrorReturn } from './error';
 
 type Event = H3.CompatibilityEvent | UnicloudEvent;
 
+let commandArgs = _commandArgs;
+
 // 获取command args
-let commandArgs = parseCommandArgs();
 const logMap = getLogger(commandArgs.platform);
 
 // 具体的proto schema引用
