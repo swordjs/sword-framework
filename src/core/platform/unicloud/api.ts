@@ -1,8 +1,14 @@
 import Ajv, { JSONSchemaType, ValidateFunction } from 'ajv';
-import { routerHandler, methods } from '../api';
-import error from '../error';
-import type { UnicloudContext, UnicloudEvent } from '../../../typings/unicloud';
-import type { Map } from '../map';
+import { routerHandler, methods } from '../../api';
+import error from '../../error';
+import type { Event } from '../../../../typings/index';
+import type { UnicloudContext, UnicloudEvent } from '../../../../typings/unicloud';
+import type { Map } from '../../map';
+
+export const adaptUnicloudEvent = async (event: Event) => {
+  const { route: url, method, params } = event as UnicloudEvent;
+  return { req: event, res: null, url, method, params };
+};
 
 /**
  *
