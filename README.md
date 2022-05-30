@@ -26,7 +26,7 @@ This is the first serverless framework in [sword.org](https://github.com/swordCo
 | platform     | status |
 | -------- | ---- |
 | Server   | ✅   |
-| Unicloud | ⚠️   |
+| Unicloud |  💻  |
 | Worker    | ⚠️   |
 | Alibaba   | ⚠️   |
 | Tencent   | ⚠️   |
