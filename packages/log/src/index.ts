@@ -24,7 +24,7 @@ export const log: LogType = {
  * @preset true
  * @return {*}
  */
-export const useLogPlugin = (): Plugin => {
+export const useLog = (): Plugin => {
   return {
     name: 'log',
     log
