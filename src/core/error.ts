@@ -1,8 +1,6 @@
-import { h3 } from './index';
-import { parseCommandArgs } from '../util/config';
-import type { H3Error } from '@sword-code-practice/h3';
-
-const commandArgs = parseCommandArgs();
+import { parseCommandArgs, commandArgs } from '../util/config';
+import { getAsyncDependency } from '../core/schedule';
+import type H3 from '@sword-code-practice/h3';
 
 // 定义不同错误类型以及它们所代表的状态码
 // 定义错误类型
@@ -23,16 +21,16 @@ export type ErrorResponse = {
   statusCode: number;
   statusMessage: string;
 };
-export type ErrorReturn = H3Error | ErrorResponse;
+export type ErrorReturn = H3.H3Error | ErrorResponse;
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export default (type: keyof typeof ErrorType, message: string): H3Error | ErrorResponse => {
+export default (type: keyof typeof ErrorType, message: string): H3.H3Error | ErrorResponse => {
   const platform = commandArgs.platform;
   const data = {
     statusCode: ErrorType[type],
     statusMessage: message
   };
   if (platform === 'server') {
-    return h3.createError(data);
+    return getAsyncDependency('@sword-code-practice/h3').createError(data);
   }
   return data;
 };

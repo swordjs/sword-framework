@@ -1,8 +1,8 @@
-import { h3Setup, h3 } from '../core/';
-import { parseCommandArgs } from '../util/config';
+import { commandArgs } from '../util/config';
 import { aggregatePluginBehavior } from '../core/plugin';
 import { implementApi } from '../core/api';
-import type { App } from '@sword-code-practice/h3';
+import { asyncDependencyScheduler, getAsyncDependency } from '../core/schedule';
+import type H3 from '@sword-code-practice/h3';
 
 /**
  *
@@ -24,6 +24,8 @@ type AppReturn = {
   };
 };
 export const useApp = async (): Promise<AppReturn> => {
+  // 异步加载与运行时环境的异步依赖
+  await asyncDependencyScheduler();
   // 初始化返回
   const returnData: AppReturn = {
     implementApi: () => implementApi(app),
@@ -34,9 +36,9 @@ export const useApp = async (): Promise<AppReturn> => {
     }
   };
   // 新建一个h3实例
-  let app: App | null = null;
-  if (['server'].includes(parseCommandArgs().platform)) {
-    await h3Setup();
+  let app: H3.App | null = null;
+  if (['server'].includes(commandArgs.platform)) {
+    const h3 = await getAsyncDependency<typeof H3>('@sword-code-practice/h3');
     app = h3.createApp();
     returnData.server.start = () => {
       if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);

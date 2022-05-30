@@ -1,5 +1,5 @@
-import { h3 } from './index';
 import { platformHook } from './platform';
+import { getAsyncDependency } from './schedule';
 import { useValidateProto } from '../hooks/proto';
 import type { HttpInstructMethod, HttpContext } from '../../typings/index';
 import type H3 from '@sword-code-practice/h3';
@@ -14,8 +14,8 @@ import type { UnicloudEvent } from '../../typings/unicloud';
  */
 export const validateMethod = async (req: H3.CompatibilityEvent | UnicloudEvent, expected: HttpInstructMethod | HttpInstructMethod[]): Promise<boolean> => {
   return (await platformHook<boolean>({
-    server: () => {
-      return h3.isMethod(req as H3.CompatibilityEvent, expected);
+    server: async () => {
+      return getAsyncDependency<typeof H3>('@sword-code-practice/h3').isMethod(req as H3.CompatibilityEvent, expected);
     },
     unicloud: () => {
       const _req = req as UnicloudEvent;
