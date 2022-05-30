@@ -5,8 +5,7 @@ import chokidar from 'chokidar';
 import { debounce } from './util';
 import { generateSchema } from './util/proto';
 import { writeFileRecursive } from './util/file';
-import { dev as unicloudDev } from './platform/unicloud';
-
+import { devUnicloudApp } from './platform/unicloud';
 import log from './log';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
@@ -33,7 +32,7 @@ const start = (args: Argv<CommandConfig>) => {
     });
     // 运行成功
     log.info(`启动入口文件: src/index.ts`);
-  } else if (args.platform === 'unicloud') unicloudDev(args);
+  } else if (args.platform === 'unicloud') devUnicloudApp(args);
 };
 
 // 重启服务器

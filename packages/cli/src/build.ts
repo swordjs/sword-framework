@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import esbuild from 'esbuild';
 import { delDir } from './util/file';
 import log from './log';
+import { buildUnicloudApp } from './platform/unicloud';
 import { writeFileRecursive } from './util/file';
 import { generateSchema } from './util/proto';
 import type { Argv } from 'mri';
@@ -30,7 +31,7 @@ const defaultBuildOptions: BuildOptions = {
  * @param {Argv<CommandConfig>} args
  * @param {{
  *     success: () => void;
- *     error: () => void;
+ *     error: (e) => void;
  *   }} cb
  * @param {BuildOptions} [buildOptions]
  */
@@ -39,7 +40,7 @@ export const build = async (
   args: Argv<CommandConfig>,
   cb: {
     success: () => void;
-    error: () => void;
+    error: (e) => void;
   },
   buildOptions?: BuildOptions
 ) => {
@@ -73,8 +74,8 @@ export const build = async (
       .then(() => {
         cb.success();
       })
-      .catch(() => {
-        cb.error();
+      .catch((e) => {
+        cb.error(e);
       });
   } catch (error) {}
 };
@@ -83,10 +84,12 @@ export default async (args: Argv<CommandConfig>) => {
   try {
     // 清空sword文件夹,需要根据platform条件进行清空
     delDir(resolve(process.cwd(), `.sword/dev/${args.platform}`));
-    build(args, {
-      success: () => log.success(`[${args.platform}]📦 打包成功`),
-      error: () => log.err(`[${args.platform}]📦 打包出现未知问题`)
-    });
+    if (args.platform === 'server') {
+      build(args, {
+        success: () => log.success(`[server]📦 打包成功`),
+        error: () => log.err(`[server]📦 打包出现未知问题`)
+      });
+    } else if (args.platform === 'unicloud') buildUnicloudApp(args);
   } catch (e) {
     throw log.err(e);
   }

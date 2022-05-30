@@ -78,3 +78,26 @@ export const delDir = (path: string) => {
     fs.rmdirSync(path);
   }
 };
+
+/**
+ *
+ * 递归拷贝文件夹
+ * @param {string} source
+ * @param {string} target
+ */
+export const copyDir = (source: string, target: string) => {
+  const files = fs.readdirSync(source);
+  if (!fs.existsSync(target)) {
+    fs.mkdirSync(target);
+  }
+  files.forEach((file) => {
+    const currentSource = source + '/' + file;
+    const currentTarget = target + '/' + file;
+    if (fs.statSync(currentSource).isDirectory()) {
+      fs.mkdirSync(currentTarget);
+      copyDir(currentSource, currentTarget);
+    } else {
+      fs.copyFileSync(currentSource, currentTarget);
+    }
+  });
+};
