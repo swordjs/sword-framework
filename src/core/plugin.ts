@@ -83,7 +83,7 @@ export const aggregatePluginBehavior = (): AggregatePlugin => {
             { name: 'server', server: { start: () => {} } },
       // log插件的实现存在chalk等色彩依赖, 所以仅在server端使用
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      log: commandArgs.platform === 'server' ? getAsyncDependency('@sword-code-practice/sword-plugin-log')['useLog']() : null
+      log: commandArgs.platform === 'server' ? getAsyncDependency('@sword-code-practice/sword-plugin-log')['useLog']() : {}
     };
     // 迭代聚合后的插件对象，如果没有聚合的插件，那么就用预设插件顶替
     // 迭代预设插件对象
