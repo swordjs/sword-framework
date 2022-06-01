@@ -16,7 +16,7 @@ describe('transform-event', () => {
     expect(result).toEqual({
       req: event,
       res: null,
-      url: event.route,
+      key: event.route,
       method: event.method,
       params: event.params,
       query: event.query

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateEvent } from '../../../src/core/platform/unicloud';
+import { validateEvent } from '../../../src/core/platform/unicloud/api';
 import type { UnicloudEvent } from '../../../typings/unicloud';
 
 describe('validateEvent', () => {
