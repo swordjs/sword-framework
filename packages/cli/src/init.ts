@@ -19,8 +19,8 @@ export default async (args: Argv<CommandConfig>) => {
   });
   const CNPM_PACKAGE_URL = 'https://registry.npmmirror.com/@sword-code-practice/sword-framework-example';
   const packageInfo = await $fetch(CNPM_PACKAGE_URL);
-  // 获取全部的版本
-  const versions = Object.keys(packageInfo.versions);
+  // 获取全部的版本(倒序)
+  const versions = Object.keys(packageInfo.versions).reverse();
   const version = await prompt({
     type: 'select',
     choices: versions,
