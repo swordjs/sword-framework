@@ -16,8 +16,10 @@ register({});
 async function main() {
   // 解析config参数
   await initConfig();
-  // 加载shim
-  processShim();
+  if (['dev', 'build'].includes(args._[0])) {
+    // 加载shim
+    processShim();
+  }
   // 解析命令行参数
   const cliHandler = {
     dev,
