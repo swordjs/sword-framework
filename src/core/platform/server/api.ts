@@ -21,7 +21,7 @@ export const adaptServerEvent = async (event: Event) => {
     // 当params是空对象时, 使用usebody解析出来的数据是空字符串, 所以为了validate, 我们需要将空字符串转换为空对象
     if (parseResult !== '') params = parseResult;
   }
-  return { req, res, url, method, params };
+  return { req, res, key: url, method, params };
 };
 
 /**

@@ -7,7 +7,7 @@ import type { Map } from '../../map';
 
 export const adaptUnicloudEvent = async (event: Event) => {
   const { route: url, method, params } = event as UnicloudEvent;
-  return { req: event, res: null, url, method, params };
+  return { req: event, res: null, key: url, method, params };
 };
 
 /**
