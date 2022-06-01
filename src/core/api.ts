@@ -48,7 +48,7 @@ export const methods: HttpInstructMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'H
  * @param {Event} event
  * @return {*}  {Promise<{ req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }>}
  */
-type AdaptEventReturn = Promise<{ key: string; req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }>;
+type AdaptEventReturn = Promise<{ key: string; req: any; res: any; method: HttpInstructMethod; params: any; query: any }>;
 export const adaptEvent = async (event: Event): AdaptEventReturn => {
   // 兼容vitest测试环境, 我们需要重新获取正确的command args
   // 在这里需要重新获取的原因是, 我们的adaptEvent测试用例, 显式地传递了command args, 但是在我们开发/生产环境中, commandArgs是一个全局变量, 它只运行一次, 但是测试环境需要获取多次, 所以我们需要重新获取
@@ -56,16 +56,22 @@ export const adaptEvent = async (event: Event): AdaptEventReturn => {
   if (process.env.VITEST) {
     commandArgs = parseCommandArgs();
   }
-  type Return = Record<Exclude<keyof UnPromisify<AdaptEventReturn>, 'query' | 'key'>, any>;
-  const result: Return = (await platformHook<Return>({
-    server: async () => await adaptServerEvent(event),
-    unicloud: async () => await adaptUnicloudEvent(event)
-  })) as any;
+  type Return = Record<Exclude<keyof UnPromisify<AdaptEventReturn>, 'query'>, any>;
+  const result: Return = (await platformHook<Return>(
+    {
+      server: async () => await adaptServerEvent(event),
+      unicloud: async () => await adaptUnicloudEvent(event)
+    },
+    commandArgs.platform
+  )) as any;
   return {
     ...result,
-    query: isJSON(await useQuery(result['url'])),
-    // key 就是 url, 在这里需要去掉?号之后部分
-    key: result['url'].split('?')[0]
+    key: result['key'].split('?')[0],
+    // 将key上的query参数和query对象进行合并
+    query: {
+      ...isJSON(await useQuery(result['key'])),
+      ...((event as any).query ?? {})
+    }
   };
 };
 
