@@ -148,8 +148,6 @@ const listenIndex = (args: Argv<CommandConfig>) => {
 };
 
 export default async (args: Argv<CommandConfig>) => {
-  // 生成protoschema到指定目录, proto schema为sword runtime提供验证服务
-  await generateSchema(resolve(process.cwd(), `./src/proto.json`));
   start(args);
   listenIndex(args);
   // 监听资源文件夹下的api文件夹

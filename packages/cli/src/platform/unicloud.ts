@@ -9,6 +9,11 @@ import type { CommandConfig } from '../../../../typings/config';
 
 // 获取云函数目标根目录
 const getTargetPath = () => {
+  // 判断unicloud的link是否配置, 如果没有配置, 则就抛出错误
+  if (!configData.unicloud.link || configData.unicloud.link === '') {
+    log.err('[unicloud]请配置unicloud.link (未配置或者为空)');
+    log.err('[unicloud]关于unicloud.link的配置参考: https://www.yuque.com/mlgrgm/lrf0ra/ngkk5m#wL5HU');
+  }
   return `${configData.unicloud.link}/sword`;
 };
 
@@ -70,13 +75,19 @@ export const buildUnicloudApp = (args: Argv<CommandConfig>) => {
       // 将packagejson写入
       writeFileRecursive(packageJsonPath, JSON.stringify(packageJson, null, 4));
       // 判断unicloud产物是文件夹还是快捷方式, 如果是文件夹, 就递归删除, 如果是快捷方式, 则删除快捷方式
-      if (lstatSync(targetPath).isDirectory()) {
-        delDir(targetPath);
-      } else {
-        unlinkSync(targetPath);
+      if (existsSync(targetPath)) {
+        if (lstatSync(targetPath).isDirectory()) {
+          delDir(targetPath);
+        } else {
+          unlinkSync(targetPath);
+        }
       }
       // 在打包之前, 需要删除之前的产物
       delDir(sourcePath);
+      // 打包之前替换shim
+      shim({
+        sourcePath: `/tmp/function/sword`
+      });
       // 打包unicloud app产物
       build(
         args,
@@ -111,8 +122,8 @@ export const buildUnicloudApp = (args: Argv<CommandConfig>) => {
 // 将文件夹软链接到目标文件夹
 const link = () => {
   const targetPath = getTargetPath();
-  // 如果目标是文件夹, 就删除
-  if (lstatSync(targetPath).isDirectory()) {
+  // 如果目标存在且目标是文件夹, 就删除
+  if (existsSync(targetPath) && lstatSync(targetPath).isDirectory()) {
     delDir(targetPath);
   }
   // 判断目标路径的sword是否存在，并且是否是替身，如果不存在/不是替身，就创建
