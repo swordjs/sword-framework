@@ -5,19 +5,15 @@
 
 ## Sword.js
 
-[中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
+[中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt) / [Unicloud平台](https://github.com/swordCodePractice/sword-framework/tree/master/docs/READEME-DCLOUD-CN.md)
 
 这是 Sword 团队内部沉淀的第一个云函数框架，毫无疑问它完全是基于`TypeScript`开发的。除了 `framework` 核心程序之外，它为开发者提供了开箱即用的开发套件，使之能够开
-发`serverless`应用像写普通的 nodejs 程序一样简单。得益于插件系统赋予了它跨平台的特性，你可以使用它开发各个厂商的 serverless 应用，比如AWS,Aliyun,Tencent,Dcloud...
-
-## Dcloud-2022 插件大赛🎉
-
-<img src="https://static.yinzhuoei.com/typecho/2022/05/17/010112482864668/WechatIMG11768.jpeg" />
+发`serverless`应用像写普通的 nodejs 程序一样简单。你可以使用它开发各个厂商的 serverless 应用，比如AWS,Aliyun,Tencent,Dcloud...
 
 ## 特性
 
 - ❤️ 完全拥抱`TypeScript`
-- 🐮 通过插件系统支持跨平台: Server/阿里云/腾讯云/Cloudflare/AWS/Unicloud
+- 🐮 支持跨平台: Server/阿里云/腾讯云/Cloudflare/AWS/Unicloud
 - 🕷️ 基于文件系统的路由
 - 🥷 开箱即用的开发套件
 - 📖 TS运行时类型校验
@@ -29,7 +25,7 @@
 | 平台     | 进度 |
 | -------- | ---- |
 | Server   | ✅   |
-| Unicloud | ⚠️   |
+| Unicloud | ✅   |
 | Woker    | ⚠️   |
 | 阿里云   | ⚠️   |
 | 腾讯云   | ⚠️   |
@@ -49,6 +45,10 @@ npm i @sword-code-practice/backend-cli -g
 ## 初始化
 
 你可以更方便的初始化一个项目，它的初始化功能是由 cli 提供的，模板是[从这里](https://github.com/swordCodePractice/sword-framework/tree/master/example)获取的。
+
+```bash
+sword init
+```
 
 ## 使用
 

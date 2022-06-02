@@ -6,7 +6,7 @@
 ## Sword.js
 
 
-[中文说明](https://github.com/swordCodePractice/sword-framework/tree/master/docs/README-CN.md) / [中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
+[中文说明](https://github.com/swordCodePractice/sword-framework/tree/master/docs/README-CN.md) / [中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt) / [Unicloud平台](https://github.com/swordCodePractice/sword-framework/tree/master/docs/READEME-DCLOUD-CN.md)
 
 
 This is the first serverless framework in [sword.org](https://github.com/swordCodePractice) for nodejs. No doubt it is fully developed based on Typescript. Except for framework core, have a toolkit for developer, make it easy to use same as developing common nodejs application, you can use it develop different company serverless application, like AWS, Dcloud, Tencent, Alibaba, etc.
@@ -35,7 +35,7 @@ This is the first serverless framework in [sword.org](https://github.com/swordCo
 ## Install
 
 ```bash
-npm install @sword-code-practice/sword-framework
+npm i @sword-code-practice/sword-framework
 ```
 We highly recommend you install the CLI toolkits to global, so you can use them in your project easily.
 
@@ -45,6 +45,11 @@ npm i @sword-code-practice/backend-cli -g
 ## Init template
 
 You can use the CLI toolkit to init a new project, the template from [here](https://github.com/swordCodePractice/sword-framework/tree/master/example)
+
+```bash
+sword init
+```
+
 
 ## Start
 
