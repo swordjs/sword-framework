@@ -1,7 +1,11 @@
+<p align="center">
+<img width="40%" src="https://static.yinzhuoei.com/typecho/2022/02/17/048881447338917/WX20220217-212200-removebg-preview.png"/>
+</p>
+
 ## Sword.js (for Unicloud)
 > 面向高阶Typescript开发者的跨平台云函数框架, 我相信sword会是unicloud社区最独特也是最强的存在, 意味着unicloud的开发体验将从“ 🪓 石器时代” -> “ 💻 工业时代”
 
-### 出来乍到, 简单介绍
+### 初来乍到, 简单介绍
 
 [中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
 
