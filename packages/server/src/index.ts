@@ -62,11 +62,11 @@ const startServer = async (app: any, serverConfig: ServerConfig = defaultServerC
 const portUsed = (port: number): Promise<number | false> => {
   return new Promise((resolve) => {
     const server = net.createServer().listen(port);
-    server.on('listening', function () {
+    server.on('listening', () => {
       server.close();
       resolve(port);
     });
-    server.on('error', function (err: any) {
+    server.on('error', (err: any) => {
       if (err.code == 'EADDRINUSE') {
         resolve(false);
       }
