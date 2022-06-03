@@ -12,11 +12,17 @@ import type { CommandConfig } from '../../../typings/config';
 
 let indexcp: ChildProcess | null = null;
 
+// 如果进程存在,则杀掉
+const killProcess = (): void => {
+  indexcp && indexcp.kill();
+};
+
 /**
  * 使用@swc-node/register执行index.ts
  * @param {CommandConfigReturn} config
  */
 const start = (args: Argv<CommandConfig>) => {
+  killProcess();
   // 判断如果platform是server，则执行server端的dev
   // server端的dev指的就是node直接运行index.ts文件
   if (args.platform === 'server') {
@@ -39,8 +45,6 @@ const start = (args: Argv<CommandConfig>) => {
 const restart = (args: Argv<CommandConfig>) => {
   // 重启服务器
   log.info('重启服务...');
-  // 杀掉现在的进程
-  indexcp && indexcp.kill();
   setTimeout(() => {
     start(args);
   }, 300);

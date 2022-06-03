@@ -37,15 +37,17 @@ export const getProtoMap = async (
   for (const key in files) {
     // 解构path和d
     const [path, d] = files[key];
-    const module = resolve(path, d);
-    delete require.cache[module];
+    const modulePath = resolve(path, d);
+    delete require.cache[modulePath];
     if (['index.ts', 'proto.ts'].includes(d)) {
       // apiPath 比如hello/detail 诸如此类
       const apiPath = path.substring(path.lastIndexOf(apiDir)).substring(apiDir.length);
       // 执行函数，获取instruct指示器
       if (d === 'index.ts') {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { instruct } = require(module).main as HttpApiReturn<any>;
+        const module = require(modulePath) as any;
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { instruct }: HttpApiReturn<any> = module.default ?? module.main;
         apiPaths.push(apiPath);
         // 如果当前目录下，存在proto.ts文件，则记录
         if (existsSync(resolve(path, 'proto.ts'))) {

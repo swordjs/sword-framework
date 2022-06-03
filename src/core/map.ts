@@ -37,8 +37,9 @@ export const getApiMap = async (
       // 执行函数，获取instruct指示器
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const module = require(path);
-      if (module.main) {
-        const { instruct, handler } = module.main as HttpApiReturn<any>;
+      // 如果模块是默认导出或者导出main
+      if (module.default || module.main) {
+        const { instruct, handler }: HttpApiReturn<any> = module.default ?? module.main;
         const currentPath = getKey(`/${apiDir}`, apiPath, instruct.path);
         // 判断apiMap中已存在某个apikey，那么就提示api被占用，那么此时默认将不会按照指示器中的path进行替换赋值
         if (apiMap[currentPath]) {
