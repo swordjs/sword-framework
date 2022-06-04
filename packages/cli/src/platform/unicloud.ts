@@ -25,8 +25,15 @@ const addCode = (args: Argv<CommandConfig>) => {
     resolve(process.cwd(), path),
     `${readFileSync(resolve(process.cwd(), path)).toString()}
 module.exports = async (event, context) => {
-const { apiMap } = await import_sword_framework.useGetApiMap()
-return import_sword_framework.useUnicloudTriggerApi(event, context, apiMap)
+  const validateResult = import_sword_framework.useUnicloudValidateEvent(event);
+  // 判断校验结果是否严格等于true
+  if (validateResult !== true) {
+    return validateResult;
+  }
+  const { apiMap } = await import_sword_framework.useGetApiMap({
+    apiPath: event.route.split("?")[0]
+  })
+  return import_sword_framework.useUnicloudTriggerApi(event, context, apiMap)
 }`
   );
 };
