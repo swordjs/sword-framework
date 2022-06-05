@@ -2,8 +2,8 @@ import { routerHandler } from '../../api';
 import { getAsyncDependency } from '../../schedule';
 import type { Map } from '../../map';
 import type H3 from '@sword-code-practice/h3';
-import type { Event } from '../../../../typings/index';
-import type { HttpInstructMethod } from '../../../../typings/index';
+import type { Event } from '../../../../../../typings/index';
+import type { HttpInstructMethod } from '../../../../../../typings/index';
 
 // 在核心程序中，读取usebody的时候，需要进行判断，只有在几个method的请求上才可以对body进行解析
 const readBodyPayloadMethods: HttpInstructMethod[] = ['POST', 'PUT', 'DELETE'];

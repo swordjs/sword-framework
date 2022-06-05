@@ -1,6 +1,6 @@
-import { commandArgs } from '../util/config';
+import { commandArgs } from '../../../../util/config';
 import { platformHook } from '../core/platform';
-import type { CommandConfig } from '../../typings/config';
+import type { CommandConfig } from '../../../../typings/config';
 
 /**
  * 获取程序的运行时环境

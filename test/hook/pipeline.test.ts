@@ -1,5 +1,5 @@
-import { exec, clear, clearAll } from '../../src/core/pipeline';
-import { usePipeline } from '../../src/hooks/pipeline';
+import { exec, clear, clearAll } from '../../packages/runtime/src/core/pipeline';
+import { usePipeline } from '../../packages/runtime/src/hooks/pipeline';
 import { describe, it, expect } from 'vitest';
 
 const pipeline = usePipeline<any>();

@@ -1,6 +1,6 @@
 import mri from 'mri';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '../../typings/config';
+import type { CommandConfig } from '../typings/config';
 
 let argv: any = null;
 

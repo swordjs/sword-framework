@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { adaptEvent } from '../../src/core/api';
+import { adaptEvent } from '../../packages/runtime/src/core/api';
 import type { UnicloudEvent } from '../../typings/unicloud';
 
 describe('transform-event', () => {

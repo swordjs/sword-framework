@@ -1,4 +1,4 @@
-import type { Use } from '../../typings/index';
+import type { Use } from '../../../../typings/index';
 import { TSBufferValidator } from 'tsbuffer-validator';
 
 // 检查proto

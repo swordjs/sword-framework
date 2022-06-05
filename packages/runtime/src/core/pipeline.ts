@@ -1,5 +1,5 @@
-import type { PipelineNode } from '../../typings/pipeline';
-import type { HttpContext } from '../../typings/index';
+import type { PipelineNode } from '../../../../typings/pipeline';
+import type { HttpContext } from '../../../../typings/index';
 
 export type PipelineTypeKeys = 'preApiCall' | 'postApiCall';
 

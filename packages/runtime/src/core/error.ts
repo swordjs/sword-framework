@@ -1,4 +1,4 @@
-import { parseCommandArgs, commandArgs } from '../util/config';
+import { parseCommandArgs, commandArgs } from '../../../../util/config';
 import { getAsyncDependency } from '../core/schedule';
 import type H3 from '@sword-code-practice/h3';
 

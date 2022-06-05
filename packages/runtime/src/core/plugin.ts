@@ -1,6 +1,6 @@
 import { getAsyncDependency } from './schedule';
-import { commandArgs } from '../util/config';
-import type { Plugin } from '../../typings/index';
+import { commandArgs } from '../../../../util/config';
+import type { Plugin } from '../../../../typings/index';
 
 export const plugins: Plugin[] = [];
 

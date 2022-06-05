@@ -1,4 +1,4 @@
-import { commandArgs } from '../../util/config';
+import { commandArgs } from '../../../../../util/config';
 
 /**
  * 根据不同平台, 传入不同的函数, 并且返回

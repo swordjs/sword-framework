@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { usePlugin } from '../../src/hooks/plugin';
-import { aggregatePluginBehavior, plugins } from '../../src/core/plugin';
-import { asyncDependencyScheduler } from '../../src/core/schedule';
+import { usePlugin } from '../../packages/runtime/src/hooks/plugin';
+import { aggregatePluginBehavior, plugins } from '../../packages/runtime/src/core/plugin';
+import { asyncDependencyScheduler } from '../../packages/runtime/src/core/schedule';
 import type { Plugin } from '../../typings/index';
 
 describe('plugin', async () => {

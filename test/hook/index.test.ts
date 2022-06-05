@@ -1,4 +1,4 @@
-import { useApi, Get, Post } from '../../src/hooks';
+import { useApi, Get, Post } from '../../packages/runtime/src/hooks';
 import { describe, it, expect } from 'vitest';
 
 describe('useApi', () => {
@@ -25,7 +25,7 @@ describe('useApi', () => {
   });
   it('传递单个指示器，传入空字符串', () => {
     const res = useApi({
-      instruct: Get(''),
+      instruct: Get('/'),
       handler: () => {
         return {
           hello: 'message'
@@ -75,7 +75,7 @@ describe('useApi', () => {
   });
   it('传递多个指示器，首个非法值，剩下的随机值', () => {
     const res = useApi({
-      instruct: [Get(''), Post('/detail'), Post()],
+      instruct: [Get('/'), Post('/detail'), Post()],
       handler: () => {
         return {
           hello: 'message'

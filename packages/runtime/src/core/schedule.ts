@@ -1,5 +1,5 @@
-import { commandArgs } from '../util/config';
-import type { CommandConfig } from '../../typings/config';
+import { commandArgs } from '../../../../util/config';
+import type { CommandConfig } from '../../../../typings/config';
 
 // 支持异步加载依赖的列表
 const asyncDependencyList = ['@sword-code-practice/h3', '@sword-code-practice/sword-plugin-log', '@sword-code-practice/sword-plugin-server'] as const;

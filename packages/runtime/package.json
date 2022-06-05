@@ -1,0 +1,66 @@
+{
+  "name": "@sword-code-practice/sword-framework",
+  "version": "1.2.0-beta.5",
+  "description": "",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib",
+    "../../README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "main": "./lib/index.cjs",
+  "module": "./lib/index.mjs",
+  "exports": {
+    "require": "./lib/index.cjs",
+    "import": "./lib/index.mjs"
+  },
+  "scripts": {
+    "dev": "unbuild --stub",
+    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
+    "build": "unbuild",
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swordCodePractice/sword-framework.git"
+  },
+  "keywords": [
+    "serverless"
+  ],
+  "author": "Seho",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/swordCodePractice/sword-framework/issues"
+  },
+  "homepage": "https://github.com/swordCodePractice/sword-framework#readme",
+  "devDependencies": {
+    "@types/mv": "^2.1.2",
+    "unbuild": "^0.6.9"
+  },
+  "dependencies": {
+    "@sword-code-practice/h3": "0.7.4",
+    "@sword-code-practice/sword-plugin-log": "workspace:*",
+    "@sword-code-practice/sword-plugin-server": "workspace:*",
+    "ajv": "^8.11.0",
+    "mri": "^1.2.0",
+    "tsbuffer-validator": "^2.1.0",
+    "ufo": "^0.8.4"
+  },
+  "unbuild": {
+    "entries": [
+      "./src/index"
+    ],
+    "outDir": "lib",
+    "declaration": true,
+    "rollup": {
+      "emitCJS": true,
+      "cjsBridge": true,
+      "esbuild": {
+        "target": "node12"
+      }
+    }
+  }
+}

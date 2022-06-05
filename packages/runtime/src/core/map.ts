@@ -1,9 +1,9 @@
-import { traverseSourceDir } from '../util/file';
+import { traverseSourceDir } from '../../../../util/file';
 import { createRequire } from 'module';
 import { resolve } from 'path';
 import { log } from './log';
-import { getSourcePath } from '../util/path';
-import type { HttpInstructMethod, HttpApiReturn, HttpContext } from '../../typings/index';
+import { getSourcePath } from '../../../../util/path';
+import type { HttpInstructMethod, HttpApiReturn, HttpContext } from '../../../../typings/index';
 
 export type Map = {
   sourcePath: string;

@@ -1,8 +1,8 @@
-import Ajv, { JSONSchemaType, ValidateFunction } from 'ajv';
+import Ajv, { JSONSchemaType } from 'ajv';
 import { routerHandler, methods } from '../../api';
 import error from '../../error';
-import type { Event } from '../../../../typings/index';
-import type { UnicloudContext, UnicloudEvent } from '../../../../typings/unicloud';
+import type { Event } from '../../../../../../typings/index';
+import type { UnicloudContext, UnicloudEvent } from '../../../../../../typings/unicloud';
 import type { Map } from '../../map';
 import type { ErrorReturn } from '../../error';
 

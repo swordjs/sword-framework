@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateEvent } from '../../../src/core/platform/unicloud/api';
+import { validateEvent } from '../../../packages/runtime/src/core/platform/unicloud/api';
 import type { UnicloudEvent } from '../../../typings/unicloud';
 
 describe('validateEvent', () => {
@@ -10,7 +10,7 @@ describe('validateEvent', () => {
       params: {},
       query: {}
     };
-    expect(validateEvent()(event)).equals(true);
+    expect(validateEvent(event)).equals(true);
   });
   it('error route', () => {
     const event: any = {
@@ -19,7 +19,7 @@ describe('validateEvent', () => {
       params: {},
       query: {}
     };
-    const result = validateEvent()(event);
+    const result = validateEvent(event);
     expect(result).equals(false);
   });
   it('error method', () => {
@@ -29,7 +29,7 @@ describe('validateEvent', () => {
       params: {},
       query: {}
     };
-    const result = validateEvent()(event);
+    const result = validateEvent(event);
     expect(result).equals(false);
   });
   it('pattern error method', () => {
@@ -39,7 +39,7 @@ describe('validateEvent', () => {
       params: {},
       query: {}
     };
-    const result = validateEvent()(event);
+    const result = validateEvent(event);
     expect(result).equals(false);
   });
   it('pattern success method - 1', () => {
@@ -49,7 +49,7 @@ describe('validateEvent', () => {
       params: {},
       query: {}
     };
-    const result = validateEvent()(event);
+    const result = validateEvent(event);
     expect(result).equals(true);
   });
   it('pattern success method - 2', () => {
@@ -59,7 +59,7 @@ describe('validateEvent', () => {
       params: {},
       query: {}
     };
-    const result = validateEvent()(event);
+    const result = validateEvent(event);
     expect(result).equals(true);
   });
   it('error params', () => {
@@ -69,7 +69,7 @@ describe('validateEvent', () => {
       params: true,
       query: {}
     };
-    const result = validateEvent()(event);
+    const result = validateEvent(event);
     expect(result).equals(false);
   });
   it('error query', () => {
@@ -79,7 +79,7 @@ describe('validateEvent', () => {
       params: {},
       query: true
     };
-    const result = validateEvent()(event);
+    const result = validateEvent(event);
     expect(result).equals(false);
   });
 });
