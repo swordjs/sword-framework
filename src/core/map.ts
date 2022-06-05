@@ -16,12 +16,17 @@ export type Map = {
  * @param {string} dir
  * @return {*}
  */
-export const getApiMap = async (
-  dir = 'src',
-  apiDir = 'api'
-): Promise<{
+export const getApiMap = async (params?: {
+  // 根文件夹
+  dir?: string;
+  // api文件夹
+  apiDir?: string;
+  // 完全匹配的api路径, 如果提供了这个参数, 那么函数会有目的性地去找此api并且仅返回匹配成功的map, 否则会迭代所有的api
+  apiPath?: string;
+}): Promise<{
   apiMap: Record<string, Map>;
 }> => {
+  const { dir = 'src', apiDir = 'api' } = params ?? {};
   const sourcePath = getSourcePath(`${dir}/${apiDir}`);
   const require = createRequire(import.meta.url);
   // 构建API Map
@@ -41,16 +46,26 @@ export const getApiMap = async (
       if (module.default || module.main) {
         const { instruct, handler }: HttpApiReturn<any> = module.default ?? module.main;
         const currentPath = getKey(`/${apiDir}`, apiPath, instruct.path);
+        // 缓存map的value对象
+        const mapValue = {
+          sourcePath: resolve(path, d),
+          method: instruct.method,
+          handler
+        };
+        // 如果当前的currentpath和参数中的apiPath一致, 则只返回当前的map (匹配成功)
+        if (params?.apiPath && params.apiPath === currentPath) {
+          return {
+            apiMap: {
+              [currentPath]: mapValue
+            }
+          };
+        }
         // 判断apiMap中已存在某个apikey，那么就提示api被占用，那么此时默认将不会按照指示器中的path进行替换赋值
         if (apiMap[currentPath]) {
           log().err(`${currentPath}路由已被占用，已跳过`);
           continue;
         } else {
-          apiMap[currentPath] = {
-            sourcePath: resolve(path, d),
-            method: instruct.method,
-            handler
-          };
+          apiMap[currentPath] = mapValue;
         }
       }
     }

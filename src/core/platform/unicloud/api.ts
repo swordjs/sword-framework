@@ -4,6 +4,7 @@ import error from '../../error';
 import type { Event } from '../../../../typings/index';
 import type { UnicloudContext, UnicloudEvent } from '../../../../typings/unicloud';
 import type { Map } from '../../map';
+import type { ErrorReturn } from '../../error';
 
 export const adaptUnicloudEvent = async (event: Event) => {
   const { route: url, method, params } = event as UnicloudEvent;
@@ -18,10 +19,6 @@ export const adaptUnicloudEvent = async (event: Event) => {
  * @return {*}
  */
 export const triggerApi = (event: UnicloudEvent, context: UnicloudContext, apiMap: Record<string, Map>) => {
-  const validateResult = validateEvent()(event);
-  if (!validateResult) {
-    return error('VALIDATE_REQUEST', 'event is not valid (unicloud)');
-  }
   // 判断apimap是否存在指定的route
   // route需要取问号之前有效的路径
   const route = event.route.split('?')[0];
@@ -36,7 +33,7 @@ export const triggerApi = (event: UnicloudEvent, context: UnicloudContext, apiMa
  * 校验event
  * @param {UnicloudEvent} event
  */
-export const validateEvent = (): ValidateFunction<UnicloudEvent> => {
+export const validateEvent = (event: UnicloudEvent): ErrorReturn | true => {
   const ajv = new Ajv();
   const schema: JSONSchemaType<UnicloudEvent> = {
     type: 'object',
@@ -49,5 +46,9 @@ export const validateEvent = (): ValidateFunction<UnicloudEvent> => {
     required: ['method', 'params', 'query', 'route'],
     additionalProperties: false
   };
-  return ajv.compile(schema);
+  const validateResult = ajv.compile(schema)(event);
+  if (!validateResult) {
+    return error('VALIDATE_REQUEST', 'event is not valid (unicloud)');
+  }
+  return true;
 };
