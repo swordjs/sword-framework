@@ -1,10 +1,12 @@
 # @sword-code-practice/sword-framework
 
-## 1.2.0
+
+## 1.2.1
 
 ### Minor Changes
 
-- 🎈 perf: new runtime and fix type
+- update runtime dependencies
+- new runtime and fix type
 
 ### Patch Changes
 
