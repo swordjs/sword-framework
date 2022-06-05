@@ -1,9 +1,0 @@
-.*
-*.config.*
-/src
-/tests
-/packages
-/example
-/scripts
-/typings
-/test

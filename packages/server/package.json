@@ -3,6 +3,10 @@
   "version": "1.0.1",
   "description": "",
   "types": "./lib/index.d.ts",
+  "files": [
+    "lib",
+    "README.md"
+  ],
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
@@ -16,10 +20,8 @@
   "scripts": {
     "dev": "unbuild --stub",
     "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run async'",
-    "prettier": "prettier --write '**/*.{js,ts,json,md}'",
     "build": "unbuild",
-    "async": "npm run build && yalc push",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "async": "npm run build && yalc push"
   },
   "keywords": [
     "serverless",
