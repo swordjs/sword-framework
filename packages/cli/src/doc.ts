@@ -1,13 +1,13 @@
 import { access, readFileSync, constants } from 'fs';
 import { writeFileRecursive } from './util/file';
 import { generateSchema } from './util/proto';
-import { getApiMap } from '../../runtime/src/core/map';
+import { useGetApiMap } from '@sword-code-practice/sword-framework';
 import log from './log';
 import { resolve } from 'path';
 import { OpenAPIV3_1 } from 'openapi-types';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
-import type { Map } from '../../runtime/src/core/map';
+import type { Map } from '@sword-code-practice/sword-framework';
 import { cwd } from 'process';
 
 type AccepptProtoName = ['ReqParams', 'ReqQuery', 'Res'];
@@ -93,7 +93,7 @@ export default async (args: Argv<CommandConfig>) => {
   try {
     log.info('开始生成文档');
     // 生成api数据，用于获取指示器等详细api信息
-    const { apiMap: map } = await getApiMap();
+    const { apiMap: map } = await useGetApiMap();
     apiMap = map;
     // 生成ast数据
     const { protoAst } = await generateSchema(null, {

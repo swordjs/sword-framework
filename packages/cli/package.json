@@ -14,9 +14,8 @@
   },
   "scripts": {
     "dev": "unbuild --stub",
-    "dev:yalc": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
+    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
     "build": "unbuild",
-    "async": "npm run build && yalc push",
     "test:cli:dev": "node ./lib/index.cjs dev",
     "test:cli:init": "node ./lib/index.cjs init",
     "test:cli:doc": "node ./lib/index.cjs doc"
@@ -44,6 +43,7 @@
   },
   "dependencies": {
     "@swc-node/register": "^1.4.2",
+    "@sword-code-practice/sword-framework": "workspace:*",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
     "consola": "^2.15.3",
