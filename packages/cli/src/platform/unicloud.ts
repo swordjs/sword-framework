@@ -82,12 +82,10 @@ export const buildUnicloudApp = (args: Argv<CommandConfig>) => {
       // 将packagejson写入
       writeFileRecursive(packageJsonPath, JSON.stringify(packageJson, null, 4));
       // 判断unicloud产物是文件夹还是快捷方式, 如果是文件夹, 就递归删除, 如果是快捷方式, 则删除快捷方式
-      if (existsSync(targetPath)) {
-        if (lstatSync(targetPath).isDirectory()) {
-          delDir(targetPath);
-        } else {
-          unlinkSync(targetPath);
-        }
+      if (lstatSync(targetPath).isDirectory()) {
+        delDir(targetPath);
+      } else if (lstatSync(targetPath).isSymbolicLink()) {
+        unlinkSync(targetPath);
       }
       // 在打包之前, 需要删除之前的产物
       delDir(sourcePath);
@@ -106,6 +104,7 @@ export const buildUnicloudApp = (args: Argv<CommandConfig>) => {
             log.success(`[unicloud]📦 打包成功, 请移动到hbuilderx中执行上传云函数命令`);
           },
           error: (e) => {
+            console.log(e);
             log.err(`[unicloud]📦 打包出现未知问题`);
           }
         },
