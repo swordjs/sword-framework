@@ -59,6 +59,7 @@ importers:
   packages/cli:
     specifiers:
       '@swc-node/register': ^1.4.2
+      '@sword-code-practice/sword-framework': workspace:*
       '@types/download': ^8.0.1
       '@types/mv': ^2.1.2
       chalk: ^4.1.2
@@ -76,6 +77,7 @@ importers:
       unconfig: ^0.3.1
     dependencies:
       '@swc-node/register': 1.5.1_typescript@4.7.3
+      '@sword-code-practice/sword-framework': link:../runtime
       chalk: 4.1.2
       chokidar: 3.5.3
       consola: 2.15.3
