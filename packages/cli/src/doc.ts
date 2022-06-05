@@ -1,13 +1,13 @@
 import { access, readFileSync, constants } from 'fs';
 import { writeFileRecursive } from './util/file';
 import { generateSchema } from './util/proto';
-import { getApiMap } from '../../../src/core/map';
+import { getApiMap } from '../../runtime/src/core/map';
 import log from './log';
 import { resolve } from 'path';
 import { OpenAPIV3_1 } from 'openapi-types';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
-import type { Map } from '../../../src/core/map';
+import type { Map } from '../../runtime/src/core/map';
 import { cwd } from 'process';
 
 type AccepptProtoName = ['ReqParams', 'ReqQuery', 'Res'];
@@ -118,10 +118,10 @@ export default async (args: Argv<CommandConfig>) => {
       // 编译markdown文档
       markdownMap[parentRoute] += await compileMarkdown(result, markdownMap[parentRoute]);
       // 编译openapi文档
-      openApiJson.paths[key] = await compileOpenApi(result, parentRoute);
+      openApiJson.paths![key] = await compileOpenApi(result, parentRoute);
       // 给openapi中的tags字段写入parentRoute
-      if (!openApiJson.tags.find((t) => t.name === parentRoute)) {
-        openApiJson.tags.push({
+      if (!openApiJson.tags!.find((t) => t.name === parentRoute)) {
+        openApiJson.tags!.push({
           name: parentRoute
         });
       }
@@ -130,19 +130,19 @@ export default async (args: Argv<CommandConfig>) => {
     outputOpenApi();
     // 处理packagejson
     try {
-      const packageInfo = await getPackageJson();
+      const packageInfo: any = await getPackageJson();
       // 给openapi的info赋值
       for (const key in openApiJson.info) {
         if (packageInfo[key]) {
-          openApiJson.info[key] = packageInfo[key];
+          (openApiJson.info as any)[key] = packageInfo[key];
         }
       }
     } catch (error) {
-      log.err(error);
+      log.err(error as Error);
     }
   } catch (error) {
     log.err('生成文档错误');
-    throw new Error(error);
+    throw new Error(error as any);
   }
 };
 
@@ -254,7 +254,7 @@ const compileMarkdown = async (result: transProtoReturn, markdown: string) => {
 const compileOpenApi = (result: transProtoReturn, parentRoute: string): OpenAPIV3_1.Document['paths'] => {
   const apiResult: OpenAPIV3_1.Document['paths'] = {};
   const assignObjArray = (data: Record<string, unknown>[]) => {
-    const res = {};
+    const res: any = {};
     // 循环data
     for (const item of data) {
       for (const key in item) {
@@ -279,7 +279,7 @@ const compileOpenApi = (result: transProtoReturn, parentRoute: string): OpenAPIV
             type: query.type.type.toLowerCase() as any
           }
         };
-      }),
+      }) as any,
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       requestBody: {
@@ -290,7 +290,7 @@ const compileOpenApi = (result: transProtoReturn, parentRoute: string): OpenAPIV
               properties: assignObjArray(
                 result.ReqParams.map((param) => {
                   return {
-                    [param.name]: {
+                    [param.name as any]: {
                       title: param.type.title,
                       description: param.type.desc,
                       type: param.type.type.toLowerCase() as any
@@ -312,7 +312,7 @@ const compileOpenApi = (result: transProtoReturn, parentRoute: string): OpenAPIV
                 properties: assignObjArray(
                   result.Res.map((res) => {
                     return {
-                      [res.name]: {
+                      [res.name as any]: {
                         title: res.type.title,
                         description: res.type.desc,
                         type: res.type.type.toLowerCase() as any

@@ -17,7 +17,7 @@ type BuildOptions = {
 };
 
 // 默认的打包参数
-const defaultBuildOptions: BuildOptions = {
+const defaultBuildOptions: Required<BuildOptions> = {
   skipPackageJson: false,
   outPath: `./.sword/build/server`,
   minify: true,
@@ -40,7 +40,7 @@ export const build = async (
   args: Argv<CommandConfig>,
   cb: {
     success: () => void;
-    error: (e) => void;
+    error: (e: any) => void;
   },
   buildOptions?: BuildOptions
 ) => {
@@ -91,6 +91,6 @@ export default async (args: Argv<CommandConfig>) => {
       });
     } else if (args.platform === 'unicloud') buildUnicloudApp(args);
   } catch (e) {
-    throw log.err(e);
+    throw log.err(e as Error);
   }
 };

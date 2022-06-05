@@ -29,17 +29,17 @@ export default async (args: Argv<CommandConfig>) => {
   });
   const now = String(new Date().getTime());
   // 下载项目
-  await download(`${CNPM_PACKAGE_URL}/-/sword-framework-example-${version['value']}.tgz`, now, {
+  await download(`${CNPM_PACKAGE_URL}/-/sword-framework-example-${(version as any)['value']}.tgz`, now, {
     extract: true
   });
-  mv(`${now}/package`, project['value'], { mkdirp: true }, (err) => {
+  mv(`${now}/package`, (project as any)['value'], { mkdirp: true }, (err) => {
     if (err) {
       throw err;
     }
     // rm 删除原目录
     spawnSync('rm', ['-rf', now]);
     // 初始化项目成功
-    consola.success(`初始化${project['value']}项目成功⚡️`);
+    consola.success(`初始化${(project as any)['value']}项目成功⚡️`);
     consola.info(`你完全可以使用pnpm,yarn,npm安装项目（我就不给你装了，我也不知道你喜欢什么❤️  ）`);
   });
 };

@@ -1,7 +1,7 @@
 import { loadConfig } from 'unconfig';
 import type { Config } from '../typings/config';
 
-export let configData: Config;
+export let configData: Required<Config>;
 
 // 默认配置的类型是非必选的config
 const defaultConfig: Config = {};
@@ -32,7 +32,7 @@ export const initConfig = async () => {
       config[key] = defaultConfig[key];
     }
   }
-  configData = config;
+  configData = config as any;
 };
 
 export type { Config } from '../typings/config';

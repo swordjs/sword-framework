@@ -136,7 +136,7 @@ const listenApiSource = (args: Argv<CommandConfig>) => {
       }, 500)
     );
   } catch (error) {
-    log.err(error);
+    log.err(error as Error);
   }
 };
 

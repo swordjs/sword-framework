@@ -121,7 +121,7 @@ export const buildUnicloudApp = (args: Argv<CommandConfig>) => {
       log.err(`[unicloud:build] 目标目录不存在package.json`);
     }
   } catch (error) {
-    log.err(error);
+    log.err(error as Error);
   }
 };
 

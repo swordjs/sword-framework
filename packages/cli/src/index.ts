@@ -7,7 +7,7 @@ import init from './init';
 import doc from './doc';
 import { processShim } from './shim';
 import { initConfig } from './config';
-import { commandArgs as args } from '../../../src/util/config';
+import { commandArgs as args } from '../../../util/config';
 
 type commands = 'dev' | 'build' | 'init' | 'doc';
 
