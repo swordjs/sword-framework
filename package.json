@@ -1,28 +1,8 @@
 {
-  "name": "@sword-code-practice/sword-framework",
-  "version": "1.2.0-beta.5",
-  "description": "",
-  "types": "./lib/index.d.ts",
-  "files": [
-    "lib",
-    "README.md"
-  ],
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "main": "./lib/index.cjs",
-  "module": "./lib/index.mjs",
-  "exports": {
-    "require": "./lib/index.cjs",
-    "import": "./lib/index.mjs"
-  },
   "scripts": {
-    "dev": "unbuild --stub",
-    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
     "prettier": "prettier --write '**/*.{js,ts,json,md}'",
     "lint-staged": "lint-staged",
-    "build": "unbuild",
+    "build": "turbo run build",
     "test": "vitest run",
     "publish:main": "pnpm publish --no-git-checks && open https://npmmirror.com/sync/@sword-code-practice/sword-framework",
     "publish:packages": "node scripts/publish-packages.mjs",
@@ -32,18 +12,8 @@
     "type": "git",
     "url": "git+https://github.com/swordCodePractice/sword-framework.git"
   },
-  "keywords": [
-    "serverless"
-  ],
-  "author": "Seho",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/swordCodePractice/sword-framework/issues"
-  },
-  "homepage": "https://github.com/swordCodePractice/sword-framework#readme",
   "devDependencies": {
-    "@dcloudio/types": "^2.6.6",
-    "@swc-node/register": "^1.4.2",
+    "@changesets/cli": "^2.22.0",
     "@types/node": "^14.18.12",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
@@ -54,19 +24,13 @@
     "husky": "^7.0.4",
     "lint-staged": "^11.2.6",
     "prettier": "^2.6.2",
-    "rimraf": "^3.0.2",
-    "tsconfig-paths": "^3.14.1",
+    "turbo": "^1.2.16",
     "typescript": "^4.6.3",
-    "unbuild": "^0.7.2",
+    "unbuild": "^0.7.4",
     "vitest": "latest"
   },
   "dependencies": {
-    "@sword-code-practice/h3": "0.7.4",
-    "@sword-code-practice/sword-plugin-log": "workspace:*",
-    "@sword-code-practice/sword-plugin-server": "workspace:*",
-    "ajv": "^8.11.0",
     "mri": "^1.2.0",
-    "tsbuffer-validator": "^2.1.0",
     "ufo": "^0.8.4"
   }
 }
