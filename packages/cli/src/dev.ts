@@ -64,8 +64,7 @@ const generatePreset = (sourceDir: string, parentDir: string, dir: string) => {
   // 生成proto
   writeFileRecursive(
     `${resolve(cwd, sourceDir, 'api', ..._parentDir, dir, 'proto.ts')}`,
-    `
-export interface ReqParams {
+    `export interface ReqParams {
 
 }
 export interface ReqQuery {
@@ -78,21 +77,21 @@ export interface Res {
   // 生成API
   writeFileRecursive(
     `${resolve(cwd, sourceDir, 'api', ..._parentDir, dir, 'index.ts')}`,
-    `
-import { useApi } from "@sword-code-practice/sword-framework";
-import { ReqQuery, ReqParams, Res } from "./proto";
+    `import { useApi } from '@sword-code-practice/sword-framework';
+import { ReqQuery, ReqParams, Res } from './proto';
 
 export const main = useApi<{
   query: ReqQuery;
   params: ReqParams;
-  res: Res;
+  res: Promise<Res>;
 }>({
-  handler: (ctx) => {
+  handler: async (ctx) => {
     return {
-      message: "hello",
+      message: 'hello'
     };
-  },
-});`
+  }
+});
+`
   );
   // 修改API文件夹的名称，去掉前缀
   renameSync(resolve(cwd, sourceDir, 'api', ..._parentDir, dir), resolve(cwd, sourceDir, 'api', ..._parentDir, _dir));

@@ -1,5 +1,10 @@
 # @sword-code-practice/backend-cli
 
+## 1.2.2
+
+### Major Changes
+
+- to modify generated template code
 ## 1.2.1
 
 ### Major Changes
