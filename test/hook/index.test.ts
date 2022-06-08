@@ -84,7 +84,7 @@ describe('useApi', () => {
     });
     expect(res.instruct).toEqual({
       method: ['GET', 'POST'],
-      path: '/detail'
+      path: '/'
     });
   });
   it('传递一个指示器到数组中，并且不设置url', () => {

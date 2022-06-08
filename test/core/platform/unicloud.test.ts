@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { validateEvent } from '../../../packages/runtime/src/core/platform/unicloud/api';
+import { asyncDependencyScheduler } from '../../../packages/runtime/src/core/schedule';
 import type { UnicloudEvent } from '../../../typings/unicloud';
 
-describe('validateEvent', () => {
+describe('validateEvent', async () => {
+  await asyncDependencyScheduler();
   it('success event', () => {
     const event: UnicloudEvent = {
       route: '/test/test',
@@ -10,7 +12,8 @@ describe('validateEvent', () => {
       params: {},
       query: {}
     };
-    expect(validateEvent(event)).equals(true);
+    // expect断言不等于true
+    expect(validateEvent(event)).toBe(true);
   });
   it('error route', () => {
     const event: any = {
@@ -20,7 +23,7 @@ describe('validateEvent', () => {
       query: {}
     };
     const result = validateEvent(event);
-    expect(result).equals(false);
+    expect(result).not.toBe(true);
   });
   it('error method', () => {
     const event: any = {
@@ -30,7 +33,7 @@ describe('validateEvent', () => {
       query: {}
     };
     const result = validateEvent(event);
-    expect(result).equals(false);
+    expect(result).not.toBe(true);
   });
   it('pattern error method', () => {
     const event: any = {
@@ -40,7 +43,7 @@ describe('validateEvent', () => {
       query: {}
     };
     const result = validateEvent(event);
-    expect(result).equals(false);
+    expect(result).not.toBe(true);
   });
   it('pattern success method - 1', () => {
     const event: any = {
@@ -50,7 +53,7 @@ describe('validateEvent', () => {
       query: {}
     };
     const result = validateEvent(event);
-    expect(result).equals(true);
+    expect(result).toBe(true);
   });
   it('pattern success method - 2', () => {
     const event: any = {
@@ -60,7 +63,7 @@ describe('validateEvent', () => {
       query: {}
     };
     const result = validateEvent(event);
-    expect(result).equals(true);
+    expect(result).toBe(true);
   });
   it('error params', () => {
     const event: any = {
@@ -70,7 +73,7 @@ describe('validateEvent', () => {
       query: {}
     };
     const result = validateEvent(event);
-    expect(result).equals(false);
+    expect(result).not.toBe(true);
   });
   it('error query', () => {
     const event: any = {
@@ -80,6 +83,6 @@ describe('validateEvent', () => {
       query: true
     };
     const result = validateEvent(event);
-    expect(result).equals(false);
+    expect(result).not.toBe(true);
   });
 });
