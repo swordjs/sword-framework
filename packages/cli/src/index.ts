@@ -5,11 +5,12 @@ import dev from './dev';
 import build from './build';
 import init from './init';
 import doc from './doc';
+import util from './util';
 import { processShim } from './shim';
 import { initConfig } from './config';
 import { commandArgs as args } from '../../../util/config';
 
-type commands = 'dev' | 'build' | 'init' | 'doc';
+type commands = 'dev' | 'build' | 'init' | 'doc' | 'util';
 
 register({});
 
@@ -25,7 +26,8 @@ async function main() {
     dev,
     build,
     init,
-    doc
+    doc,
+    util
   };
   if (args._[0]) {
     cliHandler[args._[0] as commands](args);

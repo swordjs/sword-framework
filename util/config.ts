@@ -7,7 +7,8 @@ let argv: any = null;
 // 用于解析命令行参数, 附带一个默认command默认对象
 export const parseCommandArgs = (): Argv<CommandConfig> => {
   const defaultArgs: CommandConfig = {
-    platform: 'server'
+    platform: 'server',
+    'util-name': null
   };
   // 如果是测试环境, 即vitest环境, 我们需要将env的参数进行解析, 优先使用env
   if (process.env.VITEST) {
@@ -15,7 +16,7 @@ export const parseCommandArgs = (): Argv<CommandConfig> => {
     let key: keyof typeof defaultArgs;
     for (key in defaultArgs) {
       if (process.env[key]) {
-        defaultArgs[key] = process.env[key] as any;
+        defaultArgs[key] = process.env[key] as never;
       }
     }
     argv = { _: [], ...defaultArgs };

@@ -2,7 +2,7 @@ import { renameSync } from 'fs';
 import { ChildProcess, spawn } from 'child_process';
 import { resolve } from 'path';
 import chokidar from 'chokidar';
-import { debounce } from './util';
+import { debounce } from './util/index';
 import { generateSchema } from './util/proto';
 import { writeFileRecursive } from './util/file';
 import { devUnicloudApp } from './platform/unicloud';

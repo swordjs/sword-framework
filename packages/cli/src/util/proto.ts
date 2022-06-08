@@ -1,7 +1,8 @@
 import { resolve } from 'path';
 import { createRequire } from 'module';
 import { TSBufferProtoGenerator } from 'tsbuffer-proto-generator';
-import { writeFileRecursive, traverseSourceDir } from './file';
+import { writeFileRecursive } from './file';
+import { traverseSourceDir } from '../../../../util/file';
 import log from '../log';
 import type { HttpApiReturn } from '../../../../typings/index';
 import { existsSync } from 'fs';
