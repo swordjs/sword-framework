@@ -44,5 +44,5 @@ jobs:
           run: pnpm build
 
         - name: Publish
-          run: pnpm publish
+          run: pnpm publish -r
 
