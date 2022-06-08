@@ -18,8 +18,7 @@
     "import": "./lib/index.mjs"
   },
   "scripts": {
-    "dev": "unbuild --stub",
-    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run async'",
+    "dev": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
     "build": "unbuild",
     "async": "npm run build && yalc push"
   },
