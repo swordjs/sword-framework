@@ -9,15 +9,11 @@ on:
 jobs:
   build:
       name: Build and Test
-      runs-on: ${{ matrix.os }}
+      runs-on: ubuntu-latest
       # To use Remote Caching, uncomment the next lines and follow the steps below.
       # env:
       #  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       #  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-      strategy:
-        matrix:
-          os: [ubuntu-latest, macos-latest]
-
       steps:
         - name: Check out code
           uses: actions/checkout@v2
@@ -26,7 +22,7 @@ jobs:
 
         - uses: pnpm/action-setup@v2.0.1
           with:
-            version: 6.22.2
+            version: 7.1.9
 
         - name: Setup Node.js environment
           uses: actions/setup-node@v2
