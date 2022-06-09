@@ -9,7 +9,7 @@ on:
 jobs:
   # 编译打包
   main:
-      name: Build & Test & Publish & async
+      name: Build & Test & Publish & Async
       runs-on: macos-latest
 
       steps:
@@ -38,16 +38,10 @@ jobs:
           run: pnpm run test
 
         # 推送到npm
-        - name: publish
+        - name: publish-npm
           run: pnpm run publish
           env:
             NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
-        # 推送到github npm仓库
-        - name: publish
-          run: pnpm run publish
-          env:
-            NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
         # 同步到cnpm
         - name: sync example
