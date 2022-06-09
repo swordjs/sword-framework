@@ -13,11 +13,11 @@ const packages = readdirSync(resolve('packages'))
   })
   .concat({
     name: 'example',
-    path: resolve('examples')
+    path: resolve('example')
   });
 
 packages.forEach((pkg) => {
-  spawn('pnpm', ['publish', '--no-git-checks'], {
+  spawn('pnpm', ['publish'], {
     cwd: pkg.path
   }).on('close', (code) => {
     if (code !== 0) {
