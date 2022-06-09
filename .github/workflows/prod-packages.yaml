@@ -36,11 +36,13 @@ jobs:
 
         - name: Test
           run: pnpm run test
-        
+
         # 推送到npm
         - name: publish
           run: pnpm run publish
-          
+          env:
+            NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
         # 同步到cnpm
         - name: sync example
           uses: fjogeleit/http-request-action@master
@@ -48,35 +50,35 @@ jobs:
             url: "https://npmmirror.com/sync/@sword-code-practice/sword-framework-example"
             timeout: 50000
             method: GET
-            
+
         - name: sync cli
           uses: fjogeleit/http-request-action@master
           with:
             url: "https://npmmirror.com/sync/@sword-code-practice/backend-cli"
             timeout: 50000
             method: GET
-            
+
         - name: sync cors
           uses: fjogeleit/http-request-action@master
           with:
             url: "https://npmmirror.com/sync/@sword-code-practice/sword-cors"
             timeout: 50000
             method: GET
-            
+
         - name: sync log
           uses: fjogeleit/http-request-action@master
           with:
             url: "https://npmmirror.com/sync/@sword-code-practice/sword-plugin-log"
             timeout: 50000
             method: GET
-            
+
         - name: sync runtime
           uses: fjogeleit/http-request-action@master
           with:
             url: "https://npmmirror.com/sync/@sword-code-practice/sword-framework"
             timeout: 50000
             method: GET
-            
+
         - name: sync server
           uses: fjogeleit/http-request-action@master
           with:
