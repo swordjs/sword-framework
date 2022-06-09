@@ -8,8 +8,8 @@ on:
 
 jobs:
   # 编译打包
-  build:
-      name: Build and Test
+  main:
+      name: Build & Test & Publish & async
       runs-on: macos-latest
 
       steps:
@@ -42,6 +42,12 @@ jobs:
           run: pnpm run publish
           env:
             NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+        # 推送到github npm仓库
+        - name: publish
+          run: pnpm run publish
+          env:
+            NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
         # 同步到cnpm
         - name: sync example
@@ -86,3 +92,32 @@ jobs:
             timeout: 50000
             method: GET
 
+  dingding:
+      needs: main
+      runs-on: macos-latest
+
+      steps:
+      - name: Send dingding notify
+        uses: zcong1993/actions-ding@master
+        if: success()
+        with:
+          dingToken: ${{ secrets.DING_TOKEN }}
+          body: |
+            {
+              "msgtype": "text",
+                "text": {
+                  "content": "sword-framework 打包编译 & 测试 & 发布 & 同步cnpm 成功🎉"
+              }
+            }
+      - name: Send dingding notify
+        uses: zcong1993/actions-ding@master
+        if: failure()
+        with:
+          dingToken: ${{ secrets.DING_TOKEN }}
+          body: |
+            {
+              "msgtype": "text",
+                "text": {
+                  "content": "sword-framework 打包编译 & 测试 & 发布 & 同步cnpm 失败😭"
+              }
+            }
