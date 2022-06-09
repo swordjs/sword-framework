@@ -22,6 +22,19 @@ jobs:
           with:
             version: 6.32.20
 
+        - name: Get pnpm store directory
+          id: pnpm-cache
+          run: |
+            echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+        - uses: actions/cache@v3
+          name: Setup pnpm cache
+          with:
+            path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+            key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+            restore-keys: |
+              ${{ runner.os }}-pnpm-store-
+
         - name: Setup Node.js environment
           uses: actions/setup-node@v2
           with:
@@ -86,32 +99,15 @@ jobs:
             timeout: 50000
             method: GET
 
-  dingding:
-      needs: main
-      runs-on: macos-latest
-
-      steps:
-      - name: Send dingding notify
-        uses: zcong1993/actions-ding@master
-        if: success()
-        with:
-          dingToken: ${{ secrets.DING_TOKEN }}
-          body: |
-            {
-              "msgtype": "text",
-                "text": {
-                  "content": "sword-framework 打包编译 & 测试 & 发布 & 同步cnpm 成功🎉"
+        - name: Send dingding notify
+          uses: zcong1993/actions-ding@master
+          if: success()
+          with:
+            dingToken: ${{ secrets.DING_TOKEN }}
+            body: |
+              {
+                "msgtype": "text",
+                  "text": {
+                    "content": "sword-framework 打包编译 & 测试 & 发布 & 同步cnpm 成功🎉"
+                }
               }
-            }
-      - name: Send dingding notify
-        uses: zcong1993/actions-ding@master
-        if: failure()
-        with:
-          dingToken: ${{ secrets.DING_TOKEN }}
-          body: |
-            {
-              "msgtype": "text",
-                "text": {
-                  "content": "sword-framework 打包编译 & 测试 & 发布 & 同步cnpm 失败😭"
-              }
-            }
