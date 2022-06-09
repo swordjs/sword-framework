@@ -18,8 +18,7 @@ const packages = readdirSync(resolve('packages'))
 
 packages.forEach((pkg) => {
   spawn('pnpm', ['publish', '--no-git-checks'], {
-    cwd: pkg.path,
-    stdio: 'inherit'
+    cwd: pkg.path
   }).on('close', (code) => {
     if (code !== 0) {
       console.error(`${pkg.name} publish failed`);
