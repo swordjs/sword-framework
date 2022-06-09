@@ -2,7 +2,7 @@ import { platformHook } from './platform';
 import { getAsyncDependency } from './schedule';
 import { useValidateProto } from './../hooks/proto';
 import type { HttpInstructMethod, HttpContext } from '../../../../typings/index';
-import type H3 from '@sword-code-practice/h3';
+import type * as H3 from '@sword-code-practice/h3';
 import type { UnicloudEvent } from '../../../../typings/unicloud';
 
 /**

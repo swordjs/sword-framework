@@ -1,7 +1,7 @@
 import { routerHandler } from '../../api';
 import { getAsyncDependency } from '../../schedule';
 import type { Map } from '../../map';
-import type H3 from '@sword-code-practice/h3';
+import type * as H3 from '@sword-code-practice/h3';
 import type { Event } from '../../../../../../typings/index';
 import type { HttpInstructMethod } from '../../../../../../typings/index';
 

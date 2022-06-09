@@ -14,7 +14,7 @@ import { platformHook } from './platform';
 import { getAsyncDependency } from './schedule';
 import { adaptServerEvent } from './platform/server/api';
 import { adaptUnicloudEvent } from './platform/unicloud/api';
-import type H3 from '@sword-code-practice/h3';
+import type * as H3 from '@sword-code-practice/h3';
 import type { HttpContext, HttpInstructMethod, UnPromisify, Event } from '../../../../typings/index';
 import type { ValidateProto } from './validate';
 import type { InterruptPipelineResult } from './pipeline';

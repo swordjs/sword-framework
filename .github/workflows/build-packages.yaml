@@ -7,13 +7,11 @@ on:
     types: [opened, synchronize]
 
 jobs:
+  # 编译打包
   build:
       name: Build and Test
       runs-on: macos-latest
-      # To use Remote Caching, uncomment the next lines and follow the steps below.
-      # env:
-      #  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-      #  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
       steps:
         - name: Check out code
           uses: actions/checkout@v2
@@ -31,13 +29,63 @@ jobs:
             cache: 'pnpm'
 
         - name: Install dependencies
-          run: pnpm install
+          run: pnpm install --ignore-scripts
 
         - name: Build
-          run: pnpm build
+          run: pnpm run build
 
         - name: Test
-          run: pnpm test
+          run: pnpm run test
 
-        - name: Publish
-          run: pnpm publish -r
+  # 推送到npm
+  publish:
+    name: publish
+    needs: build
+    runs-on: macos-latest
+    steps:
+      - name: publish
+        run: pnpm run publish
+
+  # 同步cnpm
+  cnpm-sync:
+    name: cnpm-sync
+    needs: publish
+    runs-on: macos-latest
+    steps:
+      - name: sync example
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: "https://npmmirror.com/sync/@sword-code-practice/sword-framework-example"
+          timeout: 50000
+          method: GET
+      - name: sync cli
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: "https://npmmirror.com/sync/@sword-code-practice/backend-cli"
+          timeout: 50000
+          method: GET
+      - name: sync cors
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: "https://npmmirror.com/sync/@sword-code-practice/sword-cors"
+          timeout: 50000
+          method: GET
+      - name: sync log
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: "https://npmmirror.com/sync/@sword-code-practice/sword-plugin-log"
+          timeout: 50000
+          method: GET
+      - name: sync runtime
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: "https://npmmirror.com/sync/@sword-code-practice/sword-framework"
+          timeout: 50000
+          method: GET
+      - name: sync server
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: "https://npmmirror.com/sync/@sword-code-practice/sword-plugin-server"
+          timeout: 50000
+          method: GET
+

@@ -2,7 +2,7 @@ import { commandArgs } from '../../../../util/config';
 import { aggregatePluginBehavior } from '../core/plugin';
 import { implementApi } from '../core/api';
 import { asyncDependencyScheduler, getAsyncDependency } from '../core/schedule';
-import type H3 from '@sword-code-practice/h3';
+import type * as H3 from '@sword-code-practice/h3';
 
 /**
  *
