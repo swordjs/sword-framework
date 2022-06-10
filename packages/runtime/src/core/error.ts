@@ -31,7 +31,7 @@ export default (type: keyof typeof ErrorType, message: string): H3.H3Error | Err
     statusMessage: message
   };
   return platformHook<H3.H3Error | ErrorResponse>({
-    server: getAsyncDependency('@sword-code-practice/h3').createError(data),
+    server: () => getAsyncDependency('@sword-code-practice/h3').createError(data),
     unicloud: () => data
   }) as any;
 };

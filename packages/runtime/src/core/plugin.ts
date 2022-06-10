@@ -23,6 +23,32 @@ export const addPlugin = (plugin: Plugin | (() => Plugin)): Plugin[] => {
 };
 
 type AggregatePlugin = Record<Exclude<keyof Plugin, 'name'>, { name: string; plugin: any }>;
+type PresetPluginKeys = Exclude<keyof Plugin, 'name' | 'context'>;
+
+/**
+ * 处理预设插件
+ * @return {*}  {Record<PresetPluginKeys, any>}
+ */
+const addPresetPlugin = (): Record<PresetPluginKeys, any> => {
+  // 如果聚合后的插件对象有空缺，那么就用预设插件顶替，比如说log，server...
+  // 可以进行预设的插件内容
+  return {
+    server: platformHook({
+      server: () => getAsyncDependency('@sword-code-practice/sword-plugin-server')['useServer'](),
+      default: () => {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        return { name: 'server', server: { start: () => {} } };
+      }
+    }),
+    log: platformHook({
+      server: () => getAsyncDependency('@sword-code-practice/sword-plugin-log')['useLog'](),
+      unicloud: () => getAsyncDependency('@sword-code-practice/sword-plugin-unicloud-log')['useLog'](),
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      default: () => {}
+    })
+  };
+};
+
 /**
  *
  * 处理插件核心，返回一个聚合插件，方便shim到程序中
@@ -71,24 +97,8 @@ export const aggregatePluginBehavior = (): AggregatePlugin => {
         }
       }
     }
-    type PresetPluginKeys = Exclude<keyof Plugin, 'name' | 'context'>;
-    // 如果聚合后的插件对象有空缺，那么就用预设插件顶替，比如说log，server...
-    // 可以进行预设的插件内容
-    const presetPlugin: Record<PresetPluginKeys, any> = {
-      server: platformHook({
-        server: getAsyncDependency('@sword-code-practice/sword-plugin-server')['useServer'](),
-        default: () => {
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          return { name: 'server', server: { start: () => {} } };
-        }
-      }),
-      log: platformHook({
-        server: getAsyncDependency('@sword-code-practice/sword-plugin-log')['useLog'](),
-        unicloud: getAsyncDependency('@sword-code-practice/sword-plugin-unicloud-log')['useLog'](),
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        default: () => {}
-      })
-    };
+    // 处理预设插件
+    const presetPlugin = addPresetPlugin();
     // 迭代聚合后的插件对象，如果没有聚合的插件，那么就用预设插件顶替
     // 迭代预设插件对象
     let presetKey: PresetPluginKeys;
