@@ -10,9 +10,10 @@ import type { CommandConfig } from '../../../../typings/config';
 // 获取云函数目标根目录
 const getTargetPath = () => {
   // 判断unicloud的link是否配置, 如果没有配置, 则就抛出错误
-  if (!configData.unicloud.link || configData.unicloud.link === '') {
+  if (!configData.unicloud?.link || configData.unicloud?.link === '') {
     log.err('[unicloud]请配置unicloud.link (未配置或者为空)');
     log.err('[unicloud]关于unicloud.link的配置参考: https://www.yuque.com/mlgrgm/lrf0ra/ngkk5m#wL5HU');
+    process.exit();
   }
   return `${configData.unicloud.link}/sword`;
 };
