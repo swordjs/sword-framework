@@ -39,13 +39,16 @@ module.exports = async (event, context) => {
   );
 };
 
+// unicloud shim是否已创建
+let isShimCreated = false;
+
 /**
  *
  * unicloud环境下的启动服务器
  * @param {Argv<CommandConfig>} args
  */
 export const devUnicloudApp = (args: Argv<CommandConfig>) => {
-  link();
+  if (!isShimCreated) link();
   // 删除指定的文件夹
   delDir(resolve(process.cwd(), `.sword/dev/unicloud`));
   build(
@@ -133,17 +136,17 @@ const link = () => {
   if (existsSync(targetPath) && lstatSync(targetPath).isDirectory()) {
     delDir(targetPath);
   }
+  const sourcePath = resolve(process.cwd(), `./.sword/dev/unicloud`);
+  // 初始化unicloud shim
+  shim({
+    sourcePath
+  });
   // 判断目标路径的sword是否存在，并且是否是替身，如果不存在/不是替身，就创建
   if (!existsSync(targetPath) || !lstatSync(targetPath).isSymbolicLink()) {
-    const sourcePath = resolve(process.cwd(), `./.sword/dev/unicloud`);
     symlink(sourcePath, targetPath, 'junction', (err) => {
       if (err) {
         log.err('[unicloud:link]🔗创建软链接失败');
       } else {
-        // 初始化unicloud shim
-        shim({
-          sourcePath
-        });
         log.success(`[unicloud:link]🔗软链接成功`);
         log.info(`[unicloud:link]在hbuilderx中，无法在项目管理中显示通过软链接创建的文件夹，你可以打开文件目录查看详情`);
       }
@@ -156,10 +159,14 @@ const link = () => {
 // 生成unicloud shim
 export const shim = (params: { sourcePath: string }) => {
   const shimPath = resolve(process.cwd(), './.sword/shim/unicloud.js');
-  const shim = `
-  // unicloud shim
-process.env._unicloud_shim_symlink_source_path = '${params.sourcePath}';
-  `;
-  writeFileRecursive(shimPath, shim);
-  log.success(`[shim:unicloud]创建shim成功`);
+  // 判断shimpath是否存在
+  if (!existsSync(shimPath)) {
+    const shim = `
+    // unicloud shim
+  process.env._unicloud_shim_symlink_source_path = '${params.sourcePath}';
+    `;
+    writeFileRecursive(shimPath, shim);
+    log.success(`[shim:unicloud]创建shim成功`);
+  }
+  isShimCreated = true;
 };
