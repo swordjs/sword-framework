@@ -1,6 +1,6 @@
 import { getAsyncDependency } from '../core/schedule';
 import { platformHook } from './platform';
-import type H3 from '@sword-code-practice/h3';
+import type * as H3 from '@sword-code-practice/h3';
 
 // 定义不同错误类型以及它们所代表的状态码
 // 定义错误类型
