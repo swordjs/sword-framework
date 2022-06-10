@@ -1,0 +1,113 @@
+name: build-packages
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  # 编译打包
+  main:
+      name: Build & Test & Publish & Async
+      runs-on: macos-latest
+
+      steps:
+        - name: Check out code
+          uses: actions/checkout@v2
+          with:
+            fetch-depth: 2
+
+        - uses: pnpm/action-setup@v2.0.1
+          with:
+            version: 6.32.20
+
+        - name: Get pnpm store directory
+          id: pnpm-cache
+          run: |
+            echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+        - uses: actions/cache@v3
+          name: Setup pnpm cache
+          with:
+            path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+            key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+            restore-keys: |
+              ${{ runner.os }}-pnpm-store-
+
+        - name: Setup Node.js environment
+          uses: actions/setup-node@v2
+          with:
+            node-version: 16
+            cache: 'pnpm'
+
+        - name: Install dependencies
+          run: pnpm install --ignore-scripts --no-frozen-lockfile
+
+        - name: Build
+          run: pnpm run build
+
+        - name: Test
+          run: pnpm run test
+
+        # 推送到npm
+        - name: publish-npm
+          run: pnpm run publish
+          env:
+            NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+        # 同步到cnpm
+        - name: sync example
+          uses: fjogeleit/http-request-action@master
+          with:
+            url: "https://npmmirror.com/sync/@sword-code-practice/sword-framework-example"
+            timeout: 50000
+            method: GET
+
+        - name: sync cli
+          uses: fjogeleit/http-request-action@master
+          with:
+            url: "https://npmmirror.com/sync/@sword-code-practice/backend-cli"
+            timeout: 50000
+            method: GET
+
+        - name: sync cors
+          uses: fjogeleit/http-request-action@master
+          with:
+            url: "https://npmmirror.com/sync/@sword-code-practice/sword-cors"
+            timeout: 50000
+            method: GET
+
+        - name: sync log
+          uses: fjogeleit/http-request-action@master
+          with:
+            url: "https://npmmirror.com/sync/@sword-code-practice/sword-plugin-log"
+            timeout: 50000
+            method: GET
+
+        - name: sync runtime
+          uses: fjogeleit/http-request-action@master
+          with:
+            url: "https://npmmirror.com/sync/@sword-code-practice/sword-framework"
+            timeout: 50000
+            method: GET
+
+        - name: sync server
+          uses: fjogeleit/http-request-action@master
+          with:
+            url: "https://npmmirror.com/sync/@sword-code-practice/sword-plugin-server"
+            timeout: 50000
+            method: GET
+
+        - name: Send dingding notify
+          uses: zcong1993/actions-ding@master
+          if: success()
+          with:
+            dingToken: ${{ secrets.DING_TOKEN }}
+            body: |
+              {
+                "msgtype": "text",
+                  "text": {
+                    "content": "sword-framework 打包编译 & 测试 & 发布 & 同步cnpm 成功🎉"
+                }
+              }

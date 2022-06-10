@@ -40,7 +40,6 @@
     "unbuild": "^0.6.9"
   },
   "dependencies": {
-    "@sword-code-practice/h3": "0.7.4",
     "@sword-code-practice/sword-plugin-log": "workspace:*",
     "@sword-code-practice/sword-plugin-server": "workspace:*",
     "@sword-code-practice/sword-plugin-unicloud-log": "workspace:*",
