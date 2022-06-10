@@ -18,10 +18,8 @@
     "import": "./lib/index.mjs"
   },
   "scripts": {
-    "dev": "unbuild --stub",
-    "dev:nodemon": "nodemon --watch src/ -C -e ts --debug -x 'npm run async'",
-    "build": "unbuild",
-    "async": "npm run build && yalc push"
+    "dev": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
+    "build": "unbuild"
   },
   "keywords": [
     "serverless",
