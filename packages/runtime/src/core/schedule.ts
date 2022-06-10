@@ -2,7 +2,12 @@ import { commandArgs } from '../../../../util/config';
 import type { CommandConfig } from '../../../../typings/config';
 
 // 支持异步加载依赖的列表
-const asyncDependencyList = ['@sword-code-practice/h3', '@sword-code-practice/sword-plugin-log', '@sword-code-practice/sword-plugin-server'] as const;
+const asyncDependencyList = [
+  '@sword-code-practice/h3',
+  '@sword-code-practice/sword-plugin-log',
+  '@sword-code-practice/sword-plugin-server',
+  '@sword-code-practice/sword-plugin-unicloud-log'
+] as const;
 
 // 配置一个缓存对象
 const asyncDependencyCache: Record<
@@ -22,6 +27,10 @@ const asyncDependencyCache: Record<
   },
   '@sword-code-practice/sword-plugin-server': {
     platforms: ['server'],
+    module: undefined
+  },
+  '@sword-code-practice/sword-plugin-unicloud-log': {
+    platforms: ['unicloud'],
     module: undefined
   }
 };

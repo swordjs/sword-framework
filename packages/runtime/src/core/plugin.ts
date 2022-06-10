@@ -1,5 +1,5 @@
 import { getAsyncDependency } from './schedule';
-import { commandArgs } from '../../../../util/config';
+import { platformHook } from './platform';
 import type { Plugin } from '../../../../typings/index';
 
 export const plugins: Plugin[] = [];
@@ -75,15 +75,19 @@ export const aggregatePluginBehavior = (): AggregatePlugin => {
     // 如果聚合后的插件对象有空缺，那么就用预设插件顶替，比如说log，server...
     // 可以进行预设的插件内容
     const presetPlugin: Record<PresetPluginKeys, any> = {
-      // server插件仅仅在server端使用, 在其他环境只会执行一个空函数
-      server:
-        commandArgs.platform === 'server'
-          ? getAsyncDependency('@sword-code-practice/sword-plugin-server')['useServer']()
-          : // eslint-disable-next-line @typescript-eslint/no-empty-function
-            { name: 'server', server: { start: () => {} } },
-      // log插件的实现存在chalk等色彩依赖, 所以仅在server端使用
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      log: commandArgs.platform === 'server' ? getAsyncDependency('@sword-code-practice/sword-plugin-log')['useLog']() : {}
+      server: platformHook({
+        server: getAsyncDependency('@sword-code-practice/sword-plugin-server')['useServer'](),
+        default: () => {
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
+          return { name: 'server', server: { start: () => {} } };
+        }
+      }),
+      log: platformHook({
+        server: getAsyncDependency('@sword-code-practice/sword-plugin-log')['useLog'](),
+        unicloud: getAsyncDependency('@sword-code-practice/sword-plugin-unicloud-log')['useLog'](),
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        default: () => {}
+      })
     };
     // 迭代聚合后的插件对象，如果没有聚合的插件，那么就用预设插件顶替
     // 迭代预设插件对象

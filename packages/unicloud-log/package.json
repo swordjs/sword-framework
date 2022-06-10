@@ -1,0 +1,44 @@
+{
+  "name": "@sword-code-practice/sword-plugin-unicloud-log",
+  "version": "1.0.0",
+  "description": "",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "module": "./lib/index.mjs",
+  "exports": {
+    "require": "./lib/index.cjs",
+    "import": "./lib/index.mjs"
+  },
+  "scripts": {
+    "dev": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
+    "build": "unbuild"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@dcloudio/types": "^2.6.6",
+    "unbuild": "^0.6.9"
+  },
+  "unbuild": {
+    "entries": [
+      "./src/index"
+    ],
+    "outDir": "lib",
+    "declaration": true,
+    "rollup": {
+      "emitCJS": true,
+      "cjsBridge": true,
+      "esbuild": {
+        "target": "node12"
+      }
+    }
+  }
+}

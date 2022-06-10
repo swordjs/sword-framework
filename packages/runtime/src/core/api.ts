@@ -34,8 +34,7 @@ const getH3 = async () => {
   return h3;
 };
 
-// 获取command args
-const logMap = getLogger(commandArgs.platform);
+const log = getLogger();
 
 // 具体的proto schema引用
 let protoSchema: Record<string, Record<string, unknown>> | null = null;
@@ -76,12 +75,12 @@ export const adaptEvent = async (event: Event): AdaptEventReturn => {
 };
 
 /**
- * 处理exec (middleware pipeline)
+ * 处理exec pipeline (middleware pipeline)
  * @param {UnPromisify<ReturnType<typeof exec>>} execResult
  * @param {CompatibilityEvent} event
  * @return {*}
  */
-const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event?: Event) => {
+const handleExecPipelineError = (execResult: UnPromisify<ReturnType<typeof exec>>, event?: Event) => {
   // 判断execresult的类型
   if (execResult instanceof Error) {
     const errorReturn = error('PIPELINE_ERROR', execResult.message);
@@ -105,7 +104,7 @@ const handleExecError = (execResult: UnPromisify<ReturnType<typeof exec>>, event
  */
 const handleErrorResponse = (validateResult: ReturnType<typeof validateProto>, event?: Event) => {
   const errorReturn = error('VALIDATE_RESPONSE', validateResult.errMsg as string);
-  logMap.RESPONSE_TYPE_ERROR(JSON.stringify(validateResult.errMsg));
+  log.RESPONSE_TYPE_ERROR(JSON.stringify(validateResult.errMsg));
   return platformHook<ErrorReturn | void>({
     server: () => {
       if (event) {
@@ -128,7 +127,7 @@ const handleValidateMethod = async (req: any, event: Event, context: HttpContext
   if (!(await validateMethod(req, context.method))) {
     // 如果校验method错误，就返回错误信息
     const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
-    logMap.REQUEST_METHOD_ERROR(errMsg);
+    log.REQUEST_METHOD_ERROR(errMsg);
     const errorReturn = error('VALIDATE_METHOD', errMsg);
     return await platformHook<ErrorReturn | void>({
       server: () => {
@@ -185,7 +184,7 @@ const handleValidateRequestProto = (context: HttpContext, params: ProtoData, que
     return v && !v.isSucc;
   }) as undefined | { errMsg: string };
   if (errorResult) {
-    logMap.REQUEST_TYPE_ERROR(JSON.stringify(errorResult.errMsg));
+    log.REQUEST_TYPE_ERROR(JSON.stringify(errorResult.errMsg));
     handleResHeaders(context, res);
     const errorReturn = error('VALIDATE_REQUEST', errorResult.errMsg);
     return platformHook<ErrorReturn | void>({
@@ -246,7 +245,7 @@ const handlePreApiCall = (
   return pipelineResultTypeMap(preApiCallExecResult, context, {
     return: (context, returnData) => {
       handleResHeaders(context, event);
-      logMap.RESPONSE_RESULT(JSON.stringify(returnData?.data), '-preApiCall');
+      log.RESPONSE_RESULT(JSON.stringify(returnData?.data), '-preApiCall');
       // 直接返回result
       return { context, returnData };
     },
@@ -273,7 +272,7 @@ const handlePostApiCall = (postApiCallExecResult: HttpContext | InterruptPipelin
     return: (context, returnData) => {
       handleResHeaders(context, event);
       // 直接返回result
-      logMap.RESPONSE_RESULT(JSON.stringify(returnData?.data), '-postApiCall');
+      log.RESPONSE_RESULT(JSON.stringify(returnData?.data), '-postApiCall');
       return { context, returnData };
     },
     stop: (context) => {
@@ -372,7 +371,7 @@ export const routerHandler = async (key: string, event: Event, apiMap: Record<st
   // 将重新处理的key替换
   key = _key;
   // 日志-请求url
-  logMap.REQUEST_URL(key);
+  log.REQUEST_URL(key);
   params = isJSON(params);
   // 构造context
   let context = createContext({
@@ -393,7 +392,7 @@ export const routerHandler = async (key: string, event: Event, apiMap: Record<st
   return handleValidateRequestProto(context, { proto: reqParamsProto, data: params }, { proto: reqQueryProto, data: query }, res, async () => {
     // 执行pipeline
     const preApiCallExecResult = await exec('preApiCall', context);
-    if (handleExecError(preApiCallExecResult, event)) {
+    if (handleExecPipelineError(preApiCallExecResult, event)) {
       // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
       if (!(preApiCallExecResult instanceof Error)) {
         // 处理PreApiCall Pipline
@@ -402,13 +401,20 @@ export const routerHandler = async (key: string, event: Event, apiMap: Record<st
         if (preApiCallReturnData) return preApiCallReturnData;
         // 经过pipeline后的context需要重新赋值
         context = preApiCallContext;
-        logMap.REQUEST_QUERY(JSON.stringify(context.query));
-        logMap.REQUEST_PARAMS(JSON.stringify(context.params));
+        log.REQUEST_QUERY(JSON.stringify(context.query));
+        log.REQUEST_PARAMS(JSON.stringify(context.params));
         // 执行handler
-        const _handlerRes = await _res.handler(context);
+        let _handlerRes;
+        try {
+          _handlerRes = await _res.handler(context);
+        } catch (e) {
+          log.EXECUTE_ERROR(JSON.stringify(e));
+          // 如果handler出错，则直接返回错误
+          return error('EXECUTE_HANDLER_ERROR', 'handler error');
+        }
         // 执行pipeline
         const postApiCallExecResult = await exec('postApiCall', context);
-        if (handleExecError(postApiCallExecResult, event)) {
+        if (handleExecPipelineError(postApiCallExecResult, event)) {
           if (!(postApiCallExecResult instanceof Error)) {
             const { returnData: postApiCallReturnData } = handlePostApiCall(postApiCallExecResult, context, event);
             if (postApiCallReturnData) return postApiCallReturnData;
@@ -420,7 +426,7 @@ export const routerHandler = async (key: string, event: Event, apiMap: Record<st
             }
           }
         }
-        logMap.RESPONSE_RESULT(typeof _handlerRes === 'undefined' ? '{}' : JSON.stringify(_handlerRes));
+        log.RESPONSE_RESULT(typeof _handlerRes === 'undefined' ? '{}' : JSON.stringify(_handlerRes));
         return _handlerRes;
       }
     }
