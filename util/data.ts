@@ -6,7 +6,10 @@ export const isJSON = <T = string | Record<string, unknown>>(input: T): T => {
       if (typeof obj == 'object' && obj) {
         return obj;
       }
-    } catch (e) {}
+    } catch (e) {
+      // 抛出错误
+      throw new Error(`${input} is not a valid json`);
+    }
   }
   return input;
 };
