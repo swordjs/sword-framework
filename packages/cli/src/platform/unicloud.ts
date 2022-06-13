@@ -25,7 +25,8 @@ const addCode = (args: Argv<CommandConfig>) => {
   writeFileRecursive(
     resolve(process.cwd(), path),
     `${readFileSync(resolve(process.cwd(), path)).toString()}
-module.exports = async (event, context) => {
+module.exports = async (e, c) => {
+  let { event, context } = await import_sword_framework.useUnicloudApp(e, c);
   const validateResult = import_sword_framework.useUnicloudValidateEvent(event);
   // 判断校验结果是否严格等于true
   if (validateResult !== true) {
@@ -34,7 +35,7 @@ module.exports = async (event, context) => {
   const { apiMap } = await import_sword_framework.useGetApiMap({
     apiPath: event.route.split("?")[0]
   })
-  return import_sword_framework.useUnicloudTriggerApi(event, context, apiMap)
+  return await import_sword_framework.useUnicloudTriggerApi(event, context, apiMap)
 }`
   );
 };
@@ -95,6 +96,7 @@ export const buildUnicloudApp = (args: Argv<CommandConfig>) => {
       delDir(sourcePath);
       // 打包之前替换shim
       shim({
+        reloadShim: true,
         sourcePath: `/tmp/function/sword`
       });
       // 打包unicloud app产物
@@ -139,6 +141,7 @@ const link = () => {
   const sourcePath = resolve(process.cwd(), `./.sword/dev/unicloud`);
   // 初始化unicloud shim
   shim({
+    reloadShim: true,
     sourcePath
   });
   // 判断目标路径的sword是否存在，并且是否是替身，如果不存在/不是替身，就创建
@@ -157,10 +160,11 @@ const link = () => {
 };
 
 // 生成unicloud shim
-export const shim = (params: { sourcePath: string }) => {
+export const shim = (params: { reloadShim?: boolean; sourcePath: string }) => {
+  const reloadShim = params.reloadShim ?? false;
   const shimPath = resolve(process.cwd(), './.sword/shim/unicloud.js');
   // 判断shimpath是否存在
-  if (!existsSync(shimPath)) {
+  if (reloadShim || !existsSync(shimPath)) {
     const shim = `
     // unicloud shim
   process.env._unicloud_shim_symlink_source_path = '${params.sourcePath}';

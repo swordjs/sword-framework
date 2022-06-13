@@ -18,7 +18,6 @@ const killProcess = (): void => {
 };
 
 /**
- * 使用@swc-node/register执行index.ts
  * @param {CommandConfigReturn} config
  */
 const start = (args: Argv<CommandConfig>) => {
@@ -27,14 +26,8 @@ const start = (args: Argv<CommandConfig>) => {
   // server端的dev指的就是node直接运行index.ts文件
   if (args.platform === 'server') {
     // 入口enrty ts 文件
-    indexcp = spawn(`node`, ['-r', '@swc-node/register', 'src/index.ts', '--platform=', args.platform], {
+    indexcp = spawn(`node`, ['-r', '@esbuild-kit/cjs-loader', 'src/index.ts', '--platform=', args.platform], {
       stdio: 'inherit'
-    });
-    indexcp.on('exit', (code) => {
-      if (code) {
-        // 错误
-        log.err(`执行入口文件错误`);
-      }
     });
     // 运行成功
     log.info(`启动入口文件: src/index.ts`);
@@ -83,7 +76,7 @@ import { ReqQuery, ReqParams, Res } from './proto';
 export const main = useApi<{
   query: ReqQuery;
   params: ReqParams;
-  res: Promise<Res>;
+  res: Res;
 }>({
   handler: async (ctx) => {
     return {

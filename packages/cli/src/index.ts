@@ -1,6 +1,5 @@
 #! /usr/bin/env node
 
-import { register } from '@swc-node/register/register';
 import dev from './dev';
 import build from './build';
 import init from './init';
@@ -11,8 +10,6 @@ import { initConfig } from './config';
 import { commandArgs as args } from '../../../util/config';
 
 type commands = 'dev' | 'build' | 'init' | 'doc' | 'util';
-
-register({});
 
 async function main() {
   // 解析config参数
