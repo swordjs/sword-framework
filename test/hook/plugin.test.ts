@@ -16,7 +16,7 @@ describe('plugin', async () => {
   //     name: 'test'
   //   });
   // });
-  it('aggregatePluginBehavior', () => {
+  it('aggregatePluginBehavior', async () => {
     const plugin1: Plugin = {
       name: 'test1',
       log: {
@@ -32,11 +32,7 @@ describe('plugin', async () => {
       }
     };
     plugin.add(plugin1);
-    const behavior = aggregatePluginBehavior();
+    const behavior = await aggregatePluginBehavior();
     expect(Object.keys(behavior)).toEqual(['log', 'server']);
-  });
-
-  it('preset plugins', () => {
-    console.log(plugins);
   });
 });
