@@ -4,7 +4,7 @@ import type { LogType } from './log';
 import type { UnicloudEvent } from './unicloud';
 import type * as H3 from '@sword-code-practice/h3';
 
-export type UnPromisify<T> = T extends Promise<infer U> ? U : never;
+export type UnPromisify<T> = T extends Promise<infer U> ? U : T;
 
 export type Event = H3.CompatibilityEvent | UnicloudEvent;
 
@@ -34,30 +34,26 @@ export type HttpInstructReturn = {
   path?: string;
 };
 
-export type HttpApiHandler<C extends ContextData> = (ctx: HttpContext<C>) => C['res'];
+export type HttpApiStatusResponse<D = any> = {
+  statusCode: number;
+  statusMessage: string;
+  data?: UnPromisify<D>;
+};
+
+export type HttpApiHandler<C extends ContextData> = (ctx: HttpContext<C>) => Promise<C['res'] | CustomHandlerReturn<C['res']>>;
+
+export type CustomHandlerReturn<D = any> = () => HttpApiStatusResponse & {
+  headers?: Record<string, string>;
+};
 
 export type HttpApiReturn<C extends ContextData> = {
   instruct: {
     method: HttpInstructMethod[];
     path?: string;
   };
-  handler: (ctx: HttpContext<C>) => C['res'];
+  // handler可以返回一个正确的res对象, 也可以返回一个集成api响应类型
+  handler: HttpApiHandler<C>;
 };
-export interface Use {
-  ValidateProto: (
-    key: string,
-    data: Record<string, unknown>,
-    schema: Record<string, unknown>
-  ) =>
-    | {
-        isSucc: true;
-        errMsg?: undefined;
-      }
-    | {
-        isSucc: false;
-        errMsg: string;
-      };
-}
 
 export type Plugin = {
   name: string;
