@@ -87,10 +87,12 @@ export const buildUnicloudApp = (args: Argv<CommandConfig>) => {
       // 将packagejson写入
       writeFileRecursive(packageJsonPath, JSON.stringify(packageJson, null, 4));
       // 判断unicloud产物是文件夹还是快捷方式, 如果是文件夹, 就递归删除, 如果是快捷方式, 则删除快捷方式
-      if (lstatSync(targetPath).isDirectory()) {
-        delDir(targetPath);
-      } else if (lstatSync(targetPath).isSymbolicLink()) {
-        unlinkSync(targetPath);
+      if (existsSync(targetPath)) {
+        if (lstatSync(targetPath).isDirectory()) {
+          delDir(targetPath);
+        } else if (lstatSync(targetPath).isSymbolicLink()) {
+          unlinkSync(targetPath);
+        }
       }
       // 在打包之前, 需要删除之前的产物
       delDir(sourcePath);
