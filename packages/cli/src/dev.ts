@@ -26,21 +26,12 @@ const start = (args: Argv<CommandConfig>) => {
   // server端的dev指的就是node直接运行index.ts文件
   if (args.platform === 'server') {
     // 入口enrty ts 文件
-    indexcp = spawn(`node`, ['-r', '@esbuild-kit/cjs-loader', 'src/index.ts', '--platform=', args.platform], {
+    indexcp = spawn(`node`, ['-r', 'esbuild-register', './src/index.ts', '--platform=', args.platform], {
       stdio: 'inherit'
     });
     // 运行成功
     log.info(`启动入口文件: src/index.ts`);
   } else if (args.platform === 'unicloud') devUnicloudApp(args);
-};
-
-// 重启服务器
-const restart = (args: Argv<CommandConfig>) => {
-  // 重启服务器
-  log.info('重启服务...');
-  setTimeout(() => {
-    start(args);
-  }, 300);
 };
 
 /**
@@ -107,7 +98,7 @@ const listenApiSource = (args: Argv<CommandConfig>) => {
       debounce(async (event: any, path: string) => {
         // 重新编译proto.json
         await generateSchema(resolve(process.cwd(), `./src/proto.json`));
-        restart(args);
+        start(args);
         switch (event) {
           case 'addDir':
             // 当文件夹约定一个规则，比如下划线开头，那么将会自动生成proto.ts 以及初始化的hook函数
@@ -139,7 +130,7 @@ const listenIndex = (args: Argv<CommandConfig>) => {
     atomic: 1000
   });
   watcher.on('all', async () => {
-    restart(args);
+    start(args);
   });
 };
 

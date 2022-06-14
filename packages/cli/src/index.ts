@@ -1,5 +1,8 @@
 #! /usr/bin/env node
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import * as esbuildRegister from 'esbuild-register/dist/node';
 import dev from './dev';
 import build from './build';
 import init from './init';
@@ -8,6 +11,8 @@ import util from './util';
 import { processShim } from './shim';
 import { initConfig } from './config';
 import { commandArgs as args } from '../../../util/config';
+
+esbuildRegister.register();
 
 type commands = 'dev' | 'build' | 'init' | 'doc' | 'util';
 

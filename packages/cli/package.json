@@ -41,7 +41,6 @@
     "unbuild": "^0.6.9"
   },
   "dependencies": {
-    "@esbuild-kit/cjs-loader": "^2.1.0",
     "@sword-code-practice/sword-framework": "workspace:*",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
@@ -49,6 +48,7 @@
     "download": "^8.0.0",
     "enquirer": "^2.3.6",
     "esbuild": "^0.14.27",
+    "esbuild-register": "^3.3.3",
     "mv": "^2.1.1",
     "ohmyfetch": "^0.4.15",
     "tsbuffer-proto-generator": "^1.7.1",
