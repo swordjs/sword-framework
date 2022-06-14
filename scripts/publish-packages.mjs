@@ -17,7 +17,7 @@ const packages = readdirSync(resolve('packages'))
   });
 
 packages.forEach((pkg) => {
-  spawn('pnpm', ['publish'], {
+  spawn('pnpm', ['publish', '--no-git-checks'], {
     cwd: pkg.path
   }).on('close', (code) => {
     if (code !== 0) {
