@@ -5,6 +5,7 @@
     "build": "node scripts/build-packages.mjs",
     "test": "vitest run",
     "publish": "node scripts/publish-packages.mjs",
+    "sync": "node scripts/sync-packages.mjs",
     "kill-port": "node scripts/kill-port.mjs"
   },
   "repository": {
