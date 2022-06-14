@@ -2,8 +2,7 @@ import { routerHandler } from '../../api';
 import { getAsyncDependency } from '../../schedule';
 import type { Map } from '../../map';
 import type * as H3 from '@sword-code-practice/h3';
-import type { Event } from '../../../../../../typings/index';
-import type { HttpInstructMethod } from '../../../../../../typings/index';
+import type { Event, HttpInstructMethod, CustomHandlerReturn } from '../../../../../../typings/index';
 
 // 在核心程序中，读取usebody的时候，需要进行判断，只有在几个method的请求上才可以对body进行解析
 const readBodyPayloadMethods: HttpInstructMethod[] = ['POST', 'PUT', 'DELETE'];
@@ -32,6 +31,13 @@ export const adaptServerEvent = async (event: Event) => {
  * @param {H3.CompatibilityEvent} event
  * @return {*}
  */
-export const serverRouterHandler = (key: string, apiMap: Record<string, Map>, event: H3.CompatibilityEvent) => {
-  return routerHandler(key, event, apiMap);
+export const serverRouterHandler = async (key: string, apiMap: Record<string, Map>, event: H3.CompatibilityEvent) => {
+  const handlerResult = await routerHandler(key, event, apiMap);
+  if (Array.isArray(handlerResult)) {
+    const [result, customResult] = handlerResult as unknown as [any, ReturnType<CustomHandlerReturn> | undefined];
+    if (customResult) {
+      return result;
+    }
+  }
+  return handlerResult;
 };

@@ -29,18 +29,18 @@ type PresetPluginKeys = Exclude<keyof Plugin, 'name' | 'context'>;
  * 处理预设插件
  * @return {*}  {Record<PresetPluginKeys, any>}
  */
-const addPresetPlugin = (): Record<PresetPluginKeys, any> => {
+const addPresetPlugin = async (): Promise<Record<PresetPluginKeys, any>> => {
   // 如果聚合后的插件对象有空缺，那么就用预设插件顶替，比如说log，server...
   // 可以进行预设的插件内容
   return {
-    server: platformHook({
+    server: await platformHook({
       server: () => getAsyncDependency('@sword-code-practice/sword-plugin-server')['useServer'](),
       default: () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         return { name: 'server', server: { start: () => {} } };
       }
     }),
-    log: platformHook({
+    log: await platformHook({
       server: () => getAsyncDependency('@sword-code-practice/sword-plugin-log')['useLog'](),
       unicloud: () => getAsyncDependency('@sword-code-practice/sword-plugin-unicloud-log')['useLog'](),
       // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -80,7 +80,7 @@ const addPresetPlugin = (): Record<PresetPluginKeys, any> => {
  *
  * @return {*}  {Record<string, unknown>}
  */
-export const aggregatePluginBehavior = (): AggregatePlugin => {
+export const aggregatePluginBehavior = async (): Promise<AggregatePlugin> => {
   if (aggregatePlugin === null) {
     // 设置一个默认空对象
     aggregatePlugin = {} as any;
@@ -98,7 +98,7 @@ export const aggregatePluginBehavior = (): AggregatePlugin => {
       }
     }
     // 处理预设插件
-    const presetPlugin = addPresetPlugin();
+    const presetPlugin = await addPresetPlugin();
     // 迭代聚合后的插件对象，如果没有聚合的插件，那么就用预设插件顶替
     // 迭代预设插件对象
     let presetKey: PresetPluginKeys;

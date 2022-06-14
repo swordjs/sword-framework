@@ -1,6 +1,7 @@
 import { getAsyncDependency } from '../core/schedule';
 import { platformHook } from './platform';
 import type * as H3 from '@sword-code-practice/h3';
+import type { HttpApiStatusResponse } from '../../../../typings/index';
 
 // 定义不同错误类型以及它们所代表的状态码
 // 定义错误类型
@@ -19,19 +20,15 @@ enum ErrorType {
   EXECUTE_HANDLER_ERROR = 500
 }
 
-export type ErrorResponse = {
-  statusCode: number;
-  statusMessage: string;
-};
-export type ErrorReturn = H3.H3Error | ErrorResponse;
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export default (type: keyof typeof ErrorType, message: string): H3.H3Error | ErrorResponse => {
-  const data = {
-    statusCode: ErrorType[type],
-    statusMessage: message
+export default async (type: keyof typeof ErrorType | number, message: string, data?: unknown): Promise<H3.H3Error | HttpApiStatusResponse> => {
+  const res: H3.H3Error | HttpApiStatusResponse = {
+    // 如果type是number类型, 那么就认为是状态码, 反之则认为是错误类型
+    statusCode: typeof type === 'number' ? type : ErrorType[type],
+    statusMessage: message,
+    data
   };
-  return platformHook<H3.H3Error | ErrorResponse>({
-    server: () => getAsyncDependency('@sword-code-practice/h3').createError(data),
-    unicloud: () => data
-  }) as any;
+  return (await platformHook<H3.H3Error | HttpApiStatusResponse>({
+    server: () => getAsyncDependency('@sword-code-practice/h3').createError(res),
+    unicloud: () => res
+  })) as any;
 };

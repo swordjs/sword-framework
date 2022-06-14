@@ -1,10 +1,9 @@
 import Ajv, { JSONSchemaType } from 'ajv';
 import { routerHandler, methods } from '../../api';
 import error from '../../error';
-import type { Event } from '../../../../../../typings/index';
-import type { UnicloudContext, UnicloudEvent } from '../../../../../../typings/unicloud';
+import type { Event, CustomHandlerReturn, HttpApiStatusResponse } from '../../../../../../typings/index';
+import type { UnicloudOriginContext, UnicloudEvent } from '../../../../../../typings/unicloud';
 import type { Map } from '../../map';
-import type { ErrorReturn } from '../../error';
 
 export const adaptUnicloudEvent = async (event: Event) => {
   const { route: url, method, params } = event as UnicloudEvent;
@@ -18,14 +17,32 @@ export const adaptUnicloudEvent = async (event: Event) => {
  * @param {Record<string, Map>} apiMap
  * @return {*}
  */
-export const triggerApi = (event: UnicloudEvent, context: UnicloudContext, apiMap: Record<string, Map>) => {
+export const triggerApi = async (event: UnicloudEvent, context: UnicloudOriginContext, apiMap: Record<string, Map>) => {
   // 判断apimap是否存在指定的route
   // route需要取问号之前有效的路径
   const route = event.route.split('?')[0];
   if (!apiMap[route]) {
     return error('NOT_FOUND', `route ${route} not found`);
   }
-  return routerHandler(event.route, event, apiMap);
+  const handlerResult = await routerHandler(event.route, event, apiMap);
+  const [result, customResult] = handlerResult as unknown as [any, ReturnType<CustomHandlerReturn> | undefined];
+  if (context.SOURCE === 'http') {
+    // 判断, 如果是函数url化, 就返回一个集成响应
+    // 判断路由返回结果类型
+    if (Array.isArray(handlerResult)) {
+      // 如果customResult存在
+      if (customResult) {
+        return {
+          mpserverlessComposedResponse: true, // 使用阿里云返回集成响应是需要此字段为true
+          isBase64Encoded: false, // 硬编码
+          statusCode: customResult.statusCode,
+          data: result,
+          headers: customResult.headers
+        };
+      }
+    }
+  }
+  return result;
 };
 
 /**
@@ -33,7 +50,7 @@ export const triggerApi = (event: UnicloudEvent, context: UnicloudContext, apiMa
  * 校验event
  * @param {UnicloudEvent} event
  */
-export const validateEvent = (event: UnicloudEvent): ErrorReturn | true => {
+export const validateEvent = (event: UnicloudEvent): HttpApiStatusResponse | true => {
   const ajv = new Ajv();
   const schema: JSONSchemaType<UnicloudEvent> = {
     type: 'object',

@@ -1,4 +1,4 @@
-import { commandArgs } from '../../../../util/config';
+import { platformHook } from '../core/platform';
 import { aggregatePluginBehavior } from '../core/plugin';
 import { implementApi } from '../core/api';
 import { asyncDependencyScheduler, getAsyncDependency } from '../core/schedule';
@@ -24,8 +24,6 @@ type AppReturn = {
   };
 };
 export const useApp = async (): Promise<AppReturn> => {
-  // 异步加载与运行时环境的异步依赖
-  await asyncDependencyScheduler();
   // 初始化返回
   const returnData: AppReturn = {
     implementApi: () => implementApi(app),
@@ -37,15 +35,19 @@ export const useApp = async (): Promise<AppReturn> => {
   };
   // 新建一个h3实例
   let app: H3.App | null = null;
-  if (['server'].includes(commandArgs.platform)) {
-    const h3 = await getAsyncDependency<typeof H3>('@sword-code-practice/h3');
-    app = h3.createApp();
-    returnData.server.start = () => {
-      if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);
-    };
-  }
-  // 整合插件
-  const aggregatePlugin = aggregatePluginBehavior();
+  await platformHook({
+    server: async () => {
+      // 异步加载与运行时环境的异步依赖
+      await asyncDependencyScheduler();
+      const aggregatePlugin = await aggregatePluginBehavior();
+      const h3 = await getAsyncDependency<typeof H3>('@sword-code-practice/h3');
+      app = h3.createApp();
+      returnData.server.start = () => {
+        if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);
+      };
+    }
+  });
+  //
   // 返回app对象,并且返回一些实例，比如说启动http服务以及实现api
   return returnData;
 };

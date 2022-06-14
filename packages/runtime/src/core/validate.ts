@@ -1,6 +1,6 @@
+import { TSBufferValidator } from 'tsbuffer-validator';
 import { platformHook } from './platform';
 import { getAsyncDependency } from './schedule';
-import { useValidateProto } from './../hooks/proto';
 import type { HttpInstructMethod, HttpContext } from '../../../../typings/index';
 import type * as H3 from '@sword-code-practice/h3';
 import type { UnicloudEvent } from '../../../../typings/unicloud';
@@ -73,7 +73,8 @@ export const validateProto = (
       errMsg: string;
     } => {
   if (proto?.key) {
-    return useValidateProto(proto?.key, data, proto?.data);
+    const validator = new TSBufferValidator({ [proto?.key]: proto?.data } as any);
+    return validator.validate(data, proto?.key);
   }
   // 如果key为空，说明需要校验的proto开发者没有填写，这里就默认校验成功
   return {
