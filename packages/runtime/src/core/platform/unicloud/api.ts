@@ -49,8 +49,9 @@ export const triggerApi = async (event: UnicloudEvent, context: UnicloudOriginCo
  *
  * 校验event
  * @param {UnicloudEvent} event
+ * @return {*}  {(Promise<HttpApiStatusResponse | true>)}
  */
-export const validateEvent = (event: UnicloudEvent): HttpApiStatusResponse | true => {
+export const validateEvent = async (event: UnicloudEvent): Promise<HttpApiStatusResponse | true> => {
   const ajv = new Ajv();
   const schema: JSONSchemaType<UnicloudEvent> = {
     type: 'object',
@@ -65,7 +66,7 @@ export const validateEvent = (event: UnicloudEvent): HttpApiStatusResponse | tru
   };
   const validateResult = ajv.compile(schema)(event);
   if (!validateResult) {
-    return error('VALIDATE_REQUEST', 'event is not valid (unicloud)');
+    return await error('VALIDATE_REQUEST', 'event is not valid (unicloud)');
   }
   return true;
 };
