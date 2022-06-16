@@ -4,7 +4,7 @@ import { ReqQuery, ReqParams, Res } from './proto';
 export default useApi<{
   query: ReqQuery;
   params: ReqParams;
-  res: Promise<Res>;
+  res: Res;
 }>({
   handler: async (ctx) => {
     return {
