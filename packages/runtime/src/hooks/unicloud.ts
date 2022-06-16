@@ -36,7 +36,8 @@ export const useUnicloudApp = async (
             route: unicloudOriginUrlEvent.path,
             method: unicloudOriginUrlEvent.httpMethod as any,
             query: unicloudOriginUrlEvent.queryStringParameters,
-            params: isJSON(unicloudOriginUrlEvent.body) as any
+            // 如果是get请求, body是不存在的, 所以需要判断, 默认给一个空对象
+            params: isJSON(unicloudOriginUrlEvent.body ?? {}) as any
           }
         : (event as UnicloudEvent),
     context: unicloudOriginContext
