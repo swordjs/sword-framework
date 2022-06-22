@@ -1,9 +1,7 @@
 import { readFileSync } from 'fs';
-import { getApiMap } from './map';
 import { validateMethod, validateProto, getNeedValidateProto } from './validate';
 import { getSourcePath } from '../../../../util/path';
 import { exec } from './pipeline';
-import { serverRouterHandler } from './platform/server/api';
 import error from './error';
 import { isJSON } from '../../../../util/data';
 import { getLogger } from './log';
@@ -11,8 +9,13 @@ import { aggregatePlugin } from './plugin';
 import { parseCommandArgs, commandArgs as _commandArgs } from '../../../../util/config';
 import { useQuery } from '../../../../util/route';
 import { platformHook } from './platform';
-import { getAsyncDependency } from './schedule';
-import { adaptServerEvent } from './platform/server/api';
+import {
+  adaptEvent as adaptServerEvent,
+  customApiReturn as customApiServerReturn,
+  implementApi as implementServerApi,
+  apiError as apiServerError,
+  apiResponseHeaders as apiServerResponseHeaders
+} from './platform/server/api';
 import { adaptUnicloudEvent } from './platform/unicloud/api';
 import type * as H3 from '@sword-code-practice/h3';
 import type { HttpContext, HttpInstructMethod, UnPromisify, Event, CustomHandlerReturn, HttpApiStatusResponse } from '../../../../typings/index';
@@ -21,17 +24,6 @@ import type { InterruptPipelineResult } from './pipeline';
 import type { Map } from './map';
 
 let commandArgs = _commandArgs;
-
-let h3: typeof H3;
-
-// 获取h3的实例
-const getH3 = async () => {
-  if (h3) {
-    return h3;
-  }
-  h3 = await getAsyncDependency<typeof H3>('@sword-code-practice/h3');
-  return h3;
-};
 
 const log = getLogger();
 
@@ -42,9 +34,10 @@ let protoSchema: Record<string, Record<string, unknown>> | null = null;
 export const methods: HttpInstructMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'CONNECT', 'OPTIONS', 'TRACE'];
 
 /**
+ *
  * event需要在不同平台之间进行适配
  * @param {Event} event
- * @return {*}  {Promise<{ req: any; res: any; url: string; method: HttpInstructMethod; params: any; query: any }>}
+ * @return {*}  {AdaptEventReturn}
  */
 type AdaptEventReturn = Promise<{ key: string; req: any; res: any; method: HttpInstructMethod; params: any; query: any }>;
 export const adaptEvent = async (event: Event): AdaptEventReturn => {
@@ -74,68 +67,63 @@ export const adaptEvent = async (event: Event): AdaptEventReturn => {
 };
 
 /**
- * 处理exec pipeline (middleware pipeline)
- * @param {UnPromisify<ReturnType<typeof exec>>} execResult
- * @param {CompatibilityEvent} event
- * @return {*}
+ *
+ * 处理多个平台的错误返回
+ * @param {Event} event
+ * @param {(H3.H3Error | HttpApiStatusResponse<any>)} errorReturn
+ * @return {*}  {(Promise<HttpApiStatusResponse | void>)}
  */
-const handleExecPipelineError = async (execResult: UnPromisify<ReturnType<typeof exec>>, event?: Event) => {
-  // 判断execresult的类型
-  if (execResult instanceof Error) {
-    const errorReturn = await error('PIPELINE_ERROR', execResult.message);
-    return platformHook<HttpApiStatusResponse | void>({
-      server: () => {
-        if (event) {
-          return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
-        }
-      },
-      unicloud: () => errorReturn
-    });
-  }
-  return true;
-};
-
-/**
- * 处理错误的返回
- * @param {ReturnType<typeof validateProto>} validateResult
- * @param {Event} [event]
- * @return {*}
- */
-const handleErrorResponse = async (validateResult: ReturnType<typeof validateProto>, event?: Event) => {
-  const errorReturn = await error('VALIDATE_RESPONSE', validateResult.errMsg as string);
-  log.RESPONSE_TYPE_ERROR(JSON.stringify(validateResult.errMsg));
-  return platformHook<HttpApiStatusResponse | void>({
-    server: () => {
-      if (event) {
-        return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
-      }
-    },
+export const handleError = async (event: Event, errorReturn: H3.H3Error | HttpApiStatusResponse<any>): Promise<HttpApiStatusResponse | void> => {
+  return await platformHook<HttpApiStatusResponse | void>({
+    server: async () => await apiServerError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error),
     unicloud: () => errorReturn
   });
 };
 
 /**
  *
- * 处理检查method
- * @param {HttpContext} context
- * @param {CompatibilityEvent} event
- * @param {any} req
+ * 处理exec pipeline 错误 (middleware pipeline)
+ * @param {Event} event
+ * @param {UnPromisify<ReturnType<typeof exec>>} execResult
  * @return {*}
  */
-const handleValidateMethod = async (req: any, event: Event, context: HttpContext) => {
+const handleExecPipelineError = async (event: Event, execResult: UnPromisify<ReturnType<typeof exec>>) => {
+  // 判断execresult的类型
+  if (execResult instanceof Error) {
+    const errorReturn = await error('PIPELINE_ERROR', execResult.message);
+    return await handleError(event as Event, errorReturn);
+  }
+  return true;
+};
+
+/**
+ *
+ * 处理错误的返回
+ * @param {Event} event
+ * @param {ReturnType<typeof validateProto>} validateResult
+ * @return {*}
+ */
+const handleErrorResponse = async (event: Event, validateResult: ReturnType<typeof validateProto>) => {
+  const errorReturn = await error('VALIDATE_RESPONSE', validateResult.errMsg as string);
+  log.RESPONSE_TYPE_ERROR(JSON.stringify(validateResult.errMsg));
+  return await handleError(event as Event, errorReturn);
+};
+
+/**
+ *
+ * 处理检查method
+ * @param {Event} event
+ * @param {HttpContext} context
+ * @param {*} req
+ * @return {*}
+ */
+const handleValidateMethod = async (event: Event, context: HttpContext, req: any) => {
   if (!(await validateMethod(req, context.method))) {
     // 如果校验method错误，就返回错误信息
     const errMsg = `Allowed request methods are: ${context.method.join(',')}, but got: ${req.method}`;
     log.REQUEST_METHOD_ERROR(errMsg);
     const errorReturn = await error('VALIDATE_METHOD', errMsg);
-    return await platformHook<HttpApiStatusResponse | void>({
-      server: () => {
-        if (event) {
-          return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
-        }
-      },
-      unicloud: () => errorReturn
-    });
+    return await handleError(event as Event, errorReturn);
   }
   return true;
 };
@@ -143,19 +131,14 @@ const handleValidateMethod = async (req: any, event: Event, context: HttpContext
 /**
  *
  * 处理返回请求头
- * @param {HttpContext} context
- * @param {CompatibilityEvent} event
+ * @param {Event} event
+ * @param {HttpContext['resHeaders']} headers
+ * @return {*}
  */
-const handleResHeaders = (headers: HttpContext['resHeaders'], event?: Event) => {
+const handleResHeaders = (event: Event, headers: HttpContext['resHeaders']) => {
   if (headers) {
     return platformHook({
-      server: () => {
-        if (event) {
-          Object.keys(headers).forEach((key) => {
-            h3.appendHeader(event as H3.CompatibilityEvent, key, headers[key] as string);
-          });
-        }
-      }
+      server: async () => await apiServerResponseHeaders(event as H3.CompatibilityEvent, headers)
     });
   }
 };
@@ -165,13 +148,13 @@ type ProtoData = { proto: ValidateProto; data: any };
 /**
  *
  * 处理检查request proto
+ * @param {Event} event
+ * @param {HttpContext} context
  * @param {ProtoData} params
  * @param {ProtoData} query
- * @param {any} res
- * @param {() => void} cb
  * @return {*}
  */
-const handleValidateRequestProto = async (context: HttpContext, params: ProtoData, query: ProtoData, res: any, cb: () => void) => {
+const handleValidateRequestProto = async (event: Event, context: HttpContext, params: ProtoData, query: ProtoData) => {
   // 检查请求params的proto
   const requestParamsProtoResult = validateProto(params.proto, params.data);
   // 检查请求query的proto
@@ -182,18 +165,11 @@ const handleValidateRequestProto = async (context: HttpContext, params: ProtoDat
   }) as undefined | { errMsg: string };
   if (errorResult) {
     log.REQUEST_TYPE_ERROR(JSON.stringify(errorResult.errMsg));
-    handleResHeaders(context.resHeaders, res);
+    handleResHeaders(event, context.resHeaders);
     const errorReturn = await error('VALIDATE_REQUEST', errorResult.errMsg);
-    return platformHook<HttpApiStatusResponse | void>({
-      server: () => {
-        return h3.sendError(res, errorReturn as H3.H3Error);
-      },
-      unicloud: () => errorReturn
-    });
-  } else {
-    // proto检测成功的回调
-    return cb();
+    return await handleError(event as Event, errorReturn);
   }
+  return true;
 };
 
 /**
@@ -230,24 +206,24 @@ const pipelineResultTypeMap = (
  *
  * 处理preApiCall pipeline
  * @param {(HttpContext | InterruptPipelineResult)} preApiCallExecResult
- * @param {(HttpContext | InterruptPipelineResult)} context
  * @param {Event} event
+ * @param {(HttpContext | InterruptPipelineResult)} context
  * @return {*}  {({ context: HttpContext; returnData: null | unknown })}
  */
 const handlePreApiCall = (
   preApiCallExecResult: HttpContext | InterruptPipelineResult,
-  context: HttpContext | InterruptPipelineResult,
-  event?: Event
+  event: Event,
+  context: HttpContext | InterruptPipelineResult
 ): { context: HttpContext; returnData: null | unknown } => {
   return pipelineResultTypeMap(preApiCallExecResult, context, {
     return: (context, returnData) => {
-      handleResHeaders(context.resHeaders, event);
+      handleResHeaders(event, context.resHeaders);
       log.RESPONSE_RESULT(JSON.stringify(returnData?.data), '-preApiCall');
       // 直接返回result
       return { context, returnData };
     },
     stop: (context) => {
-      handleResHeaders(context.resHeaders, event);
+      handleResHeaders(event, context.resHeaders);
       return { context };
     },
     cb: (context) => {
@@ -260,24 +236,24 @@ const handlePreApiCall = (
  *
  * 处理postapiCall pipeline
  * @param {(HttpContext | InterruptPipelineResult)} postApiCallExecResult
- * @param {(HttpContext | InterruptPipelineResult)} context
  * @param {Event} event
+ * @param {(HttpContext | InterruptPipelineResult)} context
  * @return {*}
  */
-const handlePostApiCall = (postApiCallExecResult: HttpContext | InterruptPipelineResult, context: HttpContext | InterruptPipelineResult, event?: Event) => {
+const handlePostApiCall = (postApiCallExecResult: HttpContext | InterruptPipelineResult, event: Event, context: HttpContext | InterruptPipelineResult) => {
   return pipelineResultTypeMap(postApiCallExecResult, context, {
     return: (context, returnData) => {
-      handleResHeaders(context.resHeaders, event);
+      handleResHeaders(event, context.resHeaders);
       // 直接返回result
       log.RESPONSE_RESULT(JSON.stringify(returnData?.data), '-postApiCall');
       return { context, returnData };
     },
     stop: (context) => {
-      handleResHeaders(context.resHeaders, event);
+      handleResHeaders(event, context.resHeaders);
       return { context };
     },
     cb: (context) => {
-      handleResHeaders(context.resHeaders, event);
+      handleResHeaders(event, context.resHeaders);
       return { context };
     }
   });
@@ -287,29 +263,12 @@ const handlePostApiCall = (postApiCallExecResult: HttpContext | InterruptPipelin
  *
  * 实现API的装载
  * @param {App} app
- * @param {string} dirName
  */
 export const implementApi = async (app: H3.App | null) => {
   // 获取proto schema
   getProtoSchema();
-  return platformHook({
-    server: async () => {
-      if (app) {
-        await getH3();
-        // 获取apimap
-        const { apiMap } = await getApiMap();
-        const router = h3.createRouter();
-        for (const key in apiMap) {
-          // key: api value: path
-          router.add(
-            key,
-            async (event: H3.CompatibilityEvent) => await serverRouterHandler(key, apiMap, event),
-            apiMap[key].method.map((m) => m.toLowerCase()) as any[]
-          );
-        }
-        app.use(router);
-      }
-    }
+  await platformHook({
+    server: async () => await implementServerApi(app)
   });
 };
 
@@ -352,25 +311,27 @@ const getProtoSchema = async () => {
   }
 };
 
-// 处理api的集成返回结果
-const handleCustomApiReturn = async (handlerRes: ReturnType<CustomHandlerReturn<any>>, event: any): Promise<ReturnType<CustomHandlerReturn<any>>> => {
+/**
+ *
+ * 处理api的集成返回结果
+ * @param {Event} event
+ * @param {ReturnType<CustomHandlerReturn<any>>} handlerRes
+ * @return {*}  {Promise<ReturnType<CustomHandlerReturn<any>>>}
+ */
+const handleCustomApiReturn = async (event: Event, handlerRes: ReturnType<CustomHandlerReturn<any>>): Promise<ReturnType<CustomHandlerReturn<any>>> => {
+  // 从集成响应中提取参数
   const headers = handlerRes.headers ?? {};
   const statusCode = handlerRes.statusCode ?? 200;
   const statusMessage = handlerRes.statusMessage ?? '';
   const data = handlerRes.data ?? {};
-  // 处理headers
-  handleResHeaders(headers, event);
+  // 处理集成响应的headers
+  handleResHeaders(event, headers);
+  // 处理集成响应的核心逻辑
   const hookResult = await platformHook({
-    server: async () => {
-      // 判断状态码不等于2xx
-      if (statusCode < 200 || statusCode >= 300) {
-        console.log(statusCode);
-        // 调用error
-        const errorReturn = await error(statusCode, statusMessage, data);
-        return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
-      }
-    }
+    server: async () => await customApiServerReturn(event as H3.CompatibilityEvent, statusCode, statusMessage, data)
   });
+  // 当hook的返回结果为undefined时 (没有错误)，则直接返回响应
+  // 为什么要返回响应呢? 因为在api执行上下文中, 仍需要响应的各个参数(data等等)
   return hookResult ?? { headers, statusCode, statusMessage, data };
 };
 
@@ -384,7 +345,7 @@ const handleCustomApiReturn = async (handlerRes: ReturnType<CustomHandlerReturn<
  */
 export const routerHandler = async (key: string, event: Event, apiMap: Record<string, Map>) => {
   // eslint-disable-next-line prefer-const
-  let { key: _key, req, res, params, query } = await adaptEvent(event);
+  let { key: _key, req, params, query } = await adaptEvent(event);
   // 将重新处理的key替换
   key = _key;
   // 日志-请求url
@@ -401,60 +362,65 @@ export const routerHandler = async (key: string, event: Event, apiMap: Record<st
   });
   const _res = apiMap[key];
   // 校验method
-  const validateMethodResult = await handleValidateMethod(req, event, context);
+  const validateMethodResult = await handleValidateMethod(event, context, req);
   if (validateMethodResult !== true) return validateMethodResult;
   // 获取符合要求的proto
   const { ReqParams: reqParamsProto, ReqQuery: reqQueryProto, Res: resProto } = getNeedValidateProto(context.proto);
-  // 校验请求proto，如果成功则会执行回调
-  return await handleValidateRequestProto(context, { proto: reqParamsProto, data: params }, { proto: reqQueryProto, data: query }, res, async () => {
-    // 执行pipeline
-    const preApiCallExecResult = await exec('preApiCall', context);
-    if (await handleExecPipelineError(preApiCallExecResult, event)) {
-      // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
-      if (!(preApiCallExecResult instanceof Error)) {
-        // 处理PreApiCall Pipline
-        const { context: preApiCallContext, returnData: preApiCallReturnData } = handlePreApiCall(preApiCallExecResult, context, event);
-        // 判断returndata是否存在, 如果存在，则直接返回
-        if (preApiCallReturnData) return preApiCallReturnData;
-        // 经过pipeline后的context需要重新赋值
-        context = preApiCallContext;
-        log.REQUEST_QUERY(JSON.stringify(context.query));
-        log.REQUEST_PARAMS(JSON.stringify(context.params));
-        // 执行handler
-        let _handlerRes;
-        // 集成handler返回值
-        let _customHandlerRes;
-        try {
-          // handler的返回有可能是一个函数, 如果是函数则就代表了它是一个集成响应, 我们需要对集成响应作出额外处理
-          _handlerRes = await _res.handler(context);
-          if (typeof _handlerRes === 'function') {
-            _customHandlerRes = await handleCustomApiReturn((_handlerRes as CustomHandlerReturn<any>)(), event);
-            // 将data赋值给_handlerRes, 因为之后的逻辑要校验data
-            _handlerRes = _customHandlerRes.data;
-          }
-        } catch (e) {
-          log.EXECUTE_ERROR(JSON.stringify(e));
-          // 如果handler出错，则直接返回错误
-          return await error('EXECUTE_HANDLER_ERROR', 'handler error');
+  // 校验请求proto
+  const validateRequestProtoResult = await handleValidateRequestProto(
+    event,
+    context,
+    { proto: reqParamsProto, data: params },
+    { proto: reqQueryProto, data: query }
+  );
+  if (validateRequestProtoResult !== true) return validateRequestProtoResult;
+  // 执行pipeline
+  const preApiCallExecResult = await exec('preApiCall', context);
+  if (await handleExecPipelineError(event, preApiCallExecResult)) {
+    // 如果为true说明pipeline执行没有出错，所以这里判断正确执行的情况
+    if (!(preApiCallExecResult instanceof Error)) {
+      // 处理PreApiCall Pipline
+      const { context: preApiCallContext, returnData: preApiCallReturnData } = handlePreApiCall(preApiCallExecResult, event, context);
+      // 判断returndata是否存在, 如果存在，则直接返回
+      if (preApiCallReturnData) return preApiCallReturnData;
+      // 经过pipeline后的context需要重新赋值
+      context = preApiCallContext;
+      log.REQUEST_QUERY(JSON.stringify(context.query));
+      log.REQUEST_PARAMS(JSON.stringify(context.params));
+      // 执行handler
+      let _handlerRes;
+      // 集成handler返回值
+      let _customHandlerRes;
+      try {
+        // handler的返回有可能是一个函数, 如果是函数则就代表了它是一个集成响应, 我们需要对集成响应作出额外处理
+        _handlerRes = await _res.handler(context);
+        if (typeof _handlerRes === 'function') {
+          _customHandlerRes = await handleCustomApiReturn(event, (_handlerRes as CustomHandlerReturn<any>)());
+          // 将data赋值给_handlerRes, 因为之后的逻辑要校验data
+          _handlerRes = _customHandlerRes.data;
         }
-        // 执行pipeline
-        const postApiCallExecResult = await exec('postApiCall', context);
-        if (await handleExecPipelineError(postApiCallExecResult, event)) {
-          if (!(postApiCallExecResult instanceof Error)) {
-            const { returnData: postApiCallReturnData } = handlePostApiCall(postApiCallExecResult, context, event);
-            if (postApiCallReturnData) return postApiCallReturnData;
-            // 校验返回结果是否符合预期
-            const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
-            if (!resProtoResult.isSucc) {
-              // 如果返回结果不符合预期，就抛出错误
-              return await handleErrorResponse(resProtoResult, event);
-            }
-          }
-        }
-        log.RESPONSE_RESULT(typeof _handlerRes === 'undefined' ? '{}' : JSON.stringify(_handlerRes));
-        // 如果所有的流程都执行成功，则返回结果, 它是一个数组, 数组的第一个值是返回的结果, 第二个值是聚合的源结果 (如果返回的是集成对象的话)
-        return [_handlerRes, _customHandlerRes];
+      } catch (e) {
+        log.EXECUTE_ERROR(JSON.stringify(e));
+        // 如果handler出错，则直接返回错误
+        return await error('EXECUTE_HANDLER_ERROR', 'handler error');
       }
+      // 执行pipeline
+      const postApiCallExecResult = await exec('postApiCall', context);
+      if (await handleExecPipelineError(event, postApiCallExecResult)) {
+        if (!(postApiCallExecResult instanceof Error)) {
+          const { returnData: postApiCallReturnData } = handlePostApiCall(postApiCallExecResult, event, context);
+          if (postApiCallReturnData) return postApiCallReturnData;
+          // 校验返回结果是否符合预期
+          const resProtoResult = validateProto(resProto, (_handlerRes as any) || {});
+          if (!resProtoResult.isSucc) {
+            // 如果返回结果不符合预期，就抛出错误
+            return await handleErrorResponse(event, resProtoResult);
+          }
+        }
+      }
+      log.RESPONSE_RESULT(typeof _handlerRes === 'undefined' ? '{}' : JSON.stringify(_handlerRes));
+      // 如果所有的流程都执行成功，则返回结果, 它是一个数组, 数组的第一个值是返回的结果, 第二个值是聚合的源结果 (如果返回的是集成对象的话)
+      return [_handlerRes, _customHandlerRes];
     }
-  });
+  }
 };

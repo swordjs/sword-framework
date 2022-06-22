@@ -36,7 +36,7 @@ export type HttpInstructReturn = {
 
 export type HttpApiStatusResponse<D = any> = {
   statusCode: number;
-  statusMessage: string;
+  statusMessage?: string;
   data?: UnPromisify<D>;
 };
 
