@@ -1,13 +1,13 @@
 import { access, readFileSync, constants } from 'fs';
 import { writeFileRecursive } from './util/file';
 import { generateSchema } from './util/proto';
-import { useGetApiMap } from '@sword-code-practice/sword-framework';
+import { useGetApiMap } from '@swordjs/sword-framework';
 import log from './log';
 import { resolve } from 'path';
 import { OpenAPIV3_1 } from 'openapi-types';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
-import type { Map } from '@sword-code-practice/sword-framework';
+import type { Map } from '@swordjs/sword-framework';
 import { cwd } from 'process';
 
 type AccepptProtoName = ['ReqParams', 'ReqQuery', 'Res'];

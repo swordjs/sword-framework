@@ -43,13 +43,13 @@
 ### 安装
 
 ```bash
-npm i @sword-code-practice/sword-framework
+npm i @swordjs/sword-framework
 ```
 
 我们非常建议你将 cli 脚手架安装到全局，这样就能够方便的使用了。
 
 ```bash
-npm i @sword-code-practice/backend-cli -g
+npm i @swordjs/backend-cli -g
 ```
 ### 初始化
 

@@ -2,7 +2,7 @@ import { createServer } from 'http';
 import net from 'net';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { log } from '@sword-code-practice/sword-plugin-log';
+import { log } from '@swordjs/sword-plugin-log';
 import type { Plugin } from '../../../typings/index';
 
 type ServerConfig = {

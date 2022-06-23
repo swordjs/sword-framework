@@ -1,4 +1,4 @@
-# @sword-code-practice/backend-cli
+# @swordjs/backend-cli
 
 ## 1.3.0
 
@@ -20,7 +20,7 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @sword-code-practice/sword-framework@1.2.1
+  - @swordjs/sword-framework@1.2.1
 
 ## 1.2.0
 

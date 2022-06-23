@@ -34,15 +34,15 @@ const addPresetPlugin = async (): Promise<Record<PresetPluginKeys, any>> => {
   // 可以进行预设的插件内容
   return {
     server: await platformHook({
-      server: () => getAsyncDependency('@sword-code-practice/sword-plugin-server')['useServer'](),
+      server: () => getAsyncDependency('@swordjs/sword-plugin-server')['useServer'](),
       default: () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         return { name: 'server', server: { start: () => {} } };
       }
     }),
     log: await platformHook({
-      server: () => getAsyncDependency('@sword-code-practice/sword-plugin-log')['useLog'](),
-      unicloud: () => getAsyncDependency('@sword-code-practice/sword-plugin-unicloud-log')['useLog'](),
+      server: () => getAsyncDependency('@swordjs/sword-plugin-log')['useLog'](),
+      unicloud: () => getAsyncDependency('@swordjs/sword-plugin-unicloud-log')['useLog'](),
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       default: () => {}
     })

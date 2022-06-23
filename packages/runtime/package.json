@@ -1,5 +1,5 @@
 {
-  "name": "@sword-code-practice/sword-framework",
+  "name": "@swordjs/sword-framework",
   "version": "1.2.2-beta.2",
   "description": "",
   "types": "./lib/index.d.ts",
@@ -43,9 +43,9 @@
     "unbuild": "^0.6.9"
   },
   "dependencies": {
-    "@sword-code-practice/sword-plugin-log": "workspace:*",
-    "@sword-code-practice/sword-plugin-server": "workspace:*",
-    "@sword-code-practice/sword-plugin-unicloud-log": "workspace:*",
+    "@swordjs/sword-plugin-log": "workspace:*",
+    "@swordjs/sword-plugin-server": "workspace:*",
+    "@swordjs/sword-plugin-unicloud-log": "workspace:*",
     "ajv": "^8.11.0",
     "mri": "^1.2.0",
     "tsbuffer-validator": "^2.1.0",

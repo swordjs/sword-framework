@@ -1,4 +1,4 @@
-import { useApi } from '@sword-code-practice/sword-framework';
+import { useApi } from '@swordjs/sword-framework';
 import { ReqQuery, ReqParams, Res } from './proto';
 
 export default useApi<{
@@ -7,8 +7,17 @@ export default useApi<{
   res: Res;
 }>({
   handler: async (ctx) => {
-    return {
-      message: 'hello'
+    return () => {
+      return {
+        statusCode: 205,
+        statusMessage: 'success',
+        headers: {
+          fuck: '666'
+        },
+        data: {
+          message: 'Hello, World!'
+        }
+      };
     };
   }
 });

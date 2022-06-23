@@ -2,14 +2,14 @@ import { platformHook } from '../core/platform';
 import { aggregatePluginBehavior } from '../core/plugin';
 import { implementApi } from '../core/api';
 import { asyncDependencyScheduler, getAsyncDependency } from '../core/schedule';
-import type * as H3 from '@sword-code-practice/h3';
+import type * as H3 from '@swordjs/h3';
 
 /**
  *
  * 创建sword app
  * @description 返回一个app实例，在实例中你可以使用挂载在实例上的方法，比如`implementApi`
  * @example
- * import { useApp } from "@sword-code-practice/backend-framework";
+ * import { useApp } from "@swordjs/backend-framework";
  * const app = useApp();
  * const init = async () => {
  *  app.implementApi();
@@ -40,7 +40,7 @@ export const useApp = async (): Promise<AppReturn> => {
       // 异步加载与运行时环境的异步依赖
       await asyncDependencyScheduler();
       const aggregatePlugin = await aggregatePluginBehavior();
-      const h3 = await getAsyncDependency<typeof H3>('@sword-code-practice/h3');
+      const h3 = await getAsyncDependency<typeof H3>('@swordjs/h3');
       app = h3.createApp();
       returnData.server.start = () => {
         if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);

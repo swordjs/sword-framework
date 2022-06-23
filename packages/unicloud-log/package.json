@@ -1,5 +1,5 @@
 {
-  "name": "@sword-code-practice/sword-plugin-unicloud-log",
+  "name": "@swordjs/sword-plugin-unicloud-log",
   "version": "1.0.1",
   "description": "",
   "types": "./lib/index.d.ts",

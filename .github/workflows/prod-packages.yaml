@@ -60,42 +60,42 @@ jobs:
         - name: sync example
           uses: fjogeleit/http-request-action@master
           with:
-            url: "https://npmmirror.com/sync/@sword-code-practice/sword-framework-example"
+            url: "https://npmmirror.com/sync/@swordjs/sword-framework-example"
             timeout: 50000
             method: GET
 
         - name: sync cli
           uses: fjogeleit/http-request-action@master
           with:
-            url: "https://npmmirror.com/sync/@sword-code-practice/backend-cli"
+            url: "https://npmmirror.com/sync/@swordjs/backend-cli"
             timeout: 50000
             method: GET
 
         - name: sync cors
           uses: fjogeleit/http-request-action@master
           with:
-            url: "https://npmmirror.com/sync/@sword-code-practice/sword-cors"
+            url: "https://npmmirror.com/sync/@swordjs/sword-cors"
             timeout: 50000
             method: GET
 
         - name: sync log
           uses: fjogeleit/http-request-action@master
           with:
-            url: "https://npmmirror.com/sync/@sword-code-practice/sword-plugin-log"
+            url: "https://npmmirror.com/sync/@swordjs/sword-plugin-log"
             timeout: 50000
             method: GET
 
         - name: sync runtime
           uses: fjogeleit/http-request-action@master
           with:
-            url: "https://npmmirror.com/sync/@sword-code-practice/sword-framework"
+            url: "https://npmmirror.com/sync/@swordjs/sword-framework"
             timeout: 50000
             method: GET
 
         - name: sync server
           uses: fjogeleit/http-request-action@master
           with:
-            url: "https://npmmirror.com/sync/@sword-code-practice/sword-plugin-server"
+            url: "https://npmmirror.com/sync/@swordjs/sword-plugin-server"
             timeout: 50000
             method: GET
 

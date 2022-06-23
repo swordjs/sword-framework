@@ -1,4 +1,4 @@
-# @sword-code-practice/sword-cors
+# @swordjs/sword-cors
 
 ## 1.1.0
 

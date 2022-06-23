@@ -1,5 +1,5 @@
 {
-  "name": "@sword-code-practice/sword-plugin-log",
+  "name": "@swordjs/sword-plugin-log",
   "version": "1.1.1",
   "description": "",
   "types": "./lib/index.d.ts",

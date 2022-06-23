@@ -1,4 +1,4 @@
-## @sword-code-practice/sword-plugin-log
+## @swordjs/sword-plugin-log
 
 sword框架内置打印插件
 

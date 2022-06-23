@@ -17,7 +17,7 @@ export default async (args: Argv<CommandConfig>) => {
       return existsSync(value) ? '项目已存在' : true;
     }
   });
-  const CNPM_PACKAGE_URL = 'https://registry.npmmirror.com/@sword-code-practice/sword-framework-example';
+  const CNPM_PACKAGE_URL = 'https://registry.npmmirror.com/@swordjs/sword-framework-example';
   const packageInfo = await $fetch(CNPM_PACKAGE_URL);
   // 获取全部的版本(倒序)
   const versions = Object.keys(packageInfo.versions).reverse();

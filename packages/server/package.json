@@ -1,5 +1,5 @@
 {
-  "name": "@sword-code-practice/sword-plugin-server",
+  "name": "@swordjs/sword-plugin-server",
   "version": "1.1.1",
   "description": "",
   "types": "./lib/index.d.ts",
@@ -36,7 +36,7 @@
     "unbuild": "^0.6.9"
   },
   "dependencies": {
-    "@sword-code-practice/sword-plugin-log": "workspace:*"
+    "@swordjs/sword-plugin-log": "workspace:*"
   },
   "unbuild": {
     "entries": [

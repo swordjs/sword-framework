@@ -1,4 +1,4 @@
-# @sword-code-practice/sword-plugin-log
+# @swordjs/sword-plugin-log
 
 ## 1.1.0
 

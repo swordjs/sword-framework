@@ -3,7 +3,7 @@ import { getAsyncDependency } from '../../schedule';
 import error from '../../error';
 import { getApiMap } from '../../map';
 import type { Map } from '../../map';
-import type * as H3 from '@sword-code-practice/h3';
+import type * as H3 from '@swordjs/h3';
 import type { Event, HttpContext, HttpInstructMethod, CustomHandlerReturn } from '../../../../../../typings/index';
 
 // 在核心程序中，读取usebody的时候，需要进行判断，只有在几个method的请求上才可以对body进行解析
@@ -24,7 +24,7 @@ export const adaptEvent = async (event: Event) => {
   let params = {};
   // 只有在一些有效的方法中，才能解析body
   if (readBodyPayloadMethods.includes(method as unknown as any)) {
-    const parseResult = (await getAsyncDependency<typeof H3>('@sword-code-practice/h3').useBody(req)) ?? {};
+    const parseResult = (await getAsyncDependency<typeof H3>('@swordjs/h3').useBody(req)) ?? {};
     // 当params是空对象时, 使用usebody解析出来的数据是空字符串, 所以为了validate, 我们需要将空字符串转换为空对象
     if (parseResult !== '') params = parseResult;
   }
@@ -39,7 +39,7 @@ export const adaptEvent = async (event: Event) => {
  * @return {*}
  */
 export const apiError = async (event: H3.CompatibilityEvent, errorReturn?: H3.H3Error): Promise<void> => {
-  const h3 = await getAsyncDependency<typeof H3>('@sword-code-practice/h3');
+  const h3 = await getAsyncDependency<typeof H3>('@swordjs/h3');
   return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
 };
 
@@ -51,7 +51,7 @@ export const apiError = async (event: H3.CompatibilityEvent, errorReturn?: H3.H3
  * @return {*}  {Promise<void>}
  */
 export const apiResponseHeaders = async (event: H3.CompatibilityEvent, headers: HttpContext['resHeaders']): Promise<void> => {
-  const h3 = await getAsyncDependency<typeof H3>('@sword-code-practice/h3');
+  const h3 = await getAsyncDependency<typeof H3>('@swordjs/h3');
   Object.keys(headers).forEach((key) => {
     h3.appendHeader(event as H3.CompatibilityEvent, key, headers[key] as string);
   });
@@ -65,7 +65,7 @@ export const apiResponseHeaders = async (event: H3.CompatibilityEvent, headers: 
  */
 export const implementApi = async (app: H3.App | null): Promise<typeof H3 | null> => {
   if (app) {
-    const h3 = await getAsyncDependency<typeof H3>('@sword-code-practice/h3');
+    const h3 = await getAsyncDependency<typeof H3>('@swordjs/h3');
     // 获取apimap
     const { apiMap } = await getApiMap();
     const router = h3.createRouter();
@@ -93,7 +93,7 @@ export const implementApi = async (app: H3.App | null): Promise<typeof H3 | null
  * @return {*}
  */
 export const customApiReturn = async (event: H3.CompatibilityEvent, statusCode: number, statusMessage: string, data: any) => {
-  const h3: typeof H3 = await getAsyncDependency<typeof H3>('@sword-code-practice/h3');
+  const h3: typeof H3 = await getAsyncDependency<typeof H3>('@swordjs/h3');
   // 判断状态码不等于2xx, 就返回一个server错误
   if (statusCode < 200 || statusCode >= 300) {
     // 调用error

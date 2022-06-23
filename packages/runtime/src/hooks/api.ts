@@ -14,7 +14,7 @@ const checkPath = (path: HttpInstructReturn['path']) => {
  * @template C
  * @example
  *
- * import { useApi } from "@sword-code-practice/backend-framework";
+ * import { useApi } from "@swordjs/backend-framework";
  * import { ReqQuery, ReqParams, Res } from "./proto";
  * export const main = useApi<{
  *  query: ReqQuery;

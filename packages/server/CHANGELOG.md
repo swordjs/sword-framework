@@ -1,4 +1,4 @@
-# @sword-code-practice/sword-plugin-server
+# @swordjs/sword-plugin-server
 
 ## 1.1.0
 
@@ -9,4 +9,4 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @sword-code-practice/sword-plugin-log@1.1.0
+  - @swordjs/sword-plugin-log@1.1.0

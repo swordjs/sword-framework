@@ -1,6 +1,6 @@
 import { getAsyncDependency } from '../core/schedule';
 import { platformHook } from './platform';
-import type * as H3 from '@sword-code-practice/h3';
+import type * as H3 from '@swordjs/h3';
 import type { HttpApiStatusResponse } from '../../../../typings/index';
 
 // 定义不同错误类型以及它们所代表的状态码
@@ -28,7 +28,7 @@ export default async (type: keyof typeof ErrorType | number, message: string, da
     data
   };
   return (await platformHook<H3.H3Error | HttpApiStatusResponse>({
-    server: () => getAsyncDependency('@sword-code-practice/h3').createError(res),
+    server: () => getAsyncDependency('@swordjs/h3').createError(res),
     unicloud: () => res
   })) as any;
 };

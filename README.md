@@ -35,12 +35,12 @@ This is the first serverless framework in [sword.org](https://github.com/swordCo
 ## Install
 
 ```bash
-npm i @sword-code-practice/sword-framework
+npm i @swordjs/sword-framework
 ```
 We highly recommend you install the CLI toolkits to global, so you can use them in your project easily.
 
 ```bash
-npm i @sword-code-practice/backend-cli -g
+npm i @swordjs/backend-cli -g
 ```
 ## Init template
 

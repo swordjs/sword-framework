@@ -1,5 +1,5 @@
 {
-  "name": "@sword-code-practice/sword-cors",
+  "name": "@swordjs/sword-cors",
   "version": "1.1.1",
   "description": "",
   "types": "./lib/index.d.ts",

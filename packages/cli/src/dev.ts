@@ -61,7 +61,7 @@ export interface Res {
   // 生成API
   writeFileRecursive(
     `${resolve(cwd, sourceDir, 'api', ..._parentDir, dir, 'index.ts')}`,
-    `import { useApi } from '@sword-code-practice/sword-framework';
+    `import { useApi } from '@swordjs/sword-framework';
 import { ReqQuery, ReqParams, Res } from './proto';
 
 export const main = useApi<{

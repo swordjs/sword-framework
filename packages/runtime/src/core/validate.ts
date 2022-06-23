@@ -2,7 +2,7 @@ import { TSBufferValidator } from 'tsbuffer-validator';
 import { platformHook } from './platform';
 import { getAsyncDependency } from './schedule';
 import type { HttpInstructMethod, HttpContext } from '../../../../typings/index';
-import type * as H3 from '@sword-code-practice/h3';
+import type * as H3 from '@swordjs/h3';
 import type { UnicloudEvent } from '../../../../typings/unicloud';
 
 /**
@@ -15,7 +15,7 @@ import type { UnicloudEvent } from '../../../../typings/unicloud';
 export const validateMethod = async (req: H3.CompatibilityEvent | UnicloudEvent, expected: HttpInstructMethod | HttpInstructMethod[]): Promise<boolean> => {
   return (await platformHook<boolean>({
     server: async () => {
-      return getAsyncDependency<typeof H3>('@sword-code-practice/h3').isMethod(req as H3.CompatibilityEvent, expected);
+      return getAsyncDependency<typeof H3>('@swordjs/h3').isMethod(req as H3.CompatibilityEvent, expected);
     },
     unicloud: () => {
       const _req = req as UnicloudEvent;

@@ -80,9 +80,9 @@ export const buildUnicloudApp = (args: Argv<CommandConfig>) => {
     if (existsSync(packageJsonPath)) {
       // 存在就获取packagejson
       const packageJson = JSON.parse(readFileSync(packageJsonPath).toString());
-      // 判断json中的dependencies是否存在@sword-code-practice/sword-framework
-      if (!packageJson.dependencies['@sword-code-practice/sword-framework']) {
-        packageJson.dependencies['@sword-code-practice/sword-framework'] = 'latest';
+      // 判断json中的dependencies是否存在@swordjs/sword-framework
+      if (!packageJson.dependencies['@swordjs/sword-framework']) {
+        packageJson.dependencies['@swordjs/sword-framework'] = 'latest';
       }
       // 将packagejson写入
       writeFileRecursive(packageJsonPath, JSON.stringify(packageJson, null, 4));
