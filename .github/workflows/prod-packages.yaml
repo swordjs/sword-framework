@@ -67,7 +67,7 @@ jobs:
         - name: sync cli
           uses: fjogeleit/http-request-action@master
           with:
-            url: "https://npmmirror.com/sync/@swordjs/backend-cli"
+            url: "https://npmmirror.com/sync/@swordjs/sword-framework-cli"
             timeout: 50000
             method: GET
 

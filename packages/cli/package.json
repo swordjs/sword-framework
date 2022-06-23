@@ -1,5 +1,5 @@
 {
-  "name": "@swordjs/backend-cli",
+  "name": "@swordjs/sword-framework-cli",
   "version": "1.3.3",
   "description": "",
   "types": "./lib/index.d.ts",

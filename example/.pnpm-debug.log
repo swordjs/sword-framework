@@ -1,0 +1,15 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1,
+    "workspacePrefix": "/Users/seho/Desktop/openSource/sword-function-framework"
+  },
+  "1 error pnpm": {
+    "code": "ERR_PNPM_CANNOT_RESOLVE_WORKSPACE_PROTOCOL",
+    "err": {
+      "name": "pnpm",
+      "message": "Cannot resolve workspace protocol of dependency \"@swordjs/sword-framework\" because this dependency is not installed. Try running \"pnpm install\".",
+      "code": "ERR_PNPM_CANNOT_RESOLVE_WORKSPACE_PROTOCOL",
+      "stack": "pnpm: Cannot resolve workspace protocol of dependency \"@swordjs/sword-framework\" because this dependency is not installed. Try running \"pnpm install\".\n    at makePublishDependency (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:178175:17)\n    at async /usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:178163:9\n    at async Promise.all (index 0)\n    at async makePublishDependencies (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:178161:60)\n    at async makePublishManifest (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:178137:22)\n    at async packPkg (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:178810:35)\n    at async Object.handler (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:178770:7)\n    at async Object.handler [as publish] (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:178624:27)\n    at async /usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:185913:21\n    at async run (/usr/local/lib/node_modules/pnpm/dist/pnpm.cjs:185887:34)"
+    }
+  }
+}
