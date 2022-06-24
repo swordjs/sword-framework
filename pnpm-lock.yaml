@@ -5,7 +5,7 @@ importers:
   .:
     specifiers:
       '@changesets/cli': ^2.22.0
-      '@swordjs/h3': 0.7.4
+      '@swordjs/h3': 0.7.6
       '@types/node': ^14.18.12
       '@typescript-eslint/eslint-plugin': ^4.33.0
       '@typescript-eslint/parser': ^4.33.0
@@ -22,7 +22,7 @@ importers:
       unbuild: ^0.7.4
       vitest: latest
     dependencies:
-      '@swordjs/h3': 0.7.4
+      '@swordjs/h3': 0.7.6
       mri: 1.2.0
       ufo: 0.8.4
     devDependencies:
@@ -44,15 +44,15 @@ importers:
   example:
     specifiers:
       '@dcloudio/types': ^2.6.6
-      '@swordjs/backend-cli': workspace:*
       '@swordjs/sword-framework': workspace:*
+      '@swordjs/sword-framework-cli': workspace:*
       '@types/node': ^17.0.24
       typescript: ^4.6.3
     dependencies:
       '@swordjs/sword-framework': link:../packages/runtime
     devDependencies:
       '@dcloudio/types': 2.6.12
-      '@swordjs/backend-cli': link:../packages/cli
+      '@swordjs/sword-framework-cli': link:../packages/cli
       '@types/node': 17.0.45
       typescript: 4.7.4
 
@@ -762,8 +762,8 @@ packages:
     engines: {node: '>=4'}
     dev: false
 
-  /@swordjs/h3/0.7.4:
-    resolution: {integrity: sha512-IG8J+wWP62850YU4eh4G7C5R3GjdlHJAd795cQsNBtiKIX9P2CPLLOzxejt3alorvZv42T1YfKJLjCG86EkjWQ==}
+  /@swordjs/h3/0.7.6:
+    resolution: {integrity: sha512-D+k8HAtv/QvNbUCPqYEMoKecP0nQCFXr97JbNNaM+oyBbtYn3AaefX8QV2r6Gr77jCPBbGyU+hU4hFIp+pIyEw==}
     dependencies:
       cookie-es: 0.5.0
       destr: 1.1.1
@@ -4874,7 +4874,7 @@ packages:
     dependencies:
       '@types/chai': 4.3.1
       '@types/chai-subset': 1.3.3
-      '@types/node': 14.18.21
+      '@types/node': 18.0.0
       chai: 4.3.6
       debug: 4.3.4
       local-pkg: 0.4.1
