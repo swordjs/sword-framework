@@ -1,4 +1,4 @@
-# @swordjs/backend-cli
+# @swordjs/sword-framework-cli
 
 ## 1.3.0
 

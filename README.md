@@ -40,7 +40,7 @@ npm i @swordjs/sword-framework
 We highly recommend you install the CLI toolkits to global, so you can use them in your project easily.
 
 ```bash
-npm i @swordjs/backend-cli -g
+npm i @swordjs/sword-framework-cli -g
 ```
 ## Init template
 
