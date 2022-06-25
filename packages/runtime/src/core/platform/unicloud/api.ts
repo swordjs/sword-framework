@@ -12,6 +12,33 @@ export const adaptUnicloudEvent = async (event: Event) => {
 
 /**
  *
+ * 返回unicloud集成响应 (云函数url化)
+ * @param {ReturnType<CustomHandlerReturn>} res
+ * @return {*}
+ */
+export const unicloudIntegratedResponse = async (
+  res: ReturnType<CustomHandlerReturn>,
+  options?: {
+    urlized?: boolean;
+  }
+) => {
+  // unicloud是否是云函数url化
+  const urlized = options?.urlized ?? true;
+  // 如果是云函数url化，则需要将返回的数据转换为云函数url化的数据
+  if (urlized) {
+    return {
+      mpserverlessComposedResponse: true, // 使用阿里云返回集成响应是需要此字段为true
+      isBase64Encoded: false, // 硬编码
+      statusCode: res.statusCode,
+      data: res,
+      headers: res.headers
+    };
+  }
+  return res;
+};
+
+/**
+ *
  * unicloud 平台触发api
  * @param {UnicloudEvent} event
  * @param {Record<string, Map>} apiMap
@@ -31,15 +58,7 @@ export const triggerApi = async (event: UnicloudEvent, context: UnicloudOriginCo
     // 判断路由返回结果类型
     if (Array.isArray(handlerResult)) {
       // 如果customResult存在
-      if (customResult) {
-        return {
-          mpserverlessComposedResponse: true, // 使用阿里云返回集成响应是需要此字段为true
-          isBase64Encoded: false, // 硬编码
-          statusCode: customResult.statusCode,
-          data: result,
-          headers: customResult.headers
-        };
-      }
+      if (customResult) return unicloudIntegratedResponse(customResult);
     }
   }
   return result;
@@ -51,7 +70,7 @@ export const triggerApi = async (event: UnicloudEvent, context: UnicloudOriginCo
  * @param {UnicloudEvent} event
  * @return {*}  {(Promise<HttpApiStatusResponse | true>)}
  */
-export const validateEvent = async (event: UnicloudEvent): Promise<HttpApiStatusResponse | true> => {
+export const validateEvent = async (event: UnicloudEvent, context: UnicloudOriginContext): Promise<HttpApiStatusResponse | true> => {
   const ajv = new Ajv();
   const schema: JSONSchemaType<UnicloudEvent> = {
     type: 'object',
@@ -66,7 +85,12 @@ export const validateEvent = async (event: UnicloudEvent): Promise<HttpApiStatus
   };
   const validateResult = ajv.compile(schema)(event);
   if (!validateResult) {
-    return await error('VALIDATE_REQUEST', 'event is not valid (unicloud)');
+    // 触发错误事件
+    return await error('VALIDATE_REQUEST', 'event is not valid (unicloud)', null, {
+      unicloud: {
+        urlized: context.SOURCE === 'http'
+      }
+    });
   }
   return true;
 };
