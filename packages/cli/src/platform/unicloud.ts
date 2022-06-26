@@ -27,7 +27,7 @@ const addCode = (args: Argv<CommandConfig>) => {
     `${readFileSync(resolve(process.cwd(), path)).toString()}
 module.exports = async (e, c) => {
   let { event, context } = await import_sword_framework.useUnicloudApp(e, c);
-  const validateResult = await import_sword_framework.useUnicloudValidateEvent(event);
+  const validateResult = await import_sword_framework.useUnicloudValidateEvent(event, context);
   // 判断校验结果是否严格等于true
   if (validateResult !== true) {
     return validateResult;
