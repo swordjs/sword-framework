@@ -55,6 +55,12 @@ export type HttpApiReturn<C extends ContextData> = {
   handler: HttpApiHandler<C>;
 };
 
+export type RouterHandlerOptions = {
+  unicloud?: {
+    urlized?: boolean;
+  };
+};
+
 export type Plugin = {
   name: string;
   // 提供几个钩子用来定义函数，作为框架runtime的shim
