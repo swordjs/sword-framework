@@ -2,6 +2,7 @@ import { routerHandler } from '../../api';
 import { getAsyncDependency } from '../../schedule';
 import error from '../../error';
 import { getApiMap } from '../../map';
+import { httpStatusCorrect } from '../../../../../../util/api';
 import type { Map } from '../../map';
 import type * as H3 from '@swordjs/h3';
 import type { Event, HttpContext, HttpInstructMethod, CustomHandlerReturn } from '../../../../../../typings/index';
@@ -95,10 +96,11 @@ export const implementApi = async (app: H3.App | null): Promise<typeof H3 | null
 export const customApiReturn = async (event: H3.CompatibilityEvent, statusCode: number, statusMessage: string, data: any) => {
   const h3: typeof H3 = await getAsyncDependency<typeof H3>('@swordjs/h3');
   // 判断状态码不等于2xx, 就返回一个server错误
-  if (statusCode < 200 || statusCode >= 300) {
+  if (!httpStatusCorrect(statusCode)) {
     // 调用error
     const errorReturn = await error(statusCode, statusMessage, data);
-    return h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
+    h3.sendError(event as H3.CompatibilityEvent, errorReturn as H3.H3Error);
+    return false;
   } else {
     // 虽然是正确的状态码(2xx),仍然需要指定当前会话中的status和message
     event.res.statusCode = statusCode;
@@ -115,12 +117,15 @@ export const customApiReturn = async (event: H3.CompatibilityEvent, statusCode: 
  * @return {*}
  */
 export const serverRouterHandler = async (key: string, apiMap: Record<string, Map>, event: H3.CompatibilityEvent) => {
-  const handlerResult = await routerHandler(key, event, apiMap);
-  if (Array.isArray(handlerResult)) {
-    const [result, customResult] = handlerResult as unknown as [any, ReturnType<CustomHandlerReturn> | undefined];
-    if (customResult) {
+  const [result, customResult] = (await routerHandler(key, event, apiMap)) as unknown as [any, Required<ReturnType<CustomHandlerReturn>> | undefined];
+  if (customResult) {
+    // 如果是集成返回, 就要经过customApiReturn
+    const customApiReturnResult = await customApiReturn(event, customResult.statusCode, customResult.statusMessage, customResult.data);
+    if (customApiReturnResult !== false) {
+      // 如果是正常的集成返回, 则就返回data
       return result;
     }
   }
-  return handlerResult;
+  // 直接返回data
+  return result;
 };

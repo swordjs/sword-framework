@@ -11,7 +11,6 @@ import { useQuery } from '../../../../util/route';
 import { platformHook } from './platform';
 import {
   adaptEvent as adaptServerEvent,
-  customApiReturn as customApiServerReturn,
   implementApi as implementServerApi,
   apiError as apiServerError,
   apiResponseHeaders as apiServerResponseHeaders
@@ -334,13 +333,7 @@ const handleCustomApiReturn = async (event: Event, handlerRes: ReturnType<Custom
   const data = handlerRes.data ?? {};
   // 处理集成响应的headers
   handleResHeaders(event, headers);
-  // 处理集成响应的核心逻辑
-  const hookResult = await platformHook({
-    server: async () => await customApiServerReturn(event as H3.CompatibilityEvent, statusCode, statusMessage, data)
-  });
-  // 当hook的返回结果为undefined时 (没有错误)，则直接返回响应
-  // 为什么要返回响应呢? 因为在api执行上下文中, 仍需要响应的各个参数(data等等)
-  return hookResult ?? { headers, statusCode, statusMessage, data };
+  return { headers, statusCode, statusMessage, data };
 };
 
 /**
@@ -355,7 +348,6 @@ const handleCustomApiReturn = async (event: Event, handlerRes: ReturnType<Custom
  *   }} options
  * @return {*}
  */
-
 export const routerHandler = async (key: string, event: Event, apiMap: Record<string, Map>, options?: RouterHandlerOptions) => {
   // eslint-disable-next-line prefer-const
   let { key: _key, req, params, query } = await adaptEvent(event);
