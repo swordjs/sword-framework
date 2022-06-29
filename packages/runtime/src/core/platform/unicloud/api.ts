@@ -18,11 +18,11 @@ export const adaptUnicloudEvent = async (event: Event) => {
  * @param {RouterHandlerOptions['unicloud']} [options]
  * @return {*}
  */
-export const unicloudResponse = async (res: ReturnType<CustomHandlerReturn>, options?: RouterHandlerOptions['unicloud']) => {
+export const unicloudResponse = (res: Partial<ReturnType<CustomHandlerReturn>>, options?: RouterHandlerOptions['unicloud']) => {
   // unicloud是否是云函数url化, 默认是
   const urlized = options?.urlized ?? true;
   // 判断状态码
-  const successStatus = httpStatusCorrect(res.statusCode as number);
+  const successStatus = res.statusCode ? httpStatusCorrect(res.statusCode as number) : true;
   // 根据状态码返回相应的响应
   const returnData = successStatus
     ? res.data
@@ -38,7 +38,7 @@ export const unicloudResponse = async (res: ReturnType<CustomHandlerReturn>, opt
       isBase64Encoded: false, // 硬编码
       statusCode: res.statusCode,
       // 如果状态正常就直接返回res.data, 否则就要返回错误信息
-      data: returnData,
+      body: JSON.stringify(returnData),
       headers: res.headers
     };
   }
@@ -61,10 +61,9 @@ export const triggerApi = async (event: UnicloudEvent, context: UnicloudOriginCo
   // 判断apimap是否存在指定的route
   // route需要取问号之前有效的路径
   const route = event.route.split('?')[0];
-  const urlized = isUnicloudUrlized(context);
   const unicloudRouterOptions: RouterHandlerOptions = {
     unicloud: {
-      urlized
+      urlized: isUnicloudUrlized(context)
     }
   };
   if (!apiMap[route]) {
@@ -74,11 +73,13 @@ export const triggerApi = async (event: UnicloudEvent, context: UnicloudOriginCo
     any,
     Required<ReturnType<CustomHandlerReturn>> | undefined
   ];
-  // 如果是sword 集成返回
-  if (customResult) {
-    return unicloudResponse(customResult, unicloudRouterOptions.unicloud);
-  }
-  return result;
+  return unicloudResponse(
+    // 如果不是集成响应, 就仅传递一个data
+    customResult ?? {
+      data: result
+    },
+    unicloudRouterOptions.unicloud
+  );
 };
 
 /**
