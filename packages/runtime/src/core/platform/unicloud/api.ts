@@ -1,6 +1,7 @@
 import Ajv, { JSONSchemaType } from 'ajv';
 import { routerHandler, methods } from '../../api';
 import error from '../../error';
+import { httpStatusCorrect } from '../../../../../../util/api';
 import type { Event, CustomHandlerReturn, HttpApiStatusResponse, RouterHandlerOptions } from '../../../../../../typings/index';
 import type { UnicloudOriginContext, UnicloudEvent } from '../../../../../../typings/unicloud';
 import type { Map } from '../../map';
@@ -20,17 +21,28 @@ export const adaptUnicloudEvent = async (event: Event) => {
 export const unicloudResponse = async (res: ReturnType<CustomHandlerReturn>, options?: RouterHandlerOptions['unicloud']) => {
   // unicloud是否是云函数url化, 默认是
   const urlized = options?.urlized ?? true;
+  // 判断状态码
+  const successStatus = httpStatusCorrect(res.statusCode as number);
+  // 根据状态码返回相应的响应
+  const returnData = successStatus
+    ? res.data
+    : {
+        statusCode: res.statusCode,
+        statusMessage: res.statusMessage,
+        data: res.data
+      };
   // 如果是云函数url化，则需要将返回的数据转换为云函数url化的数据
   if (urlized) {
     return {
       mpserverlessComposedResponse: true, // 使用阿里云返回集成响应是需要此字段为true
       isBase64Encoded: false, // 硬编码
       statusCode: res.statusCode,
-      data: res,
+      // 如果状态正常就直接返回res.data, 否则就要返回错误信息
+      data: returnData,
       headers: res.headers
     };
   }
-  return res;
+  return returnData;
 };
 
 // 判断是否是云函数url化
@@ -58,15 +70,13 @@ export const triggerApi = async (event: UnicloudEvent, context: UnicloudOriginCo
   if (!apiMap[route]) {
     return error('NOT_FOUND', `route ${route} not found`, null, unicloudRouterOptions);
   }
-  const handlerResult = await routerHandler(event.route, event, apiMap, unicloudRouterOptions);
-  const [result, customResult] = handlerResult as unknown as [any, ReturnType<CustomHandlerReturn> | undefined];
-  if (urlized) {
-    // 判断, 如果是函数url化, 就返回一个集成响应
-    // 判断路由返回结果类型
-    if (Array.isArray(handlerResult)) {
-      // 如果customResult存在
-      if (customResult) return unicloudResponse(customResult);
-    }
+  const [result, customResult] = (await routerHandler(event.route, event, apiMap, unicloudRouterOptions)) as unknown as [
+    any,
+    Required<ReturnType<CustomHandlerReturn>> | undefined
+  ];
+  // 如果是sword 集成返回
+  if (customResult) {
+    return unicloudResponse(customResult, unicloudRouterOptions.unicloud);
   }
   return result;
 };

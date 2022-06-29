@@ -1,6 +1,6 @@
 {
   "name": "@swordjs/sword-framework",
-  "version": "1.2.2-beta.4",
+  "version": "1.2.2-beta.5",
   "description": "",
   "types": "./lib/index.d.ts",
   "files": [
