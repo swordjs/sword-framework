@@ -5,7 +5,7 @@ import type { UnicloudEvent } from '../../../typings/unicloud';
 
 describe('validateEvent', async () => {
   await asyncDependencyScheduler();
-  it('success event', () => {
+  it('success event', async () => {
     const event: UnicloudEvent = {
       route: '/test/test',
       method: 'GET',
@@ -13,7 +13,7 @@ describe('validateEvent', async () => {
       query: {}
     };
     // expect断言不等于true
-    expect(validateEvent(event)).toBe(true);
+    expect(await validateEvent(event, {} as any)).toBe(true);
   });
   it('error route', () => {
     const event: any = {
@@ -22,7 +22,7 @@ describe('validateEvent', async () => {
       params: {},
       query: {}
     };
-    const result = validateEvent(event);
+    const result = validateEvent(event, {} as any);
     expect(result).not.toBe(true);
   });
   it('error method', () => {
@@ -32,7 +32,7 @@ describe('validateEvent', async () => {
       params: {},
       query: {}
     };
-    const result = validateEvent(event);
+    const result = validateEvent(event, {} as any);
     expect(result).not.toBe(true);
   });
   it('pattern error method', () => {
@@ -42,27 +42,27 @@ describe('validateEvent', async () => {
       params: {},
       query: {}
     };
-    const result = validateEvent(event);
+    const result = validateEvent(event, {} as any);
     expect(result).not.toBe(true);
   });
-  it('pattern success method - 1', () => {
+  it('pattern success method - 1', async () => {
     const event: any = {
       route: '111',
       method: 'GET',
       params: {},
       query: {}
     };
-    const result = validateEvent(event);
+    const result = await validateEvent(event, {} as any);
     expect(result).toBe(true);
   });
-  it('pattern success method - 2', () => {
+  it('pattern success method - 2', async () => {
     const event: any = {
       route: '111',
       method: 'DELETE',
       params: {},
       query: {}
     };
-    const result = validateEvent(event);
+    const result = await validateEvent(event, {} as any);
     expect(result).toBe(true);
   });
   it('error params', () => {
@@ -72,7 +72,7 @@ describe('validateEvent', async () => {
       params: true,
       query: {}
     };
-    const result = validateEvent(event);
+    const result = validateEvent(event, {} as any);
     expect(result).not.toBe(true);
   });
   it('error query', () => {
@@ -82,7 +82,7 @@ describe('validateEvent', async () => {
       params: {},
       query: true
     };
-    const result = validateEvent(event);
+    const result = validateEvent(event, {} as any);
     expect(result).not.toBe(true);
   });
 });
