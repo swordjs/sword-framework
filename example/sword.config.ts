@@ -1,4 +1,4 @@
-import type { Config } from '@swordjs/backend-cli';
+import type { Config } from '@swordjs/sword-framework-cli';
 
 const config: Config = {};
 
