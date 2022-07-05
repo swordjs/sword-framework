@@ -34,7 +34,7 @@
 | 平台     | 进度 |
 | -------- | ---- |
 | Server   | ✅   |
-| **Unicloud** | ✅   |
+| **Unicloud (支持云函数url化)** | ✅   |
 | Woker    | ⚠️   |
 | 阿里云   | ⚠️   |
 | 腾讯云   | ⚠️   |
@@ -57,10 +57,11 @@ npm i @swordjs/sword-framework-cli -g
 
 ```bash
 sword init
+npm run dev:unicloud
+npm run build:unicloud
 ```
 
-如果你初始化成功了🎉 , 那么就可以移步到这里, 查阅[unicloud入门教程](https://www.yuque.com/docs/share/61d05a31-d679-4672-8f45-f9f19681c6b8?#), 相信我, 你会很惊讶的! 如果你要深入学习swordjs在unicloud的开发姿势, 你需要熟悉一下[中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
-
+如果你初始化成功了🎉 , 那么就可以移步到这里[unicloud入门教程](https://www.yuque.com/docs/share/61d05a31-d679-4672-8f45-f9f19681c6b8?#), 相信我, 你会很惊讶的! 如果你要深入学习swordjs在unicloud的开发姿势, 你需要熟悉一下[中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
 
 
 
