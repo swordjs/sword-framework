@@ -5,7 +5,7 @@ import { delDir } from './util/file';
 import log from './log';
 import { buildUnicloudApp } from './platform/unicloud';
 import { writeFileRecursive } from './util/file';
-import { generateSchema } from './util/proto';
+import { generateSchema } from './util/api';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
 
@@ -59,7 +59,7 @@ export const build = async (
   // 编译proto，并且把json输出到.sword目录中
   // apiPaths是代表了有效api的index.ts路径，我们只需要把路径传递给esbuild即可
   try {
-    const { apiPaths } = await generateSchema(resolve(process.cwd(), `${buildOptions.outPath}/src/proto.json`));
+    const { apiPaths } = await generateSchema(resolve(process.cwd(), `${buildOptions.outPath}/src/api.json`));
     // 使用esbuild构建
     esbuild
       .build({

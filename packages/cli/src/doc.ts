@@ -1,6 +1,6 @@
 import { access, readFileSync, constants } from 'fs';
 import { writeFileRecursive } from './util/file';
-import { generateSchema } from './util/proto';
+import { generateSchema } from './util/api';
 import { useGetApiMap } from '@swordjs/sword-framework';
 import log from './log';
 import { resolve } from 'path';
@@ -96,10 +96,10 @@ export default async (args: Argv<CommandConfig>) => {
     const { apiMap: map } = await useGetApiMap();
     apiMap = map;
     // 生成ast数据
-    const { protoAst } = await generateSchema(null, {
+    const { apiResult } = await generateSchema(null, {
       keepComment: true
     });
-    for (const key in protoAst) {
+    for (const key in apiResult) {
       // key 为 api
       // 判断parentRoute是否存在
       // 通过key解析出api后的第一个路由作为父路由
@@ -107,7 +107,7 @@ export default async (args: Argv<CommandConfig>) => {
       if (!markdownMap[parentRoute]) {
         markdownMap[parentRoute] = ``;
       }
-      const protoData = protoAst[key];
+      const protoData = apiResult[key].proto;
       const result: transProtoReturn = {
         url: key,
         ReqParams: [],

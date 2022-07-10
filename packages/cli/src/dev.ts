@@ -3,7 +3,7 @@ import { ChildProcess, spawn } from 'child_process';
 import { resolve } from 'path';
 import chokidar from 'chokidar';
 import { debounce } from './util/index';
-import { generateSchema } from './util/proto';
+import { generateSchema } from './util/api';
 import { writeFileRecursive } from './util/file';
 import { devUnicloudApp } from './platform/unicloud';
 import log from './log';
@@ -15,6 +15,13 @@ let indexcp: ChildProcess | null = null;
 // 如果进程存在,则杀掉
 const killProcess = (): void => {
   indexcp && indexcp.kill();
+};
+
+const generate = async () => {
+  await generateSchema(resolve(process.cwd(), `./src/api.json`), {
+    dev: true,
+    format: true
+  });
 };
 
 /**
@@ -96,8 +103,7 @@ const listenApiSource = (args: Argv<CommandConfig>) => {
     watcher.on(
       'all',
       debounce(async (event: any, path: string) => {
-        // 重新编译proto.json
-        await generateSchema(resolve(process.cwd(), `./src/proto.json`));
+        await generate();
         start(args);
         switch (event) {
           case 'addDir':
@@ -135,6 +141,7 @@ const listenIndex = (args: Argv<CommandConfig>) => {
 };
 
 export default async (args: Argv<CommandConfig>) => {
+  await generate();
   start(args);
   listenIndex(args);
   // 监听资源文件夹下的api文件夹
