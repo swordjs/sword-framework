@@ -66,7 +66,7 @@ export const getApiMap = async (
   };
 };
 
-type Result = Record<
+export type Result = Record<
   string,
   {
     path?: string;

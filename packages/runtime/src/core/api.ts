@@ -29,13 +29,14 @@ import type {
 import type { ValidateProto } from './validate';
 import type { InterruptPipelineResult } from './pipeline';
 import type { Map } from './map';
+import type { Result as ApiSchema } from '../../../cli/src/util/api';
 
 let commandArgs = _commandArgs;
 
 const log = getLogger();
 
-// 具体的proto schema引用
-let protoSchema: Record<string, Record<string, unknown>> | null = null;
+// api schema
+let apiSchema: ApiSchema;
 
 // 支持的methods数组
 export const methods: HttpInstructMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'CONNECT', 'OPTIONS', 'TRACE'];
@@ -273,7 +274,7 @@ const handlePostApiCall = (postApiCallExecResult: HttpContext | InterruptPipelin
  */
 export const implementApi = async (app: H3.App | null) => {
   // 获取proto schema
-  getProtoSchema();
+  getApiSchema();
   await platformHook({
     server: async () => await implementServerApi(app)
   });
@@ -288,8 +289,8 @@ export const implementApi = async (app: H3.App | null) => {
 const createContext = (context: Partial<HttpContext>): HttpContext => {
   // 查询key对应的proto
   let proto: Record<string, unknown> = {};
-  if (protoSchema && protoSchema[context.key as string]) {
-    proto = protoSchema[context.key as string];
+  if (apiSchema && apiSchema[context.key as string]) {
+    proto = apiSchema[context.key as string].proto;
   }
   let result = {
     key: context.key as string,
@@ -308,13 +309,13 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
 };
 
 /**
- * 加载根目录下的protoschema（由cli生成）
+ * 加载根目录下的api schema（由cli生成）
  */
-const getProtoSchema = async () => {
-  const sourcePath = getSourcePath('./src/proto.json');
+const getApiSchema = async () => {
+  const sourcePath = getSourcePath('./src/api.json');
   const schema = readFileSync(sourcePath).toString();
   if (schema) {
-    protoSchema = JSON.parse(schema) as any;
+    apiSchema = JSON.parse(schema) as any;
   }
 };
 
