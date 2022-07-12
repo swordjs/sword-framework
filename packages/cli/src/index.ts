@@ -21,7 +21,7 @@ async function main() {
   await initConfig();
   if (['dev', 'build'].includes(args._[0])) {
     // 加载shim
-    processShim();
+    processShim(args._[0] as 'dev' | 'build');
   }
   // 解析命令行参数
   const cliHandler = {
