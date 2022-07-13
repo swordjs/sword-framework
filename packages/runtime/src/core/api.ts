@@ -1,6 +1,4 @@
-import { readFileSync } from 'fs';
 import { validateMethod, validateProto, getNeedValidateProto } from './validate';
-import { getSourcePath } from '../../../../util/path';
 import { exec } from './pipeline';
 import error from './error';
 import { isJSON } from '../../../../util/data';
@@ -29,14 +27,10 @@ import type {
 import type { ValidateProto } from './validate';
 import type { InterruptPipelineResult } from './pipeline';
 import type { Map } from './map';
-import type { Result as ApiSchema } from '../../../cli/src/util/api';
 
 let commandArgs = _commandArgs;
 
 const log = getLogger();
-
-// api schema
-let apiSchema: ApiSchema;
 
 // 支持的methods数组
 export const methods: HttpInstructMethod[] = ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'CONNECT', 'OPTIONS', 'TRACE'];
@@ -273,8 +267,6 @@ const handlePostApiCall = (postApiCallExecResult: HttpContext | InterruptPipelin
  * @param {App} app
  */
 export const implementApi = async (app: H3.App | null) => {
-  // 获取proto schema
-  getApiSchema();
   await platformHook({
     server: async () => await implementServerApi(app)
   });
@@ -287,14 +279,11 @@ export const implementApi = async (app: H3.App | null) => {
  * @return {*}  {HttpContext}
  */
 const createContext = (context: Partial<HttpContext>): HttpContext => {
-  // 查询key对应的proto
-  let proto: Record<string, unknown> = {};
-  if (apiSchema && apiSchema[context.key as string]) {
-    proto = apiSchema[context.key as string].proto;
-  }
   let result = {
     key: context.key as string,
-    proto,
+    // proto可能为null, 因为api.json中提取的proto是根据api的url提取的
+    // 在异常情况下, api匹配不成功, 则proto为null
+    proto: context.proto as Record<string, unknown> | null,
     reqHeaders: context.reqHeaders as Record<string, unknown>,
     resHeaders: context.resHeaders as Record<string, unknown>,
     query: context.query,
@@ -306,17 +295,6 @@ const createContext = (context: Partial<HttpContext>): HttpContext => {
     result = aggregatePlugin?.context.plugin(result);
   }
   return result;
-};
-
-/**
- * 加载根目录下的api schema（由cli生成）
- */
-const getApiSchema = async () => {
-  const sourcePath = getSourcePath('./src/api.json');
-  const schema = readFileSync(sourcePath).toString();
-  if (schema) {
-    apiSchema = JSON.parse(schema) as any;
-  }
 };
 
 /**
@@ -364,7 +342,8 @@ export const routerHandler = async (key: string, event: Event, apiMap: Record<st
     params,
     reqHeaders: req.headers ?? {},
     resHeaders: {}, // 返回请求头默认为空
-    method: apiMap[key].method
+    method: apiMap[key].method,
+    proto: apiMap[key].proto as any
   });
   const _res = apiMap[key];
   // 校验method
