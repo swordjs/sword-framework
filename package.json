@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/swordCodePractice/sword-framework.git"
+    "url": "git+https://github.com/swordjs/sword-framework.git"
   },
   "devDependencies": {
     "@changesets/cli": "^2.22.0",

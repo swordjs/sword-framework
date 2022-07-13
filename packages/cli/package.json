@@ -24,15 +24,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/swordCodePractice/sword-framework-cli.git"
+    "url": "git+https://github.com/swordjs/sword-framework-cli.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/swordCodePractice/sword-framework-cli/issues"
+    "url": "https://github.com/swordjs/sword-framework-cli/issues"
   },
-  "homepage": "https://github.com/swordCodePractice/sword-framework-cli#readme",
+  "homepage": "https://github.com/swordjs/sword-framework-cli#readme",
   "devDependencies": {
     "@types/download": "^8.0.1",
     "@types/mv": "^2.1.2",

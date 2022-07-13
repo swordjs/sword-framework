@@ -1,1 +1,0 @@
-{"/api/hello":{"src/api/hello/proto/ReqParams":{"type":"Interface"},"src/api/hello/proto/ReqQuery":{"type":"Interface"},"src/api/hello/proto/Res":{"type":"Interface","properties":[{"id":0,"name":"message","type":{"type":"String"}}]}}}

@@ -1,0 +1,28 @@
+{
+  "name": "@swordjs/sword-framework-example",
+  "version": "1.2.6",
+  "description": "this is a sword framework example",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "dev": "sword dev",
+    "dev:unicloud": "sword dev --platform=unicloud",
+    "build": "sword build",
+    "build:unicloud": "sword build --platform=unicloud",
+    "server": "cd ./.sword/build/server && node ./src/index.js",
+    "doc": "sword doc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@swordjs/sword-framework": "workspace:*"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^2.6.6",
+    "@swordjs/sword-framework-cli": "workspace:*",
+    "@types/node": "^17.0.24",
+    "typescript": "^4.6.3"
+  }
+}

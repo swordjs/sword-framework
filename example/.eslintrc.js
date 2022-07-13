@@ -8,6 +8,7 @@ module.exports = {
   extends: ['plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'],
   rules: {
     // 支持ts-ignore
-    '@typescript-eslint/ban-ts-ignore': 'off'
+    '@typescript-eslint/ban-ts-ignore': 'off',
+    '@typescript-eslint/no-empty-interface': 'off'
   }
 };

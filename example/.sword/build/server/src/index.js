@@ -1,0 +1,1 @@
+"use strict";process.argv=["/usr/local/bin/node","/Users/seho/Desktop/openSource/sword-function-framework/packages/cli/lib/index.cjs","build"];var e=require("@swordjs/sword-framework");const n=(0,e.usePlugin)(),o=(0,e.usePipeline)(),i=async()=>{const s=await(0,e.useApp)();await s.implementApi(),s.server.start()};i();

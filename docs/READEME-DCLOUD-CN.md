@@ -53,7 +53,7 @@ npm i @swordjs/sword-framework-cli -g
 ```
 ### 初始化
 
-你可以更方便的初始化一个项目，它的初始化功能是由 cli 提供的，模板是[从这里](https://github.com/swordCodePractice/sword-framework/tree/master/example)获取的。
+你可以更方便的初始化一个项目，它的初始化功能是由 cli 提供的，模板是[从这里](https://github.com/swordjs/sword-framework/tree/master/example)获取的。
 
 ```bash
 sword init
