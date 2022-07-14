@@ -1,11 +1,12 @@
 import { readFileSync } from 'fs';
-import { traverseSourceDir } from '../../../../util/file';
-import { createRequire } from 'module';
 import { resolve } from 'path';
+import { createRequire } from 'module';
+import { traverseSourceDir } from '~util/file';
+import { getSourcePath } from '~util/path';
+import { getKey } from '~util/map';
 import { log } from './log';
-import { getSourcePath } from '../../../../util/path';
-import type { HttpInstructMethod, HttpApiReturn, HttpContext } from '../../../../typings/index';
-import type { Result as ApiJSON } from '../../../cli/src/util/api';
+import type { HttpInstructMethod, HttpApiReturn, HttpContext } from '#types/index';
+import type { Result as ApiJSON } from '@cli/util/api';
 
 export type Map = {
   sourcePath: string;
@@ -79,9 +80,4 @@ export const getApiMap = async (params?: {
   return {
     apiMap
   };
-};
-
-// 获取map的存储key
-export const getKey = (urlPrefix: string, apiPath: string, path?: string) => {
-  return `${urlPrefix}${path ? path : apiPath}`;
 };
