@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
@@ -9,9 +10,13 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "baseUrl": "src",
     "noImplicitAny": true,
     "noImplicitThis": true,
+    "paths": {
+      "@cli/*": ["./packages/cli/src/*"],
+      "#types/*": ["./typings/*"],
+      "~util/*": ["./util/*"]
+    }
   },
   "exclude": ["node_modules", "dist", "lib"]
 }
