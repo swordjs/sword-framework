@@ -20,6 +20,7 @@ importers:
       typescript: ^4.6.3
       ufo: ^0.8.4
       unbuild: ^0.7.4
+      vite: ^3.0.0
       vitest: latest
     dependencies:
       '@swordjs/h3': 0.7.6
@@ -39,6 +40,7 @@ importers:
       prettier: 2.7.1
       typescript: 4.7.4
       unbuild: 0.7.4
+      vite: 3.0.0
       vitest: 0.18.0
 
   example:
@@ -4829,20 +4831,23 @@ packages:
       spdx-expression-parse: 3.0.1
     dev: true
 
-  /vite/2.9.12:
-    resolution: {integrity: sha512-suxC36dQo9Rq1qMB2qiRorNJtJAdxguu5TMvBHOc/F370KvqAe9t48vYp+/TbPKRNrMh/J55tOUmkuIqstZaew==}
-    engines: {node: '>=12.2.0'}
+  /vite/3.0.0:
+    resolution: {integrity: sha512-M7phQhY3+fRZa0H+1WzI6N+/onruwPTBTMvaj7TzgZ0v2TE+N2sdLKxJOfOv9CckDWt5C4HmyQP81xB4dwRKzA==}
+    engines: {node: '>=14.18.0'}
     hasBin: true
     peerDependencies:
       less: '*'
       sass: '*'
       stylus: '*'
+      terser: ^5.4.0
     peerDependenciesMeta:
       less:
         optional: true
       sass:
         optional: true
       stylus:
+        optional: true
+      terser:
         optional: true
     dependencies:
       esbuild: 0.14.47
@@ -4883,12 +4888,13 @@ packages:
       local-pkg: 0.4.1
       tinypool: 0.2.2
       tinyspy: 0.3.3
-      vite: 2.9.12
+      vite: 3.0.0
     transitivePeerDependencies:
       - less
       - sass
       - stylus
       - supports-color
+      - terser
     dev: true
 
   /wcwidth/1.0.1:
