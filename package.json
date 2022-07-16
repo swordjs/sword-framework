@@ -5,7 +5,7 @@
     "lint-staged": "lint-staged",
     "build": "pnpm --filter=./packages/** build",
     "test": "vitest run",
-    "publish": "pnpm publish -r",
+    "publish": "pnpm publish -r --no-git-checks",
     "sync": "node scripts/sync-packages.mjs",
     "kill-port": "node scripts/kill-port.mjs",
     "changeset": "changeset",
