@@ -50,8 +50,6 @@ jobs:
         # 推送到npm
         - name: publish-npm
           run: pnpm run publish
-          env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
         # 同步到cnpm
         - name: sync example
