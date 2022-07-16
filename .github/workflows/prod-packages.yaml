@@ -9,7 +9,7 @@ on:
 jobs:
   # 编译打包
   main:
-      name: Build & Test & Publish & Async
+      name: Build & Publish & Async
       runs-on: ubuntu-latest
 
       steps:
@@ -47,12 +47,9 @@ jobs:
         - name: Build
           run: pnpm run build
 
-        - name: Test
-          run: pnpm run test
-
         # 推送到npm
         - name: publish-npm
-          run: pnpm run publish
+          run: pnpm publish -r --no-git-checks
           env:
             NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
