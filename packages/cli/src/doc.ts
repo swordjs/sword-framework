@@ -1,5 +1,5 @@
 import { access, readFileSync, constants } from 'fs';
-import { writeFileRecursive } from './util/file';
+import { writeFileRecursive } from '~util/file';
 import { generateSchema } from './util/api';
 import { useGetApiMap } from '@swordjs/sword-framework';
 import log from './log';

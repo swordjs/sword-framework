@@ -1,6 +1,6 @@
 import { aggregatePlugin } from './plugin';
-import type { Plugin } from '../../../../typings/index';
-import type { Logger } from '../../../../typings/log';
+import type { Plugin } from '#types/index';
+import type { Logger } from '#types/log';
 
 export const log: () => Required<Plugin>['log'] = () => aggregatePlugin!.log.plugin;
 

@@ -50,19 +50,5 @@
     "mri": "^1.2.0",
     "tsbuffer-validator": "^2.1.0",
     "ufo": "^0.8.4"
-  },
-  "unbuild": {
-    "entries": [
-      "./src/index"
-    ],
-    "outDir": "lib",
-    "declaration": true,
-    "rollup": {
-      "emitCJS": true,
-      "cjsBridge": true,
-      "esbuild": {
-        "target": "node12"
-      }
-    }
   }
 }

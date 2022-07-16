@@ -1,13 +1,8 @@
-import { commandArgs } from '../../../../util/config';
-import type { CommandConfig } from '../../../../typings/config';
+import { commandArgs } from '~util/config';
+import type { CommandConfig } from '#types/config';
 
 // 支持异步加载依赖的列表
-const asyncDependencyList = [
-  '@swordjs/h3',
-  '@swordjs/sword-plugin-log',
-  '@swordjs/sword-plugin-server',
-  '@swordjs/sword-plugin-unicloud-log'
-] as const;
+const asyncDependencyList = ['@swordjs/h3', '@swordjs/sword-plugin-log', '@swordjs/sword-plugin-server', '@swordjs/sword-plugin-unicloud-log'] as const;
 
 // 配置一个缓存对象
 const asyncDependencyCache: Record<

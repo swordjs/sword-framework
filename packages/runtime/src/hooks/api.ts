@@ -1,4 +1,4 @@
-import type { HttpInstructReturn, HttpApiHandler, HttpInstructMethod, HttpApiReturn, ContextData } from '../../../../typings/index';
+import type { HttpInstructReturn, HttpApiHandler, HttpInstructMethod, HttpApiReturn, ContextData } from '#types/index';
 
 // 判断path是否合格
 const checkPath = (path: HttpInstructReturn['path']) => {

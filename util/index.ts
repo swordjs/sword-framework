@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const debounce = (fn: (...params: any[]) => any, delay: number) => {
   let timer: any = null;
   return (...args: any[]) => {

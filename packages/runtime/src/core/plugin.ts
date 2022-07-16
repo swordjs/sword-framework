@@ -1,6 +1,6 @@
 import { getAsyncDependency } from './schedule';
 import { platformHook } from './platform';
-import type { Plugin } from '../../../../typings/index';
+import type { Plugin } from '#types/index';
 
 export const plugins: Plugin[] = [];
 

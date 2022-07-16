@@ -37,19 +37,5 @@
   },
   "dependencies": {
     "chalk": "4.1.2"
-  },
-  "unbuild": {
-    "entries": [
-      "./src/index"
-    ],
-    "outDir": "lib",
-    "declaration": true,
-    "rollup": {
-      "emitCJS": true,
-      "cjsBridge": true,
-      "esbuild": {
-        "target": "node12"
-      }
-    }
   }
 }

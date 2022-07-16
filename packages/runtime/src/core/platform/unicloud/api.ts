@@ -1,9 +1,9 @@
 import Ajv, { JSONSchemaType } from 'ajv';
 import { routerHandler, methods } from '../../api';
 import error from '../../error';
-import { httpStatusCorrect } from '../../../../../../util/api';
-import type { Event, CustomHandlerReturn, HttpApiStatusResponse, RouterHandlerOptions } from '../../../../../../typings/index';
-import type { UnicloudOriginContext, UnicloudEvent } from '../../../../../../typings/unicloud';
+import { httpStatusCorrect } from '~util/api';
+import type { Event, CustomHandlerReturn, HttpApiStatusResponse, RouterHandlerOptions } from '#types/index';
+import type { UnicloudOriginContext, UnicloudEvent } from '#types/unicloud';
 import type { Map } from '../../map';
 
 export const adaptUnicloudEvent = async (event: Event) => {

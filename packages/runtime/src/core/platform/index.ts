@@ -1,4 +1,4 @@
-import { commandArgs } from '../../../../../util/config';
+import { commandArgs } from '~util/config';
 
 /**
  *

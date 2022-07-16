@@ -1,11 +1,10 @@
 import { resolve } from 'path';
 import { createRequire } from 'module';
 import { TSBufferProtoGenerator } from 'tsbuffer-proto-generator';
-import { writeFileRecursive } from './file';
-import { traverseSourceDir } from '../../../../util/file';
-import { getKey } from '../../../runtime/src/core/map';
+import { traverseSourceDir, writeFileRecursive } from '~util/file';
+import { getKey } from '~util/map';
 import log from '../log';
-import type { HttpApiReturn } from '../../../../typings/index';
+import type { HttpApiReturn } from '#types/index';
 import { existsSync } from 'fs';
 
 type Map = Record<string, { path: string; method: string[]; protoPath: string }>;

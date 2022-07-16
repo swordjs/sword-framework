@@ -5,7 +5,7 @@ import { build } from '../build';
 import { delDir, writeFileRecursive, copyDir } from '../util/file';
 import { configData } from '.././config';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '../../../../typings/config';
+import type { CommandConfig } from '#types/config';
 
 // 获取云函数目标根目录
 const getTargetPath = () => {

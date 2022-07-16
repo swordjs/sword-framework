@@ -2,10 +2,10 @@ import { routerHandler } from '../../api';
 import { getAsyncDependency } from '../../schedule';
 import error from '../../error';
 import { getApiMap } from '../../map';
-import { httpStatusCorrect } from '../../../../../../util/api';
+import { httpStatusCorrect } from '~util/api';
 import type { Map } from '../../map';
 import type * as H3 from '@swordjs/h3';
-import type { Event, HttpContext, HttpInstructMethod, CustomHandlerReturn } from '../../../../../../typings/index';
+import type { Event, HttpContext, HttpInstructMethod, CustomHandlerReturn } from '#types/index';
 
 // 在核心程序中，读取usebody的时候，需要进行判断，只有在几个method的请求上才可以对body进行解析
 const readBodyPayloadMethods: HttpInstructMethod[] = ['POST', 'PUT', 'DELETE'];

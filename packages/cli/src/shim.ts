@@ -1,6 +1,6 @@
 import { resolve } from 'path';
 import log from './log';
-import { writeFileRecursive } from './util/file';
+import { writeFileRecursive } from '~util/file';
 
 // 生成process shim
 export const processShim = (command: 'dev' | 'build') => {

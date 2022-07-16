@@ -1,7 +1,7 @@
 import log from './log';
 import { resolve } from 'path';
 import { readdirSync, readFileSync, existsSync, lstatSync } from 'fs';
-import { writeFileRecursive } from './util/file';
+import { writeFileRecursive } from '~util/file';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
 

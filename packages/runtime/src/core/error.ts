@@ -2,7 +2,7 @@ import { getAsyncDependency } from '../core/schedule';
 import { unicloudResponse } from '../core/platform/unicloud/api';
 import { platformHook } from './platform';
 import type * as H3 from '@swordjs/h3';
-import type { HttpApiStatusResponse, RouterHandlerOptions } from '../../../../typings/index';
+import type { HttpApiStatusResponse, RouterHandlerOptions } from '#types/index';
 
 // 定义不同错误类型以及它们所代表的状态码
 // 定义错误类型
