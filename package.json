@@ -1,6 +1,7 @@
 {
   "scripts": {
     "prettier": "prettier --write '**/*.{js,ts,json,md}'",
+    "preinstall": "npx only-allow pnpm",
     "lint-staged": "lint-staged",
     "build": "node scripts/build-packages.mjs",
     "test": "vitest run",
