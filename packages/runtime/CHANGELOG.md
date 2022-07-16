@@ -1,6 +1,11 @@
 # @swordjs/sword-framework
 
+## 1.3.0
 
+### Minor Changes
+
+- add useIsDev & useIsProd
+- api.json support
 ## 1.2.1
 
 ### Minor Changes

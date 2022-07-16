@@ -5,6 +5,8 @@
 ### Major Changes
 
 - add util core
+- proto.json -> api.json
+- add env support (shim)
 
 ## 1.2.2
 
