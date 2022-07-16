@@ -5,9 +5,14 @@
     "lint-staged": "lint-staged",
     "build": "pnpm --filter=./packages/** build",
     "test": "vitest run",
-    "publish": "node scripts/publish-packages.mjs",
+    "publish": "pnpm publish -r",
     "sync": "node scripts/sync-packages.mjs",
-    "kill-port": "node scripts/kill-port.mjs"
+    "kill-port": "node scripts/kill-port.mjs",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "prereleases": "pnpm changeset pre enter",
+    "exit-prereleases": "pnpm changeset pre exit",
+    "release": "pnpm build && pnpm release:only"
   },
   "repository": {
     "type": "git",
