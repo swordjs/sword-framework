@@ -1,6 +1,6 @@
 # @swordjs/sword-framework-cli
 
-## 1.3.0
+## 1.4.0
 
 ### Major Changes
 
