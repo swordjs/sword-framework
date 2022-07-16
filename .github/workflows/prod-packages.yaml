@@ -39,6 +39,7 @@ jobs:
           uses: actions/setup-node@v2
           with:
             node-version: 16
+            registry-url: 'https://registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}'
             cache: 'pnpm'
 
         - name: Install dependencies
@@ -50,8 +51,6 @@ jobs:
         # 推送到npm
         - name: publish-npm
           run: pnpm run publish
-          env:
-            NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
         # 同步到cnpm
         - name: sync example
