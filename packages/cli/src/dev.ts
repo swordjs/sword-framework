@@ -3,7 +3,7 @@ import { ChildProcess, spawn } from 'child_process';
 import { resolve } from 'path';
 import chokidar from 'chokidar';
 import { debounce } from '~util/index';
-import { generateSchema } from './util/api';
+import { generateSchema } from './core/api';
 import { writeFileRecursive } from '~util/file';
 import { devUnicloudApp } from './platform/unicloud';
 import log from './log';

@@ -2,7 +2,7 @@ import { resolve } from 'path';
 import { symlink, existsSync, lstatSync, readFileSync, unlinkSync } from 'fs';
 import log from '../log';
 import { build } from '../build';
-import { delDir, writeFileRecursive, copyDir } from '../util/file';
+import { delDir, writeFileRecursive, copyDir } from '~util/file';
 import { configData } from '.././config';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '#types/config';

@@ -8,7 +8,7 @@ export const processShim = (command: 'dev' | 'build') => {
   const shim = `
   // process shim
   process.argv = ${JSON.stringify(process.argv)}
-  process.env._sword_command = ${command}
+  process.env._sword_command = '${command}'
   `;
   writeFileRecursive(shimPath, shim);
   log.success(`[shim:process]创建shim成功`);

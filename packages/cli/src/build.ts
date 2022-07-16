@@ -5,7 +5,7 @@ import { delDir } from '~util/file';
 import log from './log';
 import { buildUnicloudApp } from './platform/unicloud';
 import { writeFileRecursive } from '~util/file';
-import { generateSchema } from './util/api';
+import { generateSchema } from './core/api';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
 
