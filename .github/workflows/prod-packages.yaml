@@ -10,7 +10,7 @@ jobs:
   # 编译打包
   main:
       name: Build & Test & Publish & Async
-      runs-on: macos-latest
+      runs-on: ubuntu-latest
 
       steps:
         - name: Check out code
