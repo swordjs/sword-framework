@@ -5,5 +5,6 @@
 | [cli](./cli) | 命令行cli | ❌ | ❌ |
 | [cors](./cors) | 使用cors | ❌ | ❌
 | [log](./log) | 终端打印插件 | ✅ | ✅ | *server*
+| [unicloud-log](./unicloud-log) | 终端/控制台打印插件 | ✅ | ✅ | *unicloud*
 | [server](./server) | 运行在server端的插件 | ✅ | ✅ | *server*
 
