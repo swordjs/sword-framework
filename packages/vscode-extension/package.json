@@ -1,0 +1,44 @@
+{
+  "name": "vscode-extension",
+  "displayName": "vscode-extension",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.69.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:vscode-extension.helloWorld"
+  ],
+  "main": "./lib/index.cjs",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-extension.helloWorld",
+        "title": "Hello World"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "dev": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
+    "build": "unbuild",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.69.0",
+    "@types/glob": "^7.2.0",
+    "@vscode/test-electron": "^2.1.5",
+    "unbuild": "^0.6.9"
+  },
+  "unbuild": {
+    "entries": ["./src/index"],
+    "outDir": "lib",
+    "rollup": {
+      "emitCJS": true,
+      "cjsBridge": true
+    }
+  }
+}
