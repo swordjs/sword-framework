@@ -1,6 +1,7 @@
 {
-  "name": "vscode-extension",
+  "name": "framework-helper",
   "displayName": "vscode-extension",
+  "publisher": "swordjs",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -10,16 +11,48 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vscode-extension.helloWorld"
+    "onView:Route"
   ],
   "main": "./lib/index.cjs",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "swordjs-framework-helper",
+          "title": "swordjs-framework-helper",
+          "icon": "media/logo.svg"
+        }
+      ]
+    },
+    "views": {
+			"swordjs-framework-helper": [
+				{
+					"id": "Route",
+					"name": "Route",
+					"icon": "media/logo.svg",
+					"contextualTitle": "Package Explorer"
+				}
+			]
+		},
     "commands": [
       {
-        "command": "vscode-extension.helloWorld",
-        "title": "Hello World"
+        "command": "Route.refreshEntry",
+        "title": "Refresh",
+        "icon": {
+          "light": "media/refresh_light.svg",
+          "dark": "media/refresh_dark.svg"
+        }
       }
-    ]
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "Route.refreshEntry",
+          "when": "view == Route",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
