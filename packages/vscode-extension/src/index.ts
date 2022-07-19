@@ -40,6 +40,10 @@ export class ApiProvider implements vscode.TreeDataProvider<Api> {
           iconPath: {
             light: path.join(__filename, '..', '..', 'media', 'core.svg'),
             dark: path.join(__filename, '..', '..', 'media', 'core.svg')
+          },
+          command: {
+            command: 'vscode.open',
+            arguments: [element.path]
           }
         },
         {
@@ -47,6 +51,10 @@ export class ApiProvider implements vscode.TreeDataProvider<Api> {
           iconPath: {
             light: path.join(__filename, '..', '..', 'media', 'proto.svg'),
             dark: path.join(__filename, '..', '..', 'media', 'proto.svg')
+          },
+          command: {
+            command: 'vscode.open',
+            arguments: [element.protoPath]
           }
         }
       ]);
@@ -75,7 +83,7 @@ export class ApiProvider implements vscode.TreeDataProvider<Api> {
     console.log(apiJSON);
     const list = [];
     for (const key in apiJSON) {
-      list.push(new Api(key, apiJSON[key].method, vscode.TreeItemCollapsibleState.Collapsed));
+      list.push(new Api(key, apiJSON[key].method, apiJSON[key].path, apiJSON[key].protoPath, vscode.TreeItemCollapsibleState.Collapsed));
     }
     return list;
   }
@@ -93,7 +101,9 @@ export class ApiProvider implements vscode.TreeDataProvider<Api> {
 export class Api extends vscode.TreeItem {
   constructor(
     public readonly label: string,
-    private readonly methods: string[],
+    public readonly methods: string[],
+    public readonly path: string,
+    public readonly protoPath: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly command?: vscode.Command
   ) {
