@@ -1,5 +1,10 @@
 {
-  "compilerOptions": {},
+  "compilerOptions": {
+    "target": "ES5",
+    "outDir": "./out",
+    "removeComments": true,
+    "sourceMap": false
+  },
   "include": ["src/**/*"],
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.json"
 }

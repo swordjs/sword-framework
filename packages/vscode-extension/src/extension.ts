@@ -43,7 +43,7 @@ export class ApiProvider implements vscode.TreeDataProvider<Api> {
           },
           command: {
             command: 'vscode.open',
-            arguments: [element.path]
+            arguments: [element.handlerPath]
           }
         },
         {
@@ -102,13 +102,12 @@ export class Api extends vscode.TreeItem {
   constructor(
     public readonly label: string,
     public readonly methods: string[],
-    public readonly path: string,
+    public readonly handlerPath: string,
     public readonly protoPath: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly command?: vscode.Command
   ) {
     super(label, collapsibleState);
-
     this.tooltip = this.label;
     this.description = this.methods.join('|');
   }

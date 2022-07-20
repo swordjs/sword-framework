@@ -7,13 +7,16 @@
   "engines": {
     "vscode": "^1.69.0"
   },
+  "repository": {
+    "url": "https://github.com/swordjs/sword-framework"
+  },
   "categories": [
     "Other"
   ],
   "activationEvents": [
     "onView:Route"
   ],
-  "main": "./lib/index.cjs",
+  "main": "./out/extension.js",
   "contributes": {
     "viewsContainers": {
       "activitybar": [
@@ -56,24 +59,13 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run build",
-    "dev": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
-    "build": "unbuild",
+    "dev": "nodemon --watch src/ -C -e ts --debug -x 'tsc'",
+    "build": "tsc",
     "test": "vitest run"
   },
   "devDependencies": {
-    "@types/vscode": "^1.69.0",
     "@types/glob": "^7.2.0",
-    "@vscode/test-electron": "^2.1.5",
-    "unbuild": "^0.6.9"
-  },
-  "unbuild": {
-    "entries": [
-      "./src/index"
-    ],
-    "outDir": "lib",
-    "rollup": {
-      "emitCJS": true,
-      "cjsBridge": true
-    }
+    "@types/vscode": "^1.69.0",
+    "@vscode/test-electron": "^2.1.5"
   }
 }

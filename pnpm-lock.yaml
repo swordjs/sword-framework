@@ -155,12 +155,10 @@ importers:
       '@types/glob': ^7.2.0
       '@types/vscode': ^1.69.0
       '@vscode/test-electron': ^2.1.5
-      unbuild: ^0.6.9
     devDependencies:
       '@types/glob': 7.2.0
       '@types/vscode': 1.69.0
       '@vscode/test-electron': 2.1.5
-      unbuild: 0.6.9
 
 packages:
 
