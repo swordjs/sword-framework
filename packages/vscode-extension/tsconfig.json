@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES5",
-    "outDir": "./out",
-    "removeComments": true,
-    "sourceMap": false
+    "module": "commonjs",
+		"target": "es2020",
+		"lib": ["es2020"],
+		"outDir": "out",
+		"sourceMap": true,
+		"strict": true,
+		"rootDir": "src"
   },
   "include": ["src/**/*"],
   "extends": "../../tsconfig.json"

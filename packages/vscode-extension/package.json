@@ -2,8 +2,8 @@
   "name": "framework-helper",
   "displayName": "vscode-extension",
   "publisher": "swordjs",
-  "description": "",
-  "version": "1.0.1",
+  "description": "Sword.js framework helper",
+  "version": "1.0.3",
   "icon": "media/sword-logo.png",
   "engines": {
     "vscode": "^1.69.0"
@@ -60,7 +60,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run build",
-    "dev": "nodemon --watch src/ -C -e ts --debug -x 'tsc'",
+    "dev": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
     "build": "tsc",
     "test": "vitest run"
   },
