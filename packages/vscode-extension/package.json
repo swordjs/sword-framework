@@ -3,7 +3,7 @@
   "displayName": "vscode-extension",
   "publisher": "swordjs",
   "description": "",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.69.0"
   },
@@ -25,15 +25,15 @@
       ]
     },
     "views": {
-			"swordjs-framework-helper": [
-				{
-					"id": "Route",
-					"name": "Route",
-					"icon": "media/logo.svg",
-					"contextualTitle": "Package Explorer"
-				}
-			]
-		},
+      "swordjs-framework-helper": [
+        {
+          "id": "Route",
+          "name": "Route",
+          "icon": "media/logo.svg",
+          "contextualTitle": "Package Explorer"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "Route.refreshEntry",
@@ -55,7 +55,7 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "yarn run compile",
+    "vscode:prepublish": "npm run build",
     "dev": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
     "build": "unbuild",
     "test": "vitest run"
@@ -67,7 +67,9 @@
     "unbuild": "^0.6.9"
   },
   "unbuild": {
-    "entries": ["./src/index"],
+    "entries": [
+      "./src/index"
+    ],
     "outDir": "lib",
     "rollup": {
       "emitCJS": true,
