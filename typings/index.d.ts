@@ -28,10 +28,11 @@ export interface HttpContext<T extends ContextData = ContextData> {
 
 export type HttpInstructMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE';
 
-export type HttpInstruct = (path?: `/${string}`) => HttpInstructReturn;
+type Path = `/${string}`;
+export type HttpInstruct = (path?: Path) => HttpInstructReturn;
 export type HttpInstructReturn = {
   method: HttpInstructMethod;
-  path?: string;
+  path?: Path;
 };
 
 export type HttpApiStatusResponse<D = any> = {
@@ -46,11 +47,9 @@ export type CustomHandlerReturn<D = any> = () => HttpApiStatusResponse & {
   headers?: Record<string, string>;
 };
 
+export type HttpApiInstructReturn = Map<Path | undefined, { methods: Set<HttpInstructMethod>; type: 'mandatory' | 'file-system' }>;
 export type HttpApiReturn<C extends ContextData> = {
-  instruct: {
-    method: HttpInstructMethod[];
-    path?: string;
-  };
+  instruct: HttpApiInstructReturn;
   // handler可以返回一个正确的res对象, 也可以返回一个集成api响应类型
   handler: HttpApiHandler<C>;
 };

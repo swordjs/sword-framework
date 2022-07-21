@@ -1,9 +1,13 @@
-import type { HttpInstructReturn, HttpApiHandler, HttpInstructMethod, HttpApiReturn, ContextData } from '#types/index';
+import type { HttpInstructReturn, HttpApiHandler, HttpApiInstructReturn, HttpApiReturn, ContextData } from '#types/index';
 
-// 判断path是否合格
-const checkPath = (path: HttpInstructReturn['path']) => {
-  if (path) return Boolean(path && path.trim() !== '' && path[0] === '/');
-  return false;
+/**
+ *
+ * 判断path是否合格
+ * @param {string} path
+ * @return {*}  {(string | undefined)}
+ */
+const checkPath = (path: HttpInstructReturn['path']): HttpInstructReturn['path'] | undefined => {
+  if (path && path.trim() !== '' && path[0] === '/') return path;
 };
 
 /**
@@ -38,33 +42,24 @@ export const useApi = <C extends ContextData>(params: {
   handler: HttpApiHandler<C>;
 }): HttpApiReturn<C> => {
   const { instruct } = params;
-  const method = new Set<HttpInstructMethod>();
-  let path: string | undefined;
+  const instructMap: HttpApiInstructReturn = new Map();
   // 判断是否传递了指示器, 如果没有传递指示器，那么默认是get请求
-  if (!instruct) method.add('GET');
-  // 如果传递了多个指示器
-  if (Array.isArray(instruct)) {
+  if (!instruct || (Array.isArray(instruct) && instruct.length === 0)) {
+    // type是文件系统路由
+    instructMap.set(undefined, { type: 'mandatory', methods: new Set(['GET']) });
+  } else if (Array.isArray(instruct)) {
     instruct.map((i) => {
-      method.add(i.method);
-      if (checkPath(i.path)) {
-        if (!path) {
-          path = i.path;
-        }
-        method.add(i.method);
-      }
+      // path合法性
+      const isPath = checkPath(i.path);
+      instructMap.set(isPath, { methods: (instructMap.get(isPath)?.methods || new Set()).add(i.method), type: isPath ? 'mandatory' : 'file-system' });
     });
-    // 如果指示器数组为空，那么默认是get请求
-    if (instruct.length === 0) method.add('GET');
   } else if (instruct) {
     // 如果仅仅传入了一个指示器，那么直接对method和path做处理
-    method.add(instruct.method);
-    if (checkPath(instruct.path)) path = instruct.path;
+    const isPath = checkPath(instruct.path);
+    instructMap.set(isPath, { methods: new Set([instruct.method]), type: isPath ? 'mandatory' : 'file-system' });
   }
   return {
-    instruct: {
-      method: [...method],
-      path
-    },
+    instruct: instructMap,
     handler: params.handler
   };
 };
