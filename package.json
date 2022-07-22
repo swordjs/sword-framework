@@ -12,7 +12,7 @@
     "version-packages": "changeset version",
     "prereleases": "pnpm changeset pre enter",
     "exit-prereleases": "pnpm changeset pre exit",
-    "release": "pnpm build && pnpm release:only"
+    "release": "pnpm build && pnpm publish --no-git-checks"
   },
   "repository": {
     "type": "git",
