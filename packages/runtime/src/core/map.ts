@@ -5,12 +5,13 @@ import { traverseSourceDir } from '~util/file';
 import { getSourcePath } from '~util/path';
 import { getKey } from '~util/map';
 import { log } from './log';
-import type { HttpInstructMethod, HttpApiReturn, HttpContext } from '#types/index';
+import type { HttpInstructMethod, HttpApiReturn, HttpContext, HttpApiInstructType } from '#types/index';
 import type { Result as ApiJSON } from '@cli/core/api';
 
 export type Map = {
   sourcePath: string;
   method: HttpInstructMethod[];
+  type: HttpApiInstructType;
   proto: Record<string, any> | null;
   handler: (ctx: HttpContext<any>) => void;
 };
@@ -51,29 +52,27 @@ export const getApiMap = async (params?: {
       // 如果模块是默认导出或者导出main
       if (module.default || module.main) {
         const { instruct, handler }: HttpApiReturn<any> = module.default ?? module.main;
-        const currentPath = getKey(`/${apiDir}`, apiPath, instruct.path);
-        // 缓存map的value对象
-        const mapValue: Map = {
-          sourcePath: resolve(path, d),
-          proto: apiJson[currentPath].proto ?? null,
-          method: instruct.method,
-          handler
-        };
-        // 如果当前的currentpath和参数中的apiPath一致, 则只返回当前的map (匹配成功)
-        if (params?.apiPath && params.apiPath === currentPath) {
-          return {
-            apiMap: {
-              [currentPath]: mapValue
-            }
+        instruct.forEach((value, key) => {
+          const _key = getKey(`/${apiDir}`, apiPath, key);
+          // 缓存map的value对象
+          const mapValue: Map = {
+            sourcePath,
+            method: [...value.methods],
+            type: value.type,
+            proto: apiJson[_key].proto ?? null,
+            handler
           };
-        }
-        // 判断apiMap中已存在某个apikey，那么就提示api被占用，那么此时默认将不会按照指示器中的path进行替换赋值
-        if (apiMap[currentPath]) {
-          log().err(`${currentPath}路由已被占用，已跳过`);
-          continue;
-        } else {
-          apiMap[currentPath] = mapValue;
-        }
+          // 判断apiMap中已存在某个apikey，那么就提示api被占用，那么此时默认将不会按照指示器中的path进行替换赋值
+          if (apiMap[_key] && value.type === 'mandatory' && apiMap[_key].type === 'mandatory') {
+            // 都是强制定义的, 所以需要打印警告: 强制定义了多次api, 这会增大你的维护难度, 请谨慎选择
+            log().info(`api ${_key} is Mandatory defined multiple times, please be careful`);
+          }
+          // 如果不存在路由, 则直接赋值
+          // 如果map当前存在此path, 那么查看本次path中的路由类型, 如果本次是file-system, 就替换
+          if ((apiMap[_key] && value.type === 'file-system' && apiMap[_key].type === 'mandatory') || !apiMap[_key]) {
+            apiMap[_key] = mapValue;
+          }
+        });
       }
     }
   }

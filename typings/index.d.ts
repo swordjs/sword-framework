@@ -47,7 +47,8 @@ export type CustomHandlerReturn<D = any> = () => HttpApiStatusResponse & {
   headers?: Record<string, string>;
 };
 
-export type HttpApiInstructReturn = Map<Path | undefined, { methods: Set<HttpInstructMethod>; type: 'mandatory' | 'file-system' }>;
+export type HttpApiInstructType = 'mandatory' | 'file-system'; // 指示器类型
+export type HttpApiInstructReturn = Map<Path | undefined, { methods: Set<HttpInstructMethod>; type: HttpApiInstructType }>;
 export type HttpApiReturn<C extends ContextData> = {
   instruct: HttpApiInstructReturn;
   // handler可以返回一个正确的res对象, 也可以返回一个集成api响应类型

@@ -4,10 +4,10 @@ import { TSBufferProtoGenerator } from 'tsbuffer-proto-generator';
 import { traverseSourceDir, writeFileRecursive } from '~util/file';
 import { getKey } from '~util/map';
 import log from '../log';
-import type { HttpApiReturn } from '#types/index';
 import { existsSync } from 'fs';
+import type { HttpApiReturn, HttpApiInstructType } from '#types/index';
 
-type Map = Record<string, { path: string; method: string[]; protoPath: string }>;
+type Map = Record<string, { path: string; method: string[]; protoPath?: string; type: HttpApiInstructType }>;
 
 /**
  *
@@ -44,18 +44,21 @@ export const getApiMap = async (
       if (d === 'index.ts') {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const module = require(modulePath) as any;
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { instruct }: HttpApiReturn<any> = module.default ?? module.main;
-        const key = getKey(`/${apiDir}`, apiPath, instruct.path);
-        apiPaths.push(apiPath);
-        apiMap[key] = {
-          path: modulePath,
-          method: instruct.method
-        } as any;
-        // 如果当前目录下，存在proto.ts文件，则记录
-        if (existsSync(resolve(path, 'proto.ts'))) {
-          apiMap[key] = { ...apiMap[key], protoPath: resolve(path, 'proto.ts') };
-        }
+        // 解析instruct, 是一个map
+        instruct.forEach((value, key) => {
+          const _key = getKey(`/${apiDir}`, apiPath, key);
+          apiMap[_key] = {
+            path: modulePath,
+            type: value.type,
+            // set转换成数组
+            method: [...value.methods]
+          };
+          // 如果当前目录下，存在proto.ts文件，则记录
+          if (existsSync(resolve(path, 'proto.ts'))) {
+            apiMap[_key] = { ...apiMap[_key], protoPath: resolve(path, 'proto.ts') };
+          }
+        });
       }
     }
   }
@@ -119,16 +122,18 @@ export const generateSchema = async (
         keepComment: options.keepComment
       });
       // 如果是dev环境, 则仅仅生成proto
-      result[key] = {
-        proto: await generator.generate(apiMap[key].protoPath),
-        ...(options.dev
-          ? {
-              path: apiMap[key].path,
-              method: apiMap[key].method,
-              protoPath: apiMap[key].protoPath
-            }
-          : {})
-      };
+      if (apiMap[key].protoPath) {
+        result[key] = {
+          proto: await generator.generate(apiMap[key].protoPath as any),
+          ...(options.dev
+            ? {
+                path: apiMap[key].path,
+                method: apiMap[key].method,
+                protoPath: apiMap[key].protoPath
+              }
+            : {})
+        };
+      }
     }
     // 判断outPath是否存在，如果存在，就把api.json输出到指定目录
     if (outPath) {

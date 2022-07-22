@@ -46,7 +46,7 @@ export const useApi = <C extends ContextData>(params: {
   // 判断是否传递了指示器, 如果没有传递指示器，那么默认是get请求
   if (!instruct || (Array.isArray(instruct) && instruct.length === 0)) {
     // type是文件系统路由
-    instructMap.set(undefined, { type: 'mandatory', methods: new Set(['GET']) });
+    instructMap.set(undefined, { type: 'file-system', methods: new Set(['GET']) });
   } else if (Array.isArray(instruct)) {
     instruct.map((i) => {
       // path合法性
