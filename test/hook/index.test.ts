@@ -10,7 +10,7 @@ describe('useApi', () => {
         };
       }
     });
-    expect(res.instruct.method).toEqual(['GET']);
+    expect([...(res.instruct.get(undefined)?.methods || [])]).toEqual(['GET']);
   });
   it('传递单个指示器，不传入任何参数', () => {
     const res = useApi({
@@ -21,9 +21,9 @@ describe('useApi', () => {
         };
       }
     });
-    expect(res.instruct.method).toEqual(['GET']);
+    expect([...(res.instruct.get(undefined)?.methods || [])]).toEqual(['GET']);
   });
-  it('传递单个指示器，传入空字符串', () => {
+  it('传递单个指示器，传入/', () => {
     const res = useApi({
       instruct: Get('/'),
       handler: async () => {
@@ -32,7 +32,7 @@ describe('useApi', () => {
         };
       }
     });
-    expect(res.instruct.method).toEqual(['GET']);
+    expect([...(res.instruct.get(undefined)?.methods || [])]).toEqual(['GET']);
   });
   it('传递单个指示器，传入参数', () => {
     const res = useApi({
@@ -43,9 +43,9 @@ describe('useApi', () => {
         };
       }
     });
-    expect(res.instruct).toEqual({
-      method: ['GET'],
-      path: '/yes'
+    expect(res.instruct.get('/yes')).toEqual({
+      methods: new Set(['GET']),
+      type: 'mandatory'
     });
   });
   it('传递多个指示器，只传递空数组', () => {
@@ -57,9 +57,9 @@ describe('useApi', () => {
         };
       }
     });
-    expect(res.instruct.method).toEqual(['GET']);
+    expect([...(res.instruct.get(undefined)?.methods || [])]).toEqual(['GET']);
   });
-  it('传递多个指示器，首个传值，剩下的随机非法值', () => {
+  it('传递多个指示器', () => {
     const res = useApi({
       instruct: [Get('/'), Post('/detail'), Post()],
       handler: async () => {
@@ -68,9 +68,13 @@ describe('useApi', () => {
         };
       }
     });
-    expect(res.instruct).toEqual({
-      method: ['GET', 'POST'],
-      path: '/'
+    expect(res.instruct.get(undefined)).toEqual({
+      methods: new Set(['GET', 'POST']),
+      type: 'file-system'
+    });
+    expect(res.instruct.get('/detail')).toEqual({
+      methods: new Set(['POST']),
+      type: 'mandatory'
     });
   });
   it('传递多个指示器，首个非法值，剩下的随机值', () => {
@@ -82,9 +86,9 @@ describe('useApi', () => {
         };
       }
     });
-    expect(res.instruct).toEqual({
-      method: ['GET', 'POST'],
-      path: '/'
+    expect(res.instruct.get(undefined)).toEqual({
+      methods: new Set(['GET', 'POST']),
+      type: 'file-system'
     });
   });
   it('传递一个指示器到数组中，并且不设置url', () => {
@@ -96,9 +100,9 @@ describe('useApi', () => {
         };
       }
     });
-    expect(res.instruct).toEqual({
-      method: ['POST'],
-      path: undefined
+    expect(res.instruct.get(undefined)).toEqual({
+      methods: new Set(['POST']),
+      type: 'file-system'
     });
   });
 });
