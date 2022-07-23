@@ -18,6 +18,8 @@
 - 📖 TS运行时类型校验
 - 📃 生成API文档，兼容markdown以及openapi3.0
 - 😍 完全 Hook 的写法与设计
+- 🧩 Vscode插件快速提升API开发效率
+
 
 ## 平台
 
@@ -51,13 +53,23 @@ sword init
 ## 使用
 
 ```bash
+
+# (server platform)
+
 npm run dev
+
+# (unicloud platform)
+
+npm run dev:unicloud
 
 # or
 
 npm run build
 ```
 
+## SwordJS - Vscode 插件
+
+[swordjs-Vscode extension](https://marketplace.visualstudio.com/items?itemName=swordjs.framework-helper)
 
 ## 为什么要使用 Sword?
 

@@ -19,6 +19,8 @@ This is the first serverless framework in [sword.org](https://github.com/swordjs
 - 📖 Runtime check on typescript
 - 📃 Generate markdown or openapi3.0 api documentation
 - 😍 Hooks api design
+- 🧩 Vscode-extension for develop application better.
+
 
 ## Platforms
 
@@ -53,12 +55,23 @@ sword init
 ## Start
 
 ```bash
+
+# (server platform)
+
 npm run dev
+
+# (unicloud platform)
+
+npm run dev:unicloud
 
 # or
 
 npm run build
 ```
+
+## SwordJS - Vscode extension
+
+[swordjs-Vscode extension](https://marketplace.visualstudio.com/items?itemName=swordjs.framework-helper)
 
 ## Why should I use sword.js ?
 
