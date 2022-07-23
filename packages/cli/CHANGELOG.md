@@ -1,5 +1,12 @@
 # @swordjs/sword-framework-cli
 
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @swordjs/sword-framework@1.3.2
+
 ## 1.5.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @swordjs/sword-framework
 
+## 1.3.2
+
+### Patch Changes
+
+- update checkPath core
+
 ## 1.3.1
 
 ### Patch Changes
