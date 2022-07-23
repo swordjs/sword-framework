@@ -7,7 +7,7 @@ import type { HttpInstructReturn, HttpApiHandler, HttpApiInstructReturn, HttpApi
  * @return {*}  {(string | undefined)}
  */
 const checkPath = (path: HttpInstructReturn['path']): HttpInstructReturn['path'] | undefined => {
-  if (path && path.trim() !== '' && path[0] === '/') return path;
+  if (path && !['', '/'].includes(path.trim()) && path[0] === '/') return path;
 };
 
 /**
