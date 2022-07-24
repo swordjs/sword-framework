@@ -1,5 +1,11 @@
 # @swordjs/sword-framework
 
+## 1.3.3
+
+### Patch Changes
+
+- perf presetApi()
+
 ## 1.3.2
 
 ### Patch Changes

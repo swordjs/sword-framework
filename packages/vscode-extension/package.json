@@ -3,7 +3,7 @@
   "displayName": "vscode-extension",
   "publisher": "swordjs",
   "description": "Sword.js framework helper",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "icon": "media/sword-logo.png",
   "engines": {
     "vscode": "^1.69.0"

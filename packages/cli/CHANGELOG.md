@@ -1,5 +1,13 @@
 # @swordjs/sword-framework-cli
 
+## 1.5.2
+
+### Patch Changes
+
+- perf presetApi()
+- Updated dependencies
+  - @swordjs/sword-framework@1.3.3
+
 ## 1.5.1
 
 ### Patch Changes
