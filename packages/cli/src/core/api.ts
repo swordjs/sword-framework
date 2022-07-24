@@ -113,6 +113,7 @@ export const generateSchema = async (
   apiResult: Result;
 }> => {
   const { apiMap, apiPaths } = await getApiMap();
+  console.log(apiMap);
   const result: Result = {};
   try {
     // 迭代apimap
@@ -129,7 +130,8 @@ export const generateSchema = async (
             ? {
                 path: apiMap[key].path,
                 method: apiMap[key].method,
-                protoPath: apiMap[key].protoPath
+                protoPath: apiMap[key].protoPath,
+                type: apiMap[key].type
               }
             : {})
         };
