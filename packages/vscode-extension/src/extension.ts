@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { execSync } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -16,6 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
   const apiProvider = new ApiProvider(rootPath);
   // 挂载command
   vscode.commands.registerCommand('Route.refreshEntry', () => apiProvider.refresh());
+  vscode.commands.registerCommand('Route.addEntry', () => apiProvider.addRoute());
   // 读取api.json文件, 向route视图添加内容
   vscode.window.registerTreeDataProvider('Route', apiProvider);
 }
@@ -26,6 +28,32 @@ export class ApiProvider implements vscode.TreeDataProvider<Api> {
   constructor(private workspaceRoot: string | undefined) {}
   refresh(): void {
     this._onDidChangeTreeData.fire();
+  }
+  addRoute(): void {
+    // 让用户输入一个字符串
+    vscode.window
+      .showInputBox({
+        prompt: '请输入路由名称',
+        placeHolder: '例如hello, 程序会自动建立handler和proto文件, 路径是/hello'
+      })
+      .then((name) => {
+        if (name && name.trim() !== '') {
+          // exec命令
+          try {
+            execSync(`npx sword util --util-name=presetApi --presetApi-name=${name}`, {
+              cwd: this.workspaceRoot
+            });
+          } catch (error) {
+            return vscode.window.showErrorMessage((error as any).message);
+          }
+          // 成功窗口
+          vscode.window.showInformationMessage(`success: ${name} added`);
+          setTimeout(() => {
+            // 刷新视图
+            this.refresh();
+          }, 1000);
+        }
+      });
   }
   getChildren(element?: Api | undefined): vscode.ProviderResult<any[]> {
     if (!this.workspaceRoot) {
@@ -83,7 +111,7 @@ export class ApiProvider implements vscode.TreeDataProvider<Api> {
     console.log(apiJSON);
     const list = [];
     for (const key in apiJSON) {
-      list.push(new Api(key, apiJSON[key].method, apiJSON[key].path, apiJSON[key].protoPath, vscode.TreeItemCollapsibleState.Collapsed));
+      list.push(new Api(key, apiJSON[key].method, apiJSON[key].path, apiJSON[key].type, apiJSON[key].protoPath, vscode.TreeItemCollapsibleState.Collapsed));
     }
     return list;
   }
@@ -103,13 +131,14 @@ export class Api extends vscode.TreeItem {
     public readonly label: string,
     public readonly methods: string[],
     public readonly handlerPath: string,
+    public readonly type: string,
     public readonly protoPath: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly command?: vscode.Command
   ) {
     super(label, collapsibleState);
     this.tooltip = this.label;
-    this.description = this.methods.join('|');
+    this.description = `${this.methods.join(' | ')} - ${this.type === 'mandatory' ? '强制定义类型路由' : '文件系统类型路由'}`;
   }
 
   iconPath = {
