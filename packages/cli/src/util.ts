@@ -1,6 +1,7 @@
 import log from './log';
 import schema2interface from './util/schema2interface';
 import clearShim from './util/clearShim';
+import presetApi from './util/presetApi';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '#types/config';
 
@@ -12,7 +13,8 @@ export default async (args: Argv<CommandConfig>) => {
     // 定义一个对象, 存储和匹配所有的util函数
     const utilHandler = {
       schema2interface,
-      clearShim
+      clearShim,
+      presetApi
     };
     // 判断util-name是否在utilHandler中
     if (utilHandler[args['util-name']]) {
