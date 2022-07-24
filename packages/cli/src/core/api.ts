@@ -129,7 +129,8 @@ export const generateSchema = async (
             ? {
                 path: apiMap[key].path,
                 method: apiMap[key].method,
-                protoPath: apiMap[key].protoPath
+                protoPath: apiMap[key].protoPath,
+                type: apiMap[key].type
               }
             : {})
         };

@@ -46,12 +46,25 @@
           "light": "media/refresh_light.svg",
           "dark": "media/refresh_dark.svg"
         }
+      },
+      {
+        "command": "Route.addEntry",
+        "title": "AddApi",
+        "icon": {
+          "light": "media/add_light.svg",
+          "dark": "media/add_dark.svg"
+        }
       }
     ],
     "menus": {
       "view/title": [
         {
           "command": "Route.refreshEntry",
+          "when": "view == Route",
+          "group": "navigation"
+        },
+        {
+          "command": "Route.addEntry",
           "when": "view == Route",
           "group": "navigation"
         }

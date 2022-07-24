@@ -4,8 +4,8 @@ import { resolve } from 'path';
 import chokidar from 'chokidar';
 import { debounce } from '~util/index';
 import { generateSchema } from './core/api';
-import { writeFileRecursive } from '~util/file';
 import { devUnicloudApp } from './platform/unicloud';
+import { presetApi } from './util/presetApi';
 import log from './log';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
@@ -49,44 +49,13 @@ const start = (args: Argv<CommandConfig>) => {
 const generatePreset = (sourceDir: string, parentDir: string, dir: string) => {
   // 删除前缀后的root根节点路由
   const _dir = dir.slice(1);
-  // 处理parnetDir的路径，使之能够通过/进行分割成多个文件夹，比如/level1/level2 会被分割成['level1', 'level2']，这会让resolve更好工作
-  const _parentDir = parentDir.split('/');
-  const cwd = process.cwd();
-  // 生成proto
-  writeFileRecursive(
-    `${resolve(cwd, sourceDir, 'api', ..._parentDir, dir, 'proto.ts')}`,
-    `export interface ReqParams {
-
-}
-export interface ReqQuery {
-
-}
-export interface Res {
-  message: string;
-}`
-  );
-  // 生成API
-  writeFileRecursive(
-    `${resolve(cwd, sourceDir, 'api', ..._parentDir, dir, 'index.ts')}`,
-    `import { useApi } from '@swordjs/sword-framework';
-import { ReqQuery, ReqParams, Res } from './proto';
-
-export const main = useApi<{
-  query: ReqQuery;
-  params: ReqParams;
-  res: Res;
-}>({
-  handler: async (ctx) => {
-    return {
-      message: 'hello'
-    };
+  try {
+    const [cwd, _parentDir] = presetApi(sourceDir, parentDir, dir);
+    renameSync(resolve(cwd, sourceDir, 'api', ..._parentDir, dir), resolve(cwd, sourceDir, 'api', ..._parentDir, _dir));
+  } catch (error) {
+    return log.err(`API创建失败, ${error as Error}`);
   }
-});
-`
-  );
-  // 修改API文件夹的名称，去掉前缀
-  renameSync(resolve(cwd, sourceDir, 'api', ..._parentDir, dir), resolve(cwd, sourceDir, 'api', ..._parentDir, _dir));
-  log.info(`${_dir} API创建成功，已自动生成index.ts,proto.ts`);
+  return log.info(`${_dir} API创建成功，已自动生成index.ts,proto.ts`);
 };
 
 /**
@@ -103,7 +72,6 @@ const listenApiSource = (args: Argv<CommandConfig>) => {
     watcher.on(
       'all',
       debounce(async (event: any, path: string) => {
-        await generate();
         start(args);
         switch (event) {
           case 'addDir':
@@ -122,6 +90,7 @@ const listenApiSource = (args: Argv<CommandConfig>) => {
           case 'change':
             log.info(`[重新编译]触发文件:${path}`);
         }
+        await generate();
       }, 500)
     );
   } catch (error) {
