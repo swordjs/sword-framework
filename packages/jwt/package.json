@@ -1,0 +1,36 @@
+{
+  "name": "@swordjs/jwt",
+  "version": "1.0.0",
+  "description": "",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "main": "./lib/index.cjs",
+  "module": "./lib/index.mjs",
+  "exports": {
+    ".": {
+      "require": "./lib/index.cjs",
+      "import": "./lib/index.mjs",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "nodemon --watch src/ -C -e ts --debug -x 'npm run build'",
+    "build": "unbuild",
+    "test": "vitest run"
+  },
+  "author": "Seho",
+  "license": "ISC",
+  "devDependencies": {
+    "unbuild": "^0.6.9"
+  },
+  "dependencies": {
+    "njwt": "^1.2.0"
+  }
+}
