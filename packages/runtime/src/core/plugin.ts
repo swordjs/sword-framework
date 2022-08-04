@@ -1,10 +1,10 @@
 import { getAsyncDependency } from './schedule';
 import { platformHook } from './platform';
-import type { Plugin } from '#types/index';
+import type { Plugin, RegisterOneceRoot } from '#types/index';
 
 export const plugins: Plugin[] = [];
 
-export let aggregatePlugin: AggregatePlugin | null = null as any;
+export let aggregatePlugin: AggregatePlugin | null = null;
 
 /**
  *
@@ -22,7 +22,7 @@ export const addPlugin = (plugin: Plugin | (() => Plugin)): Plugin[] => {
   return plugins;
 };
 
-type AggregatePlugin = Record<Exclude<keyof Plugin, 'name'>, { name: string; plugin: any }>;
+type AggregatePlugin = Record<Exclude<keyof Plugin, 'name'>, { name: string | null; plugin: any | any[] }>;
 type PresetPluginKeys = keyof Pick<Plugin, 'server' | 'log'>;
 
 /**
@@ -81,6 +81,10 @@ const addPresetPlugin = async (): Promise<Record<PresetPluginKeys, any>> => {
  * @return {*}  {Record<string, unknown>}
  */
 export const aggregatePluginBehavior = async (): Promise<AggregatePlugin> => {
+  // 插件公开的root节点中, 有要确保唯一性的, 所以即使有多个插件注册了root节点, 最终也只会有一个root节点
+  // 比如server, log, unicloud-log等等
+  // 所以我们需要把这些root节点进行硬编码
+  const registerOneceRoot: RegisterOneceRoot[] = ['server', 'log'];
   if (aggregatePlugin === null) {
     // 设置一个默认空对象
     aggregatePlugin = {} as any;
@@ -91,9 +95,14 @@ export const aggregatePluginBehavior = async (): Promise<AggregatePlugin> => {
       for (key in plugin) {
         // 聚合不需要把name也聚合进去
         if (key !== 'name') {
+          // key是否可以重复注册
+          const isOnece = registerOneceRoot.includes(key as any);
           // 循环plugin下的每一个节点,将所有插件的行为递归聚合到aggregatePlugin中，可以调用一个方法
-          // 这个数据结构每个root根节点之下，都保存了一个对象，key就是声明此root功能的插件名称，它的值则是插件核心
-          aggregatePlugin![key] = { name: plugin.name, plugin: plugin[key] as any };
+          aggregatePlugin![key] = {
+            name: isOnece ? plugin.name : null,
+            // 如果允许多次注册的钩子, 那么plugin就是一个数组, 否则就不是一个数组
+            plugin: !isOnece ? (aggregatePlugin![key]?.plugin ?? []).concat(plugin[key]) : plugin[key]
+          };
         }
       }
     }

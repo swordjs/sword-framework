@@ -69,4 +69,12 @@ export type Plugin = {
   };
   log?: LogType;
   context?: (context: HttpContext) => HttpContext;
+  // pipeline
+  // preApi
+  preApi?: PipelineNode<T> | PipelineNode<T>[];
+  // postApi
+  postApi?: PipelineNode<T> | PipelineNode<T>[];
 };
+
+// 仅仅注册一次的插件root类型定义
+export type RegisterOneceRoot = keyof Pick<Plugin, 'server' | 'log'>;
