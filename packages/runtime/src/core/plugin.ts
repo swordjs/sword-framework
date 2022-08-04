@@ -23,7 +23,7 @@ export const addPlugin = (plugin: Plugin | (() => Plugin)): Plugin[] => {
 };
 
 type AggregatePlugin = Record<Exclude<keyof Plugin, 'name'>, { name: string; plugin: any }>;
-type PresetPluginKeys = Exclude<keyof Plugin, 'name' | 'context'>;
+type PresetPluginKeys = keyof Pick<Plugin, 'server' | 'log'>;
 
 /**
  * 处理预设插件
