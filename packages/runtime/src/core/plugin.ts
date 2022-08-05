@@ -84,7 +84,7 @@ export const aggregatePluginBehavior = async (): Promise<AggregatePlugin> => {
   // 插件公开的root节点中, 有要确保唯一性的, 所以即使有多个插件注册了root节点, 最终也只会有一个root节点
   // 比如server, log, unicloud-log等等
   // 所以我们需要把这些root节点进行硬编码
-  const registerOneceRoot: RegisterOneceRoot[] = ['server', 'log'];
+  const registerOneceRoot: RegisterOneceRoot = ['server', 'log', 'context'];
   if (aggregatePlugin === null) {
     // 设置一个默认空对象
     aggregatePlugin = {} as any;

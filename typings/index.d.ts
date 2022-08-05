@@ -77,4 +77,4 @@ export type Plugin = {
 };
 
 // 仅仅注册一次的插件root类型定义
-export type RegisterOneceRoot = keyof Pick<Plugin, 'server' | 'log'>;
+export type RegisterOneceRoot = (keyof Pick<Plugin, 'server' | 'log' | 'context'>)[];
