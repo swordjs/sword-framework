@@ -1,5 +1,11 @@
 # @swordjs/sword-framework
 
+## 1.4.0
+
+### Minor Changes
+
+- support preApi & postApi on plugin root
+
 ## 1.3.3
 
 ### Patch Changes
