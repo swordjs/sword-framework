@@ -1,3 +1,4 @@
+import { aggregatePlugin } from './plugin';
 import type { PipelineNode } from '#types/pipeline';
 import type { HttpContext } from '#types/index';
 
@@ -50,6 +51,11 @@ export type InterruptPipelineResult = { type: 'return' | 'stop'; last: HttpConte
  */
 export const exec = async <T extends HttpContext>(type: PipelineTypeKeys, input: T): Promise<Error | T | InterruptPipelineResult> => {
   const res = [input];
+  // 将插件中可能的preapi和postapi推送到队列中
+  const pluginResult = aggregatePlugin![type === 'preApiCall' ? 'preApi' : 'postApi']?.plugin;
+  if (Array.isArray(pluginResult)) {
+    pluginResult.map((cb: PipelineNode<any>) => push(cb)(pipelineMap[type]));
+  }
   for (let i = 0; i < pipelineMap[type].length; i++) {
     const last = res[res.length - 1];
     try {
