@@ -1,6 +1,6 @@
 {
   "name": "@swordjs/sword-framework-cli",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
