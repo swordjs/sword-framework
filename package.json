@@ -35,7 +35,7 @@
     "vitest": "latest"
   },
   "dependencies": {
-    "@swordjs/h3": "0.7.6",
+    "@swordjs/h3": "^0.7.6",
     "mri": "^1.2.0",
     "ufo": "^0.8.4"
   }
