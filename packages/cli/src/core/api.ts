@@ -29,7 +29,7 @@ export const getApiMap = async (
   apiMap: Map;
 }> => {
   const require = createRequire(import.meta.url);
-  const apiPaths: string[] = [];
+  const apiPaths: Set<string> = new Set();
   const apiMap: Map = {};
   const files = traverseSourceDir(resolve(dir, apiDir));
   for (const key in files) {
@@ -42,6 +42,7 @@ export const getApiMap = async (
       const apiPath = path.substring(path.lastIndexOf(apiDir)).substring(apiDir.length);
       // 执行函数，获取instruct指示器
       if (d === 'index.ts') {
+        apiPaths.add(apiPath);
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const module = require(modulePath) as any;
         const { instruct }: HttpApiReturn<any> = module.default ?? module.main;
@@ -63,7 +64,7 @@ export const getApiMap = async (
     }
   }
   return {
-    apiPaths,
+    apiPaths: [...apiPaths],
     apiMap
   };
 };
