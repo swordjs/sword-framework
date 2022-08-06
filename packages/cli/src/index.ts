@@ -8,15 +8,19 @@ import build from './build';
 import init from './init';
 import doc from './doc';
 import util from './util';
+import packageJSON from './../package.json';
 import { processShim } from './shim';
 import { initConfig } from './config';
 import { commandArgs as args } from '../../../util/config';
-
 esbuildRegister.register();
 
 type commands = 'dev' | 'build' | 'init' | 'doc' | 'util';
 
 async function main() {
+  if (args['v']) {
+    console.log(`cli version: ${packageJSON.version}`);
+    return;
+  }
   // 解析config参数
   await initConfig();
   if (['dev', 'build'].includes(args._[0])) {

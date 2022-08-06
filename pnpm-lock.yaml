@@ -44,16 +44,22 @@ importers:
   example:
     specifiers:
       '@dcloudio/types': ^2.6.6
+      '@swordjs/h3': 0.7.6
       '@swordjs/sword-framework': workspace:*
       '@swordjs/sword-framework-cli': workspace:*
       '@types/node': ^17.0.24
+      esbuild: ^0.14.27
+      esbuild-register: ^3.3.3
       typescript: ^4.6.3
     dependencies:
+      '@swordjs/h3': 0.7.6
       '@swordjs/sword-framework': link:../packages/runtime
     devDependencies:
       '@dcloudio/types': 2.6.12
       '@swordjs/sword-framework-cli': link:../packages/cli
       '@types/node': 17.0.45
+      esbuild: 0.14.47
+      esbuild-register: 3.3.3_esbuild@0.14.47
       typescript: 4.7.4
 
   packages/cli:
@@ -2096,7 +2102,6 @@ packages:
       esbuild: '>=0.12 <1'
     dependencies:
       esbuild: 0.14.47
-    dev: false
 
   /esbuild-sunos-64/0.13.15:
     resolution: {integrity: sha512-lbivT9Bx3t1iWWrSnGyBP9ODriEvWDRiweAs69vI+miJoeKwHWOComSRukttbuzjZ8r1q0mQJ8Z7yUsDJ3hKdw==}
