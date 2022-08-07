@@ -21,6 +21,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.22.0",
     "@types/node": "^14.18.12",
+    "@types/write": "^2.0.1",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "eslint": "^7.32.0",
@@ -37,6 +38,7 @@
   "dependencies": {
     "@swordjs/h3": "^0.7.6",
     "mri": "^1.2.0",
-    "ufo": "^0.8.4"
+    "ufo": "^0.8.4",
+    "write": "^2.0.0"
   }
 }

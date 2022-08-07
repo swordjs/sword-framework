@@ -7,6 +7,7 @@ importers:
       '@changesets/cli': ^2.22.0
       '@swordjs/h3': ^0.7.6
       '@types/node': ^14.18.12
+      '@types/write': ^2.0.1
       '@typescript-eslint/eslint-plugin': ^4.33.0
       '@typescript-eslint/parser': ^4.33.0
       eslint: ^7.32.0
@@ -21,13 +22,16 @@ importers:
       ufo: ^0.8.4
       unbuild: ^0.7.4
       vitest: latest
+      write: ^2.0.0
     dependencies:
       '@swordjs/h3': 0.7.6
       mri: 1.2.0
       ufo: 0.8.4
+      write: 2.0.0
     devDependencies:
       '@changesets/cli': 2.23.0
       '@types/node': 14.18.21
+      '@types/write': 2.0.1
       '@typescript-eslint/eslint-plugin': 4.33.0_3ekaj7j3owlolnuhj3ykrb7u7i
       '@typescript-eslint/parser': 4.33.0_hxadhbs2xogijvk7vq4t2azzbu
       eslint: 7.32.0
@@ -64,7 +68,6 @@ importers:
 
   packages/cli:
     specifiers:
-      '@swordjs/sword-framework': workspace:*
       '@types/download': ^8.0.1
       '@types/mv': ^2.1.2
       chalk: ^4.1.2
@@ -82,7 +85,6 @@ importers:
       unbuild: ^0.6.9
       unconfig: ^0.3.1
     dependencies:
-      '@swordjs/sword-framework': link:../runtime
       chalk: 4.1.2
       chokidar: 3.5.3
       consola: 2.15.3
@@ -925,6 +927,12 @@ packages:
     resolution: {integrity: sha512-RlzDAnGqUoo9wS6d4tthNyAdZLxOIddLiX3djMoWk29jFfSA1yJbIwr0epBYqqYarWB6s2Z+4VaZCQ80Jaa3kA==}
     dev: true
 
+  /@types/write/2.0.1:
+    resolution: {integrity: sha512-8eG49vz1AF6RxC/te02BvsnPhHw7ONW+/D47Jz2xXh7zLeU3EHWDmy8XviZ2ZQs47Hwc094SoR80Qn+d0RkYqA==}
+    dependencies:
+      '@types/node': 18.0.0
+    dev: true
+
   /@typescript-eslint/eslint-plugin/4.33.0_3ekaj7j3owlolnuhj3ykrb7u7i:
     resolution: {integrity: sha512-aINiAxGVdOl1eJyVjaWn/YcVAq4Gi/Yo35qHGCnqbWVz61g39D0h23veY/MA0rFFGfxK7TySg2uwDeNv+JgVpg==}
     engines: {node: ^10.12.0 || >=12.0.0}
@@ -1056,6 +1064,13 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
     dev: true
+
+  /add-filename-increment/1.0.0:
+    resolution: {integrity: sha512-pFV8VZX8jxuVMIycKvGZkWF/ihnUubu9lbQVnOnZWp7noVxbKQTNj7zG2y9fXdPcuZ6lAN3Drr517HaivGCjdQ==}
+    engines: {node: '>=8'}
+    dependencies:
+      strip-filename-increment: 2.0.1
+    dev: false
 
   /agent-base/6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
@@ -4573,6 +4588,11 @@ packages:
       is-natural-number: 4.0.1
     dev: false
 
+  /strip-filename-increment/2.0.1:
+    resolution: {integrity: sha512-+v5xsiTTsdYqkPj7qz1zlngIsjZedhHDi3xp/9bMurV8kXe9DAr732gNVqtt4X8sI3hOqS3nlFfps5gyVcux6w==}
+    engines: {node: '>=8'}
+    dev: false
+
   /strip-final-newline/2.0.0:
     resolution: {integrity: sha512-BrpvfNAE3dcvq7ll3xVumzjKjZQ5tI1sEUIKr3Uoks0XUl45St3FlatVqef9prk4jRDzhW6WZg+3bk93y6pLjA==}
     engines: {node: '>=6'}
@@ -5142,6 +5162,13 @@ packages:
 
   /wrappy/1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
+
+  /write/2.0.0:
+    resolution: {integrity: sha512-yam9TAqN8sAZokECAejo9HpT2j2s39OgK8i8yxadrFBVo+iSWLfnipRVFulfAw1d2dz5vSuGmlMHYRKG4fysOA==}
+    engines: {node: '>=10'}
+    dependencies:
+      add-filename-increment: 1.0.0
+    dev: false
 
   /xtend/4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}

@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { resolve } from 'path';
+import write from 'write';
 
 /**
  * 遍历资源目录，去获得无限级下的文件
@@ -50,14 +51,23 @@ export const isSymlink = (path: string) => {
  */
 export const writeFileRecursive = (path: string, buffer: string) => {
   return new Promise((resolve, reject) => {
-    const lastPath = path.substring(0, path.lastIndexOf('/'));
-    try {
-      fs.mkdirSync(lastPath, { recursive: true });
-      fs.writeFileSync(path, buffer);
-    } catch (error) {
-      reject(error);
-    }
-    resolve(null);
+    write(path, buffer, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(null);
+      }
+    });
+    // const lastPath = path.substring(0, path.lastIndexOf('/'));
+    // try {
+    //   // 递归创建文件夹
+
+    //   fs.mkdirSync(lastPath, { recursive: true });
+    //   fs.writeFileSync(path, buffer);
+    // } catch (error) {
+    //   reject(error);
+    // }
+    // resolve(null);
   });
 };
 
