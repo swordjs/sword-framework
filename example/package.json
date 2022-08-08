@@ -1,6 +1,6 @@
 {
   "name": "@swordjs/sword-framework-example",
-  "version": "1.2.14",
+  "version": "1.2.15",
   "description": "this is a sword framework example",
   "publishConfig": {
     "access": "public",
@@ -21,6 +21,7 @@
     "@swordjs/h3": "0.7.6"
   },
   "devDependencies": {
+    "@swordjs/sword-framework-cli": "workspace:*",
     "@dcloudio/types": "^2.6.6",
     "@types/node": "^17.0.24",
     "esbuild": "^0.14.27",
