@@ -36,8 +36,8 @@ export default async (args: Argv<CommandConfig>) => {
     if (err) {
       throw err;
     }
-    // rm 删除原目录
-    spawnSync('rm', ['-rf', now]);
+    // windows中使用del删除
+    spawnSync(process.platform === 'win32' ? 'del' : 'rm', ['-rf', now]);
     // 初始化项目成功
     consola.success(`初始化${(project as any)['value']}项目成功⚡️`);
     consola.info(`你完全可以使用pnpm,yarn,npm安装项目（我就不给你装了，我也不知道你喜欢什么❤️  ）`);
