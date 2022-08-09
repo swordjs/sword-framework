@@ -30,7 +30,7 @@ export const traverseSourceDir = (dir: string): string[][] => {
 // 获取指定path下所有的文件
 export const getFilesByDirPath = (path: string) => {
   return fs.readdirSync(path).filter(function (file) {
-    return fs.statSync(path + '/' + file);
+    return fs.statSync(resolve(path, file));
   });
 };
 
@@ -80,7 +80,7 @@ export const delDir = (path: string) => {
   if (fs.existsSync(path)) {
     files = fs.readdirSync(path);
     files.forEach((file, index) => {
-      const curPath = path + '/' + file;
+      const curPath = resolve(path, file);
       if (fs.statSync(curPath).isDirectory()) {
         delDir(curPath); //递归删除文件夹
       } else {
@@ -103,8 +103,8 @@ export const copyDir = (source: string, target: string) => {
     fs.mkdirSync(target);
   }
   files.forEach((file) => {
-    const currentSource = source + '/' + file;
-    const currentTarget = target + '/' + file;
+    const currentSource = resolve(source, file);
+    const currentTarget = resolve(target, file);
     if (fs.statSync(currentSource).isDirectory()) {
       fs.mkdirSync(currentTarget);
       copyDir(currentSource, currentTarget);
