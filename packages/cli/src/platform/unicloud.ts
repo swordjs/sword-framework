@@ -1,4 +1,4 @@
-import { resolve } from 'path';
+import { resolve, join } from 'path';
 import { symlink, existsSync, lstatSync, readFileSync, unlinkSync } from 'fs';
 import log from '../log';
 import { build } from '../build';
@@ -20,24 +20,23 @@ const getTargetPath = () => {
 
 // 在源代码中添加指定的代码片段
 const addCode = async (args: Argv<CommandConfig>) => {
-  const path = `.sword/${args._}/unicloud/src/index.js`;
-  console.log(resolve(process.cwd(), path));
+  const _path = join('.sword', args._[0] as unknown as string, 'unicloud', 'src', 'index.js');
   // 在源代码中添加默认导出的代码片段
   await writeFileRecursive(
-    resolve(process.cwd(), path),
-    `${readFileSync(resolve(process.cwd(), path)).toString()}
-module.exports = async (e, c) => {
-  let { event, context } = await import_sword_framework.useUnicloudApp(e, c);
-  const validateResult = await import_sword_framework.useUnicloudValidateEvent(event, context);
-  // 判断校验结果是否严格等于true
-  if (validateResult !== true) {
-    return validateResult;
-  }
-  const { apiMap } = await import_sword_framework.useGetApiMap({
-    apiPath: event.route.split("?")[0]
-  })
-  return await import_sword_framework.useUnicloudTriggerApi(event, context, apiMap)
-}`
+    resolve(process.cwd(), _path),
+    `${readFileSync(resolve(process.cwd(), _path)).toString()}
+  module.exports = async (e, c) => {
+    let { event, context } = await import_sword_framework.useUnicloudApp(e, c);
+    const validateResult = await import_sword_framework.useUnicloudValidateEvent(event, context);
+    // 判断校验结果是否严格等于true
+    if (validateResult !== true) {
+      return validateResult;
+    }
+    const { apiMap } = await import_sword_framework.useGetApiMap({
+      apiPath: event.route.split("?")[0]
+    })
+    return await import_sword_framework.useUnicloudTriggerApi(event, context, apiMap)
+  }`
   );
 };
 
