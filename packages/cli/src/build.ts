@@ -54,7 +54,7 @@ export const build = async (
   }
   // 将packge.json输出到.sword目录中
   if (!buildOptions.skipPackageJson) {
-    writeFileRecursive(resolve(process.cwd(), `${buildOptions.outPath}/package.json`), readFileSync(resolve(process.cwd(), 'package.json')).toString());
+    await writeFileRecursive(resolve(process.cwd(), `${buildOptions.outPath}/package.json`), readFileSync(resolve(process.cwd(), 'package.json')).toString());
   }
   // 编译proto，并且把json输出到.sword目录中
   // apiPaths是代表了有效api的index.ts路径，我们只需要把路径传递给esbuild即可
@@ -89,7 +89,7 @@ export default async (args: Argv<CommandConfig>) => {
         success: () => log.success(`[server]📦 打包成功`),
         error: () => log.err(`[server]📦 打包出现未知问题`)
       });
-    } else if (args.platform === 'unicloud') buildUnicloudApp(args);
+    } else if (args.platform === 'unicloud') await buildUnicloudApp(args);
   } catch (e) {
     throw log.err(e as Error);
   }

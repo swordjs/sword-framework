@@ -92,10 +92,10 @@ export default (args: Argv<CommandConfig>) => {
     if (existsSync(databasePath) && lstatSync(databasePath).isDirectory()) {
       // 拿到database文件夹下的所有文件
       const files = readdirSync(databasePath).filter((f) => f.includes('schema.json'));
-      files.map((f) => {
+      files.map(async (f) => {
         const complieResult = complie(`${databasePath}/${f}`);
         const tsName = unicloudPath + `/typings/database/${f.replace('schema.json', '')}d.ts`;
-        writeFileRecursive(tsName, complieResult);
+        await writeFileRecursive(tsName, complieResult);
         // ts文件编译成功
         log.success(`${f} complie success -> ${tsName}`);
       });

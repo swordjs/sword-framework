@@ -24,7 +24,7 @@ export const presetApi = async (sourceDir: string, parentDir: string, dir: strin
   const _parentDir = parentDir.split('/');
   const cwd = process.cwd();
   // 生成proto
-  writeFileRecursive(
+  await writeFileRecursive(
     `${resolve(cwd, sourceDir, 'api', ..._parentDir, dir, 'proto.ts')}`,
     `export interface ReqParams {}
 export interface ReqQuery {}

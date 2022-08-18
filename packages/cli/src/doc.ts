@@ -338,12 +338,12 @@ const outputMarkdown = async () => {
     // 给markdown拼接父标题
     str += `## ${key} \n ${markdownMap[key]}`;
   }
-  writeFileRecursive(resolve(process.cwd(), `docs`, `api.md`), str);
+  await writeFileRecursive(resolve(process.cwd(), `docs`, `api.md`), str);
   log.success('生成markdown成功');
 };
 
 // 输出openapi文档到指定目录
 const outputOpenApi = async () => {
-  writeFileRecursive(resolve(process.cwd(), `docs`, `openapi.json`), JSON.stringify(openApiJson));
+  await writeFileRecursive(resolve(process.cwd(), `docs`, `openapi.json`), JSON.stringify(openApiJson));
   log.success('生成openapi.json成功');
 };
