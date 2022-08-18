@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { resolve, join } from 'path';
 import { createRequire } from 'module';
 import { traverseSourceDir } from '~util/file';
 import { getSourcePath } from '~util/path';
@@ -33,8 +33,8 @@ export const getApiMap = async (params?: {
 }> => {
   const { dir = 'src', apiDir = 'api' } = params ?? {};
   // 获取api.json
-  const apiJson = JSON.parse(readFileSync(resolve('src', 'api.json')).toString()) as ApiJSON;
-  const sourcePath = getSourcePath(`${dir}/${apiDir}`);
+  const apiJson = JSON.parse(readFileSync(getSourcePath(join('src', 'api.json'))).toString()) as ApiJSON;
+  const sourcePath = getSourcePath(join(dir, apiDir));
   const require = createRequire(import.meta.url);
   // 构建API Map
   const apiMap: Record<string, Map> = {};
