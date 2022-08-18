@@ -46,11 +46,11 @@ const start = (args: Argv<CommandConfig>) => {
  * @param {string} sourceDir
  * @param {string} dir
  */
-const generatePreset = (sourceDir: string, parentDir: string, dir: string) => {
+const generatePreset = async (sourceDir: string, parentDir: string, dir: string) => {
   // 删除前缀后的root根节点路由
   const _dir = dir.slice(1);
   try {
-    const [cwd, _parentDir] = presetApi(sourceDir, parentDir, dir);
+    const [cwd, _parentDir] = await presetApi(sourceDir, parentDir, dir);
     renameSync(resolve(cwd, sourceDir, 'api', ..._parentDir, dir), resolve(cwd, sourceDir, 'api', ..._parentDir, _dir));
   } catch (error) {
     return log.err(`API创建失败, ${error as Error}`);
@@ -84,7 +84,7 @@ const listenApiSource = (args: Argv<CommandConfig>) => {
             // 判断当前新建的文件夹是否有前缀
             if (prefix === dir[0]) {
               // 自动生成预设置
-              generatePreset('src', parentDir, dir);
+              await generatePreset('src', parentDir, dir);
             }
             break;
           case 'change':

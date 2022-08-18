@@ -39,7 +39,8 @@ export const getApiMap = async (
     delete require.cache[modulePath];
     if (['index.ts', 'proto.ts'].includes(d)) {
       // apiPath 比如hello/detail 诸如此类
-      const apiPath = path.substring(path.lastIndexOf(apiDir)).substring(apiDir.length);
+      // 如果在windows下, 则路径中的\被转义成\\, 所以需要进行转义
+      const apiPath = path.substring(path.lastIndexOf(apiDir)).substring(apiDir.length).replace(/\\/g, '/');
       // 执行函数，获取instruct指示器
       if (d === 'index.ts') {
         apiPaths.add(apiPath);

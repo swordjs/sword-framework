@@ -18,7 +18,7 @@ export default (args: Argv<CommandConfig>) => {
   }
 };
 
-export const presetApi = (sourceDir: string, parentDir: string, dir: string): [string, string[]] => {
+export const presetApi = async (sourceDir: string, parentDir: string, dir: string): Promise<[string, string[]]> => {
   // 删除前缀后的root根节点路由
   // 处理parnetDir的路径，使之能够通过/进行分割成多个文件夹，比如/level1/level2 会被分割成['level1', 'level2']，这会让resolve更好工作
   const _parentDir = parentDir.split('/');
@@ -34,7 +34,7 @@ export interface Res {
 `
   );
   // 生成API
-  writeFileRecursive(
+  await writeFileRecursive(
     `${resolve(cwd, sourceDir, 'api', ..._parentDir, dir, 'index.ts')}`,
     `import { useApi } from '@swordjs/sword-framework';
 import { ReqQuery, ReqParams, Res } from './proto';
