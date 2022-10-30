@@ -1,5 +1,11 @@
 # @swordjs/sword-framework-cli
 
+## 1.5.5
+
+### Patch Changes
+
+- fix api route error in windows
+
 ## 1.5.4
 
 ### Patch Changes

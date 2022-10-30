@@ -53,7 +53,9 @@ export const getApiMap = async (params?: {
       if (module.default || module.main) {
         const { instruct, handler }: HttpApiReturn<any> = module.default ?? module.main;
         instruct.forEach((value, key) => {
-          const _key = getKey(`/${apiDir}`, apiPath, key);
+          let _key = getKey(`/${apiDir}`, apiPath, key);
+          // 在windows环境下, /会被转义为\\, 所以需要转义为/
+          _key = _key.replace(/\\/g, '/');
           // 缓存map的value对象
           const mapValue: Map = {
             sourcePath,
