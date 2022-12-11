@@ -1,3 +1,4 @@
+import { PackageJson } from '#types/package';
 export interface Config {
   unicloud?: {
     link: string;
@@ -5,14 +6,12 @@ export interface Config {
   // 共享目录
   share?: {
     // share目录的名称
-    dirName: string;
+    dirName?: string;
     // share目录的路径
     path?: string;
     type?: {
       dirName?: string;
-      package?: {
-        [key: string]: any
-      }
+      package?: PackageJson
     }
   }
 }
