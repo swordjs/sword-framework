@@ -3,6 +3,7 @@ import { symlink, existsSync, lstatSync, readFileSync, unlinkSync } from 'fs';
 import log from '../log';
 import { build } from '../build';
 import { delDir, writeFileRecursive, copyDir } from '~util/file';
+import { getPackageJson } from "~util/package"
 import { configData } from '.././config';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '#types/config';
@@ -75,11 +76,9 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
   const targetPath = getTargetPath();
   const sourcePath = resolve(process.cwd(), `./.sword/build/unicloud`);
   try {
-    // 判断target中是否存在packagejson
-    const packageJsonPath = resolve(targetPath, '../package.json');
-    if (existsSync(packageJsonPath)) {
-      // 存在就获取packagejson
-      const packageJson = JSON.parse(readFileSync(packageJsonPath).toString());
+    const packageData = getPackageJson(targetPath);
+    if (packageData) {
+      const { package: packageJson, path: packageJsonPath } = packageData;
       // 判断json中的dependencies是否存在@swordjs/sword-framework
       if (!packageJson.dependencies['@swordjs/sword-framework']) {
         packageJson.dependencies['@swordjs/sword-framework'] = 'latest';
@@ -94,7 +93,7 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
         if (lstatSync(targetPath).isSymbolicLink()) {
           unlinkSync(targetPath);
         }
-      } catch (error) {}
+      } catch (error) { }
       // 在打包之前, 需要删除之前的产物
       delDir(sourcePath);
       // 打包之前替换shim
@@ -142,7 +141,7 @@ const link = async () => {
     if (lstatSync(targetPath).isDirectory()) {
       delDir(targetPath);
     }
-  } catch (error) {}
+  } catch (error) { }
 
   const sourcePath = resolve(process.cwd(), `./.sword/dev/unicloud`);
   // 初始化unicloud shim

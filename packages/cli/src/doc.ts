@@ -1,13 +1,12 @@
-import { access, readFileSync, constants } from 'fs';
-import { cwd } from 'process';
 import { writeFileRecursive } from '~util/file';
 import { generateSchema } from './core/api';
 import { getApiMap } from '@runtime/core/map';
 import log from './log';
 import { resolve } from 'path';
 import { OpenAPIV3_1 } from 'openapi-types';
+import { getPackageJson } from "~util/package"
 import type { Argv } from 'mri';
-import type { CommandConfig } from '../../../typings/config';
+import type { CommandConfig } from '#types/config';
 import type { Map } from '@runtime/core/map';
 
 type AccepptProtoName = ['ReqParams', 'ReqQuery', 'Res'];
@@ -53,26 +52,6 @@ const accepptProtoNames: AccepptProtoName = ['ReqParams', 'ReqQuery', 'Res'];
 let apiMap: Record<string, Map> = {};
 // 定义一个以父路由为key，value为markdown文档的对象
 const markdownMap: Record<string, string> = {};
-
-// 读取packagejson信息
-const getPackageJson = () => {
-  return new Promise((r, j) => {
-    // 判断是否存在packagejson
-    access(resolve(cwd(), 'package.json'), constants.F_OK, (err) => {
-      if (err) {
-        // 不存在
-        j('根目录没有package.json文件，生成openapi失败');
-      } else {
-        try {
-          const packageInfo = JSON.parse(readFileSync(resolve(cwd(), 'package.json')).toString());
-          r(packageInfo);
-        } catch (error) {
-          j(error);
-        }
-      }
-    });
-  });
-};
 
 // 定义一个openapi格式的json
 const openApiJson: OpenAPIV3_1.Document = {
@@ -129,16 +108,17 @@ export default async (args: Argv<CommandConfig>) => {
     outputMarkdown();
     outputOpenApi();
     // 处理packagejson
-    try {
-      const packageInfo: any = await getPackageJson();
+    const packageData = getPackageJson();
+    if (packageData) {
+      const { package: packageInfo} = packageData;
       // 给openapi的info赋值
       for (const key in openApiJson.info) {
         if (packageInfo[key]) {
           (openApiJson.info as any)[key] = packageInfo[key];
         }
       }
-    } catch (error) {
-      log.err(error as Error);
+    }else{
+      log.err("未找到package.json文件")
     }
   } catch (error) {
     log.err('生成文档错误');
