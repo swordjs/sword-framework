@@ -1,7 +1,7 @@
 import { commandArgs } from './config';
-import { env as uniclouEnv } from '../packages/runtime/src/env/unicloud';
-import type { CommandConfig } from '../typings/config';
 import { resolve } from 'path';
+import { UnicloudEnv } from '#types/env';
+import type { CommandConfig } from '../typings/config';
 
 /**
  *
@@ -12,7 +12,7 @@ import { resolve } from 'path';
  */
 export const getSourcePath = (path: string) => {
   const pathMap: Record<CommandConfig['platform'], () => string> = {
-    unicloud: () => resolve(process.env[uniclouEnv.symlinkSourcePath] as string, path),
+    unicloud: () => resolve(process.env[UnicloudEnv.symlinkSourcePath] as string, path),
     server: () => resolve(path)
   };
   return pathMap[commandArgs.platform]();

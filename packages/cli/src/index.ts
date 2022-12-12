@@ -8,13 +8,14 @@ import build from './build';
 import init from './init';
 import doc from './doc';
 import util from './util';
+import share from "./share"
 import packageJSON from './../package.json';
 import { processShim } from './shim';
 import { initConfig } from './config';
 import { commandArgs as args } from '../../../util/config';
 esbuildRegister.register();
 
-type commands = 'dev' | 'build' | 'init' | 'doc' | 'util';
+type commands = 'dev' | 'build' | 'init' | 'doc' | 'share' | 'util';
 
 async function main() {
   if (args['v']) {
@@ -33,6 +34,7 @@ async function main() {
     build,
     init,
     doc,
+    share,
     util
   };
   if (args._[0]) {

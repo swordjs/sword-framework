@@ -1,4 +1,4 @@
-import { isDev, isProd } from '../core/env';
+import { isDev, isProd } from '~util/env';
 
 /**
  * 获取当前环境是否是dev开发模式 (永远与useIsProd互斥)
