@@ -13,6 +13,7 @@ import packageJSON from './../package.json';
 import { processShim } from './shim';
 import { initConfig } from './config';
 import { commandArgs as args } from '../../../util/config';
+import { resolve } from 'path';
 esbuildRegister.register();
 
 type commands = 'dev' | 'build' | 'init' | 'doc' | 'share' | 'util';
@@ -25,9 +26,13 @@ async function main() {
   // 解析config参数
   await initConfig();
   if (['dev', 'build'].includes(args._[0])) {
-    // 加载shim
+    // 创建shim
     processShim(args._[0] as 'dev' | 'build');
   }
+  // 加载可能已经预定义的shim
+  try {
+    require(resolve(process.cwd(), './.sword/shim/process.js'));
+  } catch (error) {}
   // 解析命令行参数
   const cliHandler = {
     dev,
