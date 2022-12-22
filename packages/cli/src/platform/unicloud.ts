@@ -80,8 +80,8 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
     if (packageData) {
       const { package: packageJson, path: packageJsonPath } = packageData;
       // 判断json中的dependencies是否存在@swordjs/sword-framework
-      if (!packageJson.dependencies['@swordjs/sword-framework']) {
-        packageJson.dependencies['@swordjs/sword-framework'] = 'latest';
+      if (!packageJson.dependencies!['@swordjs/sword-framework']) {
+        packageJson.dependencies!['@swordjs/sword-framework'] = 'latest';
       }
       // 将packagejson写入
       await writeFileRecursive(packageJsonPath, JSON.stringify(packageJson, null, 4));

@@ -17,8 +17,7 @@ const defaultConfig: Config = {
       package: {
         name: `${packageData?.package.name}-type`,
         version: packageData?.package.version,
-        description: `${packageData?.package.name}-type`,
-        types: "./src/index.d.ts"
+        description: `${packageData?.package.name}-type`
       }
     }
   }
