@@ -13,5 +13,6 @@ export interface Config {
       dirName?: string;
       package?: PackageJson
     }
-  }
+  },
+  language?: "CN" | "EN";
 }

@@ -20,7 +20,8 @@ const defaultConfig: Config = {
         description: `${packageData?.package.name}-type`
       }
     }
-  }
+  },
+  language: "EN"
 };
 
 export const initConfig = async () => {
