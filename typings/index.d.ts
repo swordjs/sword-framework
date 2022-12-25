@@ -1,5 +1,4 @@
 import './pipeline';
-import './hook';
 import type { LogType } from './log';
 import type { UnicloudEvent } from './unicloud';
 import type * as H3 from '@swordjs/h3';
