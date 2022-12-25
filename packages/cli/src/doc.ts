@@ -5,7 +5,8 @@ import log from './log';
 import { resolve } from 'path';
 import { OpenAPIV3_1 } from 'openapi-types';
 import { getPackageJson } from "~util/package"
-import type { Argv } from 'mri';
+import { configData } from "./config"
+import type Mri from 'mri';
 import type { CommandConfig } from '#types/config';
 import type { Map } from '@runtime/core/map';
 
@@ -26,7 +27,7 @@ type Proto = {
   [key: string]: unknown;
 };
 
-type PropertiesAstReturn = {
+export type PropertiesAstReturn = {
   id: number;
   name: string | null;
   type: {
@@ -37,7 +38,7 @@ type PropertiesAstReturn = {
   };
 }[];
 
-type transProtoReturn = {
+export type TransProtoReturn = {
   url: string;
   title?: string;
   desc?: string;
@@ -68,7 +69,7 @@ const openApiJson: OpenAPIV3_1.Document = {
   }
 };
 
-export default async (args: Argv<CommandConfig>) => {
+export default async (args: Mri.Argv<CommandConfig>) => {
   try {
     log.info('开始生成文档');
     // 生成api数据，用于获取指示器等详细api信息
@@ -87,12 +88,12 @@ export default async (args: Argv<CommandConfig>) => {
         markdownMap[parentRoute] = ``;
       }
       const protoData = apiResult[key].proto;
-      const result: transProtoReturn = {
+      const result: TransProtoReturn = {
         url: key,
         ReqParams: [],
         ReqQuery: [],
         Res: []
-      } as any;
+      };
       transAst(protoData, result);
       // 编译markdown文档
       markdownMap[parentRoute] += await compileMarkdown(result, markdownMap[parentRoute]);
@@ -110,14 +111,14 @@ export default async (args: Argv<CommandConfig>) => {
     // 处理packagejson
     const packageData = getPackageJson();
     if (packageData) {
-      const { package: packageInfo} = packageData;
+      const { package: packageInfo } = packageData;
       // 给openapi的info赋值
       for (const key in openApiJson.info) {
         if (packageInfo[key]) {
           (openApiJson.info as any)[key] = packageInfo[key];
         }
       }
-    }else{
+    } else {
       log.err("未找到package.json文件")
     }
   } catch (error) {
@@ -127,7 +128,7 @@ export default async (args: Argv<CommandConfig>) => {
 };
 
 // 从ast转换数据
-const transAst = async (protoData: Record<string, unknown>, result: transProtoReturn) => {
+const transAst = async (protoData: Record<string, unknown>, result: TransProtoReturn) => {
   for (const protoKey in protoData) {
     const proto = protoData[protoKey] as Proto;
     for (const acceptProtoName of accepptProtoNames) {
@@ -151,7 +152,7 @@ const parseMultiLineComment = (comment: string | undefined) => {
 };
 
 // 解析注释
-const parseComment = (proto: Proto, result: transProtoReturn, acceptProtoName: AccepptProtoName[number]) => {
+const parseComment = (proto: Proto, result: TransProtoReturn, acceptProtoName: AccepptProtoName[number]) => {
   // 当前如果是params的节点，解析顶层注释时要设置title，desc等等，因为params的顶层代表了整个接口的说明
   // 通过换行符分割注释
   const [title, desc] = parseMultiLineComment(proto.comment);
@@ -195,7 +196,11 @@ const parseComment = (proto: Proto, result: transProtoReturn, acceptProtoName: A
 };
 
 // 编译markdown文档
-const compileMarkdown = async (result: transProtoReturn, markdown: string) => {
+const compileMarkdown = async (result: TransProtoReturn, markdown: string) => {
+  // 判断config中是否有markdown的配置
+  if (configData.doc.markdown) {
+    return await configData.doc.markdown.compile(result, markdown, { apiMap });
+  }
   const handleMarkdownTable = (data: PropertiesAstReturn) => {
     return data
       .map(
@@ -231,7 +236,7 @@ const compileMarkdown = async (result: transProtoReturn, markdown: string) => {
 };
 
 // 编译openapi
-const compileOpenApi = (result: transProtoReturn, parentRoute: string): OpenAPIV3_1.Document['paths'] => {
+const compileOpenApi = (result: TransProtoReturn, parentRoute: string): OpenAPIV3_1.Document['paths'] => {
   const apiResult: OpenAPIV3_1.Document['paths'] = {};
   const assignObjArray = (data: Record<string, unknown>[]) => {
     const res: any = {};
@@ -313,6 +318,9 @@ const compileOpenApi = (result: transProtoReturn, parentRoute: string): OpenAPIV
 
 // 输出markdown文档到指定目录
 const outputMarkdown = async () => {
+  if(configData.doc.markdown){
+    return configData.doc.markdown.output(markdownMap);
+  }
   let str = '';
   for (const key in markdownMap) {
     // 给markdown拼接父标题
