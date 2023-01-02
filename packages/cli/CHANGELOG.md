@@ -1,5 +1,12 @@
 # @swordjs/sword-framework-cli
 
+## 1.6.0
+
+### Minor Changes
+
+- 1. add custom doc compile and output for markdown
+  2. Preliminary completion of the extension of the old solution for front-end and back-end type synchronization #15
+
 ## 1.5.5
 
 ### Patch Changes
