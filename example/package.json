@@ -1,6 +1,6 @@
 {
   "name": "@swordjs/sword-framework-example",
-  "version": "1.2.16",
+  "version": "1.2.17",
   "description": "this is a sword framework example",
   "publishConfig": {
     "access": "public",
@@ -12,17 +12,18 @@
     "build": "sword build",
     "build:unicloud": "sword build --platform=unicloud",
     "server": "cd ./.sword/build/server && node ./src/index.js",
-    "doc": "sword doc"
+    "doc": "sword doc",
+    "share": "sword share"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@swordjs/sword-framework": "workspace:*",
-    "@swordjs/h3": "0.7.6"
+    "@swordjs/h3": "0.7.6",
+    "@swordjs/sword-framework": "workspace:*"
   },
   "devDependencies": {
-    "@swordjs/sword-framework-cli": "workspace:*",
     "@dcloudio/types": "^2.6.6",
+    "@swordjs/sword-framework-cli": "workspace:*",
     "@types/node": "^17.0.24",
     "esbuild": "^0.14.27",
     "esbuild-register": "^3.3.3",
