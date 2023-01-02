@@ -1,5 +1,5 @@
 import { PackageJson } from '#types/package';
-import type { TransProtoReturn } from "../src/doc"
+import type { TransProtoReturn } from '../src/doc';
 import type { Map } from '@runtime/core/map';
 
 export interface Config {
@@ -14,16 +14,16 @@ export interface Config {
     path?: string;
     type?: {
       dirName?: string;
-      package?: PackageJson
-    }
-  },
+      package?: PackageJson;
+    };
+  };
   // 编译文档的配置
   doc?: {
     markdown?: {
       // 每一个api都会被调用一次编译函数, 传入的参数是api的信息, 返回的则是现有的markdown文档
-      compile: (result: TransProtoReturn, markdown: string, options: { apiMap: Record<string, Map> }) => string,
-      output: (markdownMap: Record<string, string>) => void
-    }
-  }
-  language?: "CN" | "EN";
+      compile: (result: TransProtoReturn, markdown: string, options: { apiMap: Record<string, Map> }) => string;
+      output: (markdownMap: Record<string, string>) => void;
+    };
+  };
+  language?: 'CN' | 'EN';
 }
