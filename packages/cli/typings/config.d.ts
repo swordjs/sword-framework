@@ -23,9 +23,6 @@ export interface Config {
       // 每一个api都会被调用一次编译函数, 传入的参数是api的信息, 返回的则是现有的markdown文档
       compile: (result: TransProtoReturn, markdown: string, options: { apiMap: Record<string, Map> }) => string,
       output: (markdownMap: Record<string, string>) => void
-    },
-    openapi?: {
-
     }
   }
   language?: "CN" | "EN";
