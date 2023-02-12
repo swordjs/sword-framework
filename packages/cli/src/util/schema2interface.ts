@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, existsSync, lstatSync } from 'fs';
 import { resolve } from 'path';
 import { camelCase } from '~util/index';
 import { writeFileRecursive } from '~util/file';
-import log from './../log';
+import log from '../core/log';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '#types/config';
 

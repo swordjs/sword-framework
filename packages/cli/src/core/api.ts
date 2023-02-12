@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 import { TSBufferProtoGenerator } from 'tsbuffer-proto-generator';
 import { traverseSourceDir, writeFileRecursive } from '~util/file';
 import { getKey } from '~util/map';
-import log from '../log';
+import log from './log';
 import { existsSync } from 'fs';
 import type { HttpApiReturn, HttpApiInstructType } from '#types/index';
 

@@ -1,3 +1,3 @@
 ## @swordjs/sword-plugin-server
 
-sword框架内置在运行server上的插件
+sword 框架内置在运行 server 上的插件

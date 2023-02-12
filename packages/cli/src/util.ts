@@ -1,4 +1,4 @@
-import log from './log';
+import log from './core/log';
 import schema2interface from './util/schema2interface';
 import clearShim from './util/clearShim';
 import presetApi from './util/presetApi';

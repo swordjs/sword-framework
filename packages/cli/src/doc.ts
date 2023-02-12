@@ -1,11 +1,11 @@
 import { writeFileRecursive } from '~util/file';
 import { generateSchema } from './core/api';
 import { getApiMap } from '@runtime/core/map';
-import log from './log';
+import log from './core/log';
 import { resolve } from 'path';
 import { OpenAPIV3_1 } from 'openapi-types';
-import { getPackageJson } from "~util/package"
-import { configData } from "./config"
+import { getPackageJson } from '~util/package';
+import { configData } from './core/config';
 import type Mri from 'mri';
 import type { CommandConfig } from '#types/config';
 import type { Map } from '@runtime/core/map';
@@ -119,7 +119,7 @@ export default async (args: Mri.Argv<CommandConfig>) => {
         }
       }
     } else {
-      log.err("未找到package.json文件")
+      log.err('未找到package.json文件');
     }
   } catch (error) {
     log.err('生成文档错误');
@@ -318,7 +318,7 @@ const compileOpenApi = (result: TransProtoReturn, parentRoute: string): OpenAPIV
 
 // 输出markdown文档到指定目录
 const outputMarkdown = async () => {
-  if(configData.doc.markdown){
+  if (configData.doc.markdown) {
     return configData.doc.markdown.output(markdownMap);
   }
   let str = '';

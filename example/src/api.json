@@ -44,9 +44,7 @@
       }
     },
     "path": "/Users/seho/Desktop/openSource/sword-function-framework/example/src/api/hello/index.ts",
-    "method": [
-      "GET"
-    ],
+    "method": ["GET"],
     "protoPath": "/Users/seho/Desktop/openSource/sword-function-framework/example/src/api/hello/proto.ts",
     "type": "file-system"
   }

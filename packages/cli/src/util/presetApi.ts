@@ -1,6 +1,6 @@
 import { resolve } from 'path';
 import { writeFileRecursive } from '~util/file';
-import log from './../log';
+import log from '../core/log';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '#types/config';
 

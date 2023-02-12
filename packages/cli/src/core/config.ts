@@ -1,7 +1,7 @@
 import { cwd } from 'process';
 import { loadConfig } from 'unconfig';
 import { getPackageJson } from '~util/package';
-import type { Config } from '../typings/config';
+import type { Config } from '../../typings/config';
 
 export let configData: Required<Config>;
 
@@ -10,10 +10,10 @@ const packageData = getPackageJson();
 // 默认配置的类型是非必选的config
 const defaultConfig: Config = {
   share: {
-    dirName: "share",
+    dirName: 'share',
     path: cwd(),
     type: {
-      dirName: "type",
+      dirName: 'type',
       package: {
         name: `${packageData?.package.name}-type`,
         version: packageData?.package.version,
@@ -21,7 +21,7 @@ const defaultConfig: Config = {
       }
     }
   },
-  language: "EN"
+  language: 'EN'
 };
 
 export const initConfig = async () => {
@@ -61,4 +61,4 @@ const mergeConfig = (config: Config, defaultConfig: Config) => {
   return config;
 };
 
-export type { Config } from '../typings/config';
+export type { Config } from '../../typings/config';

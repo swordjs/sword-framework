@@ -3,20 +3,20 @@
 </p>
 
 ## Sword.js (for Unicloud)
-> 面向高阶Typescript开发者的跨平台云函数框架, 我相信sword会是unicloud社区最独特也是最强的存在, 意味着unicloud的开发体验将从“ 🪓 石器时代” -> “ 💻 工业时代”
+
+> 面向高阶 Typescript 开发者的跨平台云函数框架, 我相信 sword 会是 unicloud 社区最独特也是最强的存在, 意味着 unicloud 的开发体验将从“ 🪓 石器时代” -> “ 💻 工业时
+> 代”
 
 ### 初来乍到, 简单介绍
 
 [中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
 
 这是 Sword 团队内部沉淀的第一个云函数框架，毫无疑问它完全是基于`TypeScript`开发的。除了 `framework` 核心程序之外，它为开发者提供了开箱即用的开发套件，使之能够开
-发`serverless`应用像写普通的 nodejs 程序一样简单。你可以使用它开发各个厂商的 serverless 应用，比如AWS,Aliyun,Tencent,**Dcloud (unicloud)** ...
+发`serverless`应用像写普通的 nodejs 程序一样简单。你可以使用它开发各个厂商的 serverless 应用，比如 AWS,Aliyun,Tencent,**Dcloud (unicloud)** ...
 
-
-### Dcloud-2022 插件大赛🎉
+### Dcloud-2022 插件大赛 🎉
 
 <img src="https://static.yinzhuoei.com/typecho/2022/05/17/010112482864668/WechatIMG11768.jpeg" />
-
 
 ### 特性
 
@@ -24,22 +24,21 @@
 - 🐮 支持跨平台: Server/阿里云/腾讯云/Cloudflare/AWS/**Unicloud**
 - 🕷️ 基于文件系统的路由
 - 🥷 开箱即用的开发套件
-- 📖 TS运行时类型校验
-- 📃 生成API文档，兼容markdown以及openapi3.0
+- 📖 TS 运行时类型校验
+- 📃 生成 API 文档，兼容 markdown 以及 openapi3.0
 - 😍 完全 Hook 的写法与设计
-- 🧩 Vscode插件快速提升API开发效率
-
+- 🧩 Vscode 插件快速提升 API 开发效率
 
 ### 平台
 
-| 平台     | 进度 |
-| -------- | ---- |
-| Server   | ✅   |
-| **Unicloud (支持云函数url化)** | ✅   |
-| Woker    | ⚠️   |
-| 阿里云   | ⚠️   |
-| 腾讯云   | ⚠️   |
-| AWS      | ⚠️   |
+| 平台                             | 进度 |
+| -------------------------------- | ---- |
+| Server                           | ✅   |
+| **Unicloud (支持云函数 url 化)** | ✅   |
+| Woker                            | ⚠️   |
+| 阿里云                           | ⚠️   |
+| 腾讯云                           | ⚠️   |
+| AWS                              | ⚠️   |
 
 ### 安装
 
@@ -52,6 +51,7 @@ npm i @swordjs/sword-framework
 ```bash
 npm i @swordjs/sword-framework-cli -g
 ```
+
 ### 初始化
 
 你可以更方便的初始化一个项目，它的初始化功能是由 cli 提供的，模板是[从这里](https://github.com/swordjs/sword-framework/tree/master/example)获取的。
@@ -62,9 +62,8 @@ npm run dev:unicloud
 npm run build:unicloud
 ```
 
-如果你初始化成功了🎉 , 那么就可以移步到这里[unicloud入门教程](https://www.yuque.com/docs/share/61d05a31-d679-4672-8f45-f9f19681c6b8?#), 相信我, 你会很惊讶的! 如果你要深入学习swordjs在unicloud的开发姿势, 你需要熟悉一下[中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
-
-
+如果你初始化成功了 🎉 , 那么就可以移步到这里[unicloud 入门教程](https://www.yuque.com/docs/share/61d05a31-d679-4672-8f45-f9f19681c6b8?#), 相信我, 你会很惊讶的!
+如果你要深入学习 swordjs 在 unicloud 的开发姿势, 你需要熟悉一下[中文文档](https://www.yuque.com/mlgrgm/lrf0ra/af4ngt)
 
 ### 联系我们
 

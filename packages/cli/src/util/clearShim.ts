@@ -1,6 +1,6 @@
 import { existsSync, lstatSync, readdirSync, unlinkSync } from 'fs';
 import { resolve } from 'path';
-import log from './../log';
+import log from '../core/log';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '#types/config';
 

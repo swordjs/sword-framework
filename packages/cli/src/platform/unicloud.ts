@@ -1,10 +1,10 @@
 import { resolve, join } from 'path';
 import { symlink, existsSync, lstatSync, readFileSync, unlinkSync } from 'fs';
-import log from '../log';
+import log from '../core/log';
 import { build } from '../build';
 import { delDir, writeFileRecursive, copyDir } from '~util/file';
-import { getPackageJson } from "~util/package"
-import { configData } from '.././config';
+import { getPackageJson } from '~util/package';
+import { configData } from '../core/config';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '#types/config';
 
@@ -93,7 +93,7 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
         if (lstatSync(targetPath).isSymbolicLink()) {
           unlinkSync(targetPath);
         }
-      } catch (error) { }
+      } catch (error) {}
       // 在打包之前, 需要删除之前的产物
       delDir(sourcePath);
       // 打包之前替换shim
@@ -141,7 +141,7 @@ const link = async () => {
     if (lstatSync(targetPath).isDirectory()) {
       delDir(targetPath);
     }
-  } catch (error) { }
+  } catch (error) {}
 
   const sourcePath = resolve(process.cwd(), `./.sword/dev/unicloud`);
   // 初始化unicloud shim

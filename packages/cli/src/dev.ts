@@ -6,9 +6,9 @@ import { debounce } from '~util/index';
 import { generateSchema } from './core/api';
 import { devUnicloudApp } from './platform/unicloud';
 import { presetApi } from './util/presetApi';
-import log from './log';
+import log from './core/log';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '../../../typings/config';
+import type { CommandConfig } from '#types/config';
 
 let indexcp: ChildProcess | null = null;
 
