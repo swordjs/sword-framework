@@ -1,14 +1,16 @@
 import { resolve } from 'path';
 import log from './log';
 import { writeFileRecursive } from '~util/file';
+import { env } from '#types/env';
+import type { CommandConfig } from '#types/config';
 
 // 生成process shim
-export const processShim = async (command: 'dev' | 'build') => {
+export const processShim = async (command: 'dev' | 'build', platform: CommandConfig['platform']) => {
   const shimPath = resolve(process.cwd(), './.sword/shim/process.js');
   const shim = `
   // process shim
-  process.argv = ${JSON.stringify(process.argv)}
-  process.env._sword_command = '${command}'
+  process.env.${env['swordCommand']} = '${command}'
+  process.env.${env['swordPlatform']} = '${platform}'
   `;
   await writeFileRecursive(shimPath, shim);
   log.success(`[shim:process]创建shim成功`);

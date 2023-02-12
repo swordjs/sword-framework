@@ -2,10 +2,11 @@ import { resolve } from 'path';
 import { readFileSync } from 'fs';
 import esbuild from 'esbuild';
 import { delDir } from '~util/file';
-import log from './log';
+import log from './core/log';
 import { buildUnicloudApp } from './platform/unicloud';
 import { writeFileRecursive } from '~util/file';
 import { generateSchema } from './core/api';
+import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from './core/conditional-compiler';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
 
@@ -69,7 +70,9 @@ export const build = async (
         outdir: `${buildOptions.outPath}/src`,
         mainFields: ['module', 'main'],
         minify: buildOptions.minify,
-        inject: buildOptions.inject
+        inject: buildOptions.inject,
+        plugins: [esbuildPluginConditionalCompiler(args.platform)],
+        define: esbuildDefineConditionalCompiler(args.platform)
       })
       .then(() => {
         cb.success();

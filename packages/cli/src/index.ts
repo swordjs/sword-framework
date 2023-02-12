@@ -8,11 +8,11 @@ import build from './build';
 import init from './init';
 import doc from './doc';
 import util from './util';
-import share from "./share"
+import share from './share';
 import packageJSON from './../package.json';
-import { processShim } from './shim';
-import { initConfig } from './config';
-import { commandArgs as args } from '../../../util/config';
+import { processShim } from './core/shim';
+import { initConfig } from './core/config';
+import { commandArgs as args } from '~util/config';
 import { resolve } from 'path';
 esbuildRegister.register();
 
@@ -27,7 +27,7 @@ async function main() {
   await initConfig();
   if (['dev', 'build'].includes(args._[0])) {
     // 创建shim
-    processShim(args._[0] as 'dev' | 'build');
+    processShim(args._[0] as 'dev' | 'build', args.platform);
   }
   // 加载可能已经预定义的shim
   try {
@@ -52,4 +52,4 @@ main().catch((err) => {
   process.exit(1);
 });
 
-export * from './config';
+export * from './core/config';

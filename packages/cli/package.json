@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/swordjs/sword-framework-cli#readme",
   "devDependencies": {
+    "@swordjs/esbuild-plugin-condition-comment-macro": "^1.0.1",
     "@types/download": "^8.0.1",
     "@types/mv": "^2.1.2",
     "openapi-types": "^11.0.0",
