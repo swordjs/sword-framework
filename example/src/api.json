@@ -5,7 +5,30 @@
         "type": "Interface"
       },
       "src/api/hello/proto/ReqQuery": {
-        "type": "Interface"
+        "type": "Interface",
+        "properties": [
+          {
+            "id": 0,
+            "name": "title",
+            "type": {
+              "type": "Union",
+              "members": [
+                {
+                  "id": 0,
+                  "type": {
+                    "type": "String"
+                  }
+                },
+                {
+                  "id": 1,
+                  "type": {
+                    "type": "Number"
+                  }
+                }
+              ]
+            }
+          }
+        ]
       },
       "src/api/hello/proto/Res": {
         "type": "Interface",
@@ -22,38 +45,9 @@
     },
     "path": "/Users/seho/Desktop/openSource/sword-function-framework/example/src/api/hello/index.ts",
     "method": [
-      "GET",
-      "POST",
-      "DELETE"
+      "GET"
     ],
-    "protoPath": "/Users/seho/Desktop/openSource/sword-function-framework/example/src/api/hello/proto.ts"
-  },
-  "/api/diy": {
-    "proto": {
-      "src/api/hello/proto/ReqParams": {
-        "type": "Interface"
-      },
-      "src/api/hello/proto/ReqQuery": {
-        "type": "Interface"
-      },
-      "src/api/hello/proto/Res": {
-        "type": "Interface",
-        "properties": [
-          {
-            "id": 0,
-            "name": "message",
-            "type": {
-              "type": "String"
-            }
-          }
-        ]
-      }
-    },
-    "path": "/Users/seho/Desktop/openSource/sword-function-framework/example/src/api/hello/index.ts",
-    "method": [
-      "POST",
-      "DELETE"
-    ],
-    "protoPath": "/Users/seho/Desktop/openSource/sword-function-framework/example/src/api/hello/proto.ts"
+    "protoPath": "/Users/seho/Desktop/openSource/sword-function-framework/example/src/api/hello/proto.ts",
+    "type": "file-system"
   }
 }
