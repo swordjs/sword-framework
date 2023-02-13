@@ -1,0 +1,26 @@
+{
+    "sword.js: Conditional compilation, writing code logic for a given platform": {
+        "prefix": [
+            "ifdef",
+            "@ifdef"
+        ],
+        "description": "swordjs: logic code that runs only on the specified platform.",
+        "body": [
+            "// @ifdef ${1|server,unicloud|}",
+            "$2",
+            "// @endif"
+        ]
+    },
+    "sword.js: Conditional compilation, exclude the code logic of the specified platform": {
+        "prefix": [
+            "ifndef",
+            "@ifndef"
+        ],
+        "description": "swordjs: exclude logic code that runs on the specified platform.",
+        "body": [
+            "// @ifndef ${1|server,unicloud|}",
+            "$2",
+            "// @endif"
+        ]
+    }
+}

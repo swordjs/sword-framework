@@ -12,13 +12,24 @@
     "url": "https://github.com/swordjs/sword-framework"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Snippets"
   ],
   "activationEvents": [
     "onView:Route"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "snippets": [
+      {
+				"language": "javascript",
+				"path": "./snippets.json"
+			},
+      {
+				"language": "typescript",
+				"path": "./snippets.json"
+			}
+    ],
     "viewsContainers": {
       "activitybar": [
         {
