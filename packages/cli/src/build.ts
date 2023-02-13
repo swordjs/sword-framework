@@ -7,6 +7,7 @@ import { buildUnicloudApp } from './platform/unicloud';
 import { writeFileRecursive } from '~util/file';
 import { generateSchema } from './core/api';
 import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from './core/conditional-compiler';
+import { env } from '#types/env';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
 
@@ -25,6 +26,13 @@ const defaultBuildOptions: Required<BuildOptions> = {
   inject: ['./.sword/shim/process.js']
 };
 
+const buildDefine = (args: Argv<CommandConfig>) => {
+  return {
+    ...esbuildDefineConditionalCompiler(args.platform),
+    [`process.env.${env.swordCommand}`]: `'${args._[0]}'`
+  };
+};
+
 /**
  *
  * 抽象build函数
@@ -36,7 +44,6 @@ const defaultBuildOptions: Required<BuildOptions> = {
  *   }} cb
  * @param {BuildOptions} [buildOptions]
  */
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const build = async (
   args: Argv<CommandConfig>,
   cb: {
@@ -72,7 +79,7 @@ export const build = async (
         minify: buildOptions.minify,
         inject: buildOptions.inject,
         plugins: [esbuildPluginConditionalCompiler(args.platform)],
-        define: esbuildDefineConditionalCompiler(args.platform)
+        define: buildDefine(args)
       })
       .then(() => {
         cb.success();
