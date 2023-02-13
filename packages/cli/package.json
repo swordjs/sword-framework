@@ -1,6 +1,6 @@
 {
   "name": "@swordjs/sword-framework-cli",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "",
   "types": "./lib/index.d.ts",
   "module": "./lib/index.mjs",
@@ -34,7 +34,6 @@
   },
   "homepage": "https://github.com/swordjs/sword-framework-cli#readme",
   "devDependencies": {
-    "@swordjs/esbuild-plugin-condition-comment-macro": "^1.0.1",
     "@types/download": "^8.0.1",
     "@types/mv": "^2.1.2",
     "openapi-types": "^11.0.0",
@@ -42,6 +41,7 @@
     "unbuild": "^0.6.9"
   },
   "dependencies": {
+    "@swordjs/esbuild-plugin-condition-comment-macro": "^1.0.1",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
     "consola": "^2.15.3",
