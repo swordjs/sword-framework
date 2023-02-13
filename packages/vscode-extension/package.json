@@ -3,7 +3,7 @@
   "displayName": "vscode-extension",
   "publisher": "swordjs",
   "description": "Sword.js framework helper",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "icon": "media/sword-logo.png",
   "engines": {
     "vscode": "^1.69.0"
@@ -22,13 +22,13 @@
   "contributes": {
     "snippets": [
       {
-				"language": "javascript",
-				"path": "./snippets.json"
-			},
+        "language": "javascript",
+        "path": "./snippets.json"
+      },
       {
-				"language": "typescript",
-				"path": "./snippets.json"
-			}
+        "language": "typescript",
+        "path": "./snippets.json"
+      }
     ],
     "viewsContainers": {
       "activitybar": [

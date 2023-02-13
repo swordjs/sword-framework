@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.0
+
+### Minor Changes
+
+- 1. vscode plugin adds conditional compilation code snippets
+
 ## 1.0.4
 
 ### Patch Changes
