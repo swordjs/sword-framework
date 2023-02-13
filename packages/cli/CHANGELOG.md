@@ -1,5 +1,11 @@
 # @swordjs/sword-framework-cli
 
+## 1.7.1
+
+### Patch Changes
+
+- 1. move esbuild's marco dependency to a runtime dependency
+
 ## 1.7.0
 
 ### Minor Changes
