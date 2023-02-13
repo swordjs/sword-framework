@@ -6,7 +6,7 @@ import log from './core/log';
 import { buildUnicloudApp } from './platform/unicloud';
 import { writeFileRecursive } from '~util/file';
 import { generateSchema } from './core/api';
-import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from './core/conditional-compiler';
+import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from './core/conditionalCompiler';
 import { env } from '#types/env';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
