@@ -74,11 +74,11 @@ export const devUnicloudApp = async (args: Argv<CommandConfig>) => {
 export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
   // 给云函数根目录的packagejson, 添加依赖
   const targetPath = getTargetPath();
-  const sourcePath = resolve(process.cwd(), `./.sword/build/unicloud`);
   try {
-    const packageData = getPackageJson(targetPath);
+    const packageData = getPackageJson(configData.unicloud.link);
     if (packageData) {
       const { package: packageJson, path: packageJsonPath } = packageData;
+      const sourcePath = resolve(process.cwd(), `./.sword/build/unicloud`);
       // 判断json中的dependencies是否存在@swordjs/sword-framework
       if (!packageJson.dependencies!['@swordjs/sword-framework']) {
         packageJson.dependencies!['@swordjs/sword-framework'] = 'latest';
