@@ -1,5 +1,11 @@
 # @swordjs/sword-framework-cli
 
+## 1.7.2
+
+### Patch Changes
+
+- 1. unicloud platform packaged for code compression
+
 ## 1.7.1
 
 ### Patch Changes

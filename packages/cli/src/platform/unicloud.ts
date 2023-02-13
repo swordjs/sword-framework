@@ -119,8 +119,7 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
         {
           skipPackageJson: true,
           outPath: `./.sword/build/unicloud`,
-          // 这里并不需要压缩, 在云函数上传到云端时, 会自动压缩
-          minify: false,
+          minify: true,
           inject: ['./.sword/shim/unicloud.js']
         }
       );
