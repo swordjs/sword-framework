@@ -1,5 +1,11 @@
 # @swordjs/sword-framework-cli
 
+## 1.7.0
+
+### Minor Changes
+
+- 1. Add conditional compilation function and optimize code package
+
 ## 1.6.0
 
 ### Minor Changes
