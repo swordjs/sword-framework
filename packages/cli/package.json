@@ -52,6 +52,7 @@
     "mv": "^2.1.1",
     "ohmyfetch": "^0.4.15",
     "tsbuffer-proto-generator": "^1.7.1",
-    "unconfig": "^0.3.1"
+    "unconfig": "^0.3.1",
+    "wrangler": "^2.11.1"
   }
 }
