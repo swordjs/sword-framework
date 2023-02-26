@@ -2,6 +2,8 @@ import { platformHook } from '../core/platform';
 import { aggregatePluginBehavior } from '../core/plugin';
 import { implementApi } from '../core/api';
 import { asyncDependencyScheduler, getAsyncDependency } from '../core/schedule';
+import { env } from '#types/env';
+import type { Config } from '@cli/core/config';
 import type * as H3 from '@swordjs/h3';
 
 /**
@@ -43,7 +45,10 @@ export const useApp = async (): Promise<AppReturn> => {
       const h3 = await getAsyncDependency<typeof H3>('@swordjs/h3');
       app = h3.createApp();
       returnData.server.start = () => {
-        if (aggregatePlugin.server.plugin.start) aggregatePlugin.server.plugin.start(app);
+        if (aggregatePlugin.server.plugin.start)
+          aggregatePlugin.server.plugin.start(app, {
+            port: (JSON.parse(process.env[env['swordConfig']] as string) as Config).server?.port
+          });
       };
     }
   });
