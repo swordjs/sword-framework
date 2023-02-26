@@ -5,6 +5,7 @@ import { build } from '../build';
 import { delDir, writeFileRecursive, copyDir } from '~util/file';
 import { getPackageJson } from '~util/package';
 import { configData } from '../core/config';
+import { UnicloudEnv } from '#types/env';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '#types/config';
 
@@ -172,7 +173,7 @@ export const shim = async (params: { reloadShim?: boolean; sourcePath: string })
   if (reloadShim || !existsSync(shimPath)) {
     const shim = `
     // unicloud shim
-  process.env._unicloud_shim_symlink_source_path = '${params.sourcePath}';
+  process.env.${UnicloudEnv.symlinkSourcePath} = '${params.sourcePath}';
     `;
     await writeFileRecursive(shimPath, shim);
     log.success(`[shim:unicloud]创建shim成功`);
