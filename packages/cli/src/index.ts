@@ -24,10 +24,10 @@ async function main() {
     return;
   }
   // 解析config参数
-  await initConfig();
+  const config = await initConfig();
   if (['dev', 'build'].includes(args._[0])) {
     // 创建shim
-    processShim(args._[0] as 'dev' | 'build', args.platform);
+    processShim(args._[0] as 'dev' | 'build', args.platform, config);
   }
   // 加载可能已经预定义的shim
   try {

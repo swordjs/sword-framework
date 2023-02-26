@@ -45,6 +45,7 @@ export const initConfig = async () => {
   if (typeof config === 'undefined') return defaultConfig;
   // 合并对象
   configData = mergeConfig(config, defaultConfig) as any;
+  return configData;
 };
 
 // 递归遍历defaultConfig, 如果config中没有某个配置, 则使用defaultConfig中的配置
