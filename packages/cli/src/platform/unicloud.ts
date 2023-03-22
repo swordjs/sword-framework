@@ -66,8 +66,7 @@ export const devUnicloudApp = async (args: Argv<CommandConfig>) => {
     {
       skipPackageJson: true,
       outPath: `./.sword/dev/unicloud`,
-      minify: false,
-      inject: ['./.sword/shim/unicloud.js']
+      minify: false
     }
   );
 };
@@ -120,8 +119,7 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
         {
           skipPackageJson: true,
           outPath: `./.sword/build/unicloud`,
-          minify: true,
-          inject: ['./.sword/shim/unicloud.js']
+          minify: true
         }
       );
     } else {

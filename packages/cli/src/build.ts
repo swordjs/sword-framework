@@ -1,11 +1,11 @@
 import { resolve } from 'path';
 import { readFileSync } from 'fs';
 import esbuild from 'esbuild';
+import glob from 'glob';
 import { delDir } from '~util/file';
 import log from './core/log';
 import { buildUnicloudApp } from './platform/unicloud';
 import { writeFileRecursive } from '~util/file';
-import { generateSchema } from './core/api';
 import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from './core/conditionalCompiler';
 import { env } from '#types/env';
 import type { Argv } from 'mri';
@@ -15,15 +15,13 @@ type BuildOptions = {
   skipPackageJson?: boolean;
   outPath?: string;
   minify?: boolean;
-  inject?: string[];
 };
 
 // 默认的打包参数
 const defaultBuildOptions: Required<BuildOptions> = {
   skipPackageJson: false,
   outPath: `./.sword/build/server`,
-  minify: true,
-  inject: ['./.sword/shim/process.js']
+  minify: true
 };
 
 const buildDefine = (args: Argv<CommandConfig>) => {
@@ -56,28 +54,23 @@ export const build = async (
     ...defaultBuildOptions,
     ...buildOptions
   };
-  // 需要合并默认的inject选项,也需要合并用户的inject选项
-  if (buildOptions && buildOptions.inject) {
-    buildOptions.inject = [...new Set([...defaultBuildOptions.inject, ...buildOptions.inject])];
-  }
   // 将packge.json输出到.sword目录中
   if (!buildOptions.skipPackageJson) {
     await writeFileRecursive(resolve(process.cwd(), `${buildOptions.outPath}/package.json`), readFileSync(resolve(process.cwd(), 'package.json')).toString());
   }
   // 编译proto，并且把json输出到.sword目录中
-  // apiPaths是代表了有效api的index.ts路径，我们只需要把路径传递给esbuild即可
   try {
-    const { apiPaths } = await generateSchema(resolve(process.cwd(), `${buildOptions.outPath}/src/api.json`));
-    // 使用esbuild构建
+    // glob屏蔽d.ts文件, 但是包裹src下所有的ts和js文件
+    const entryPoints = glob.sync('./src/**/!(*.d).{ts,js}');
     esbuild
       .build({
-        entryPoints: ['./src/index.ts', ...apiPaths.map((a) => `./src/api${a}/index.ts`)],
+        // 使用global语法来设置entryPoints
+        entryPoints,
         format: 'cjs',
         platform: 'node',
         outdir: `${buildOptions.outPath}/src`,
         mainFields: ['module', 'main'],
         minify: buildOptions.minify,
-        inject: buildOptions.inject,
         plugins: [esbuildPluginConditionalCompiler(args.platform)],
         define: buildDefine(args)
       })
