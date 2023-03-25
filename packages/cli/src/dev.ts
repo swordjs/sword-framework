@@ -33,7 +33,7 @@ const start = (args: Argv<CommandConfig>) => {
   // server端的dev指的就是node直接运行index.ts文件
   if (args.platform === 'server') {
     // 入口enrty ts 文件
-    indexcp = spawn(`node`, ['-r', 'esbuild-register', './src/index.ts', '--platform=', args.platform], {
+    indexcp = spawn(`node`, ['-r', 'esbuild-register', './src/index.ts'], {
       stdio: 'inherit'
     });
     // 运行成功

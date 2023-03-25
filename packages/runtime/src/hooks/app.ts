@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 import { platformHook } from '../core/platform';
 import { aggregatePluginBehavior } from '../core/plugin';
 import { implementApi } from '../core/api';
@@ -39,6 +40,10 @@ export const useApp = async (): Promise<AppReturn> => {
   let app: H3.App | null = null;
   await platformHook({
     server: async () => {
+      // 尝试加载.shim文件夹中的process.js文件，因为运行时可能需要加载shim/process，但是在dev环境下，由于是sword cli运行程序，所以不需要加载；但是build之后独立于cli运行，所以需要加载
+      try {
+        await import(resolve(process.cwd(), './.shim/process.js'));
+      } catch (e) {}
       // 异步加载与运行时环境的异步依赖
       await asyncDependencyScheduler();
       const aggregatePlugin = await aggregatePluginBehavior();

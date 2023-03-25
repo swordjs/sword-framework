@@ -5,11 +5,12 @@ import glob from 'glob';
 import { delDir } from '~util/file';
 import log from './core/log';
 import { buildUnicloudApp } from './platform/unicloud';
-import { writeFileRecursive } from '~util/file';
+import { writeFileRecursive, copyDir } from '~util/file';
 import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from './core/conditionalCompiler';
 import { env } from '#types/env';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
+import { generateSchema } from './core/api';
 
 type BuildOptions = {
   skipPackageJson?: boolean;
@@ -60,6 +61,7 @@ export const build = async (
   }
   // 编译proto，并且把json输出到.sword目录中
   try {
+    await generateSchema(resolve(process.cwd(), `${buildOptions.outPath}/src/api.json`));
     // glob屏蔽d.ts文件, 但是包裹src下所有的ts和js文件
     const entryPoints = glob.sync('./src/**/!(*.d).{ts,js}');
     esbuild
@@ -88,6 +90,8 @@ export default async (args: Argv<CommandConfig>) => {
     // 清空sword文件夹,需要根据platform条件进行清空
     delDir(resolve(process.cwd(), `.sword/dev/${args.platform}`));
     if (args.platform === 'server') {
+      // 拷贝shim文件夹到server中
+      copyDir(resolve(process.cwd(), `.sword/shim`), resolve(process.cwd(), `.sword/build/server/.shim`));
       build(args, {
         success: () => log.success(`[server]📦 打包成功`),
         error: () => log.err(`[server]📦 打包出现未知问题`)

@@ -31,7 +31,7 @@ async function main() {
   }
   // 加载可能已经预定义的shim
   try {
-    require(resolve(process.cwd(), './.sword/shim/process.js'));
+    await import(resolve(process.cwd(), './.sword/shim/process.js'));
   } catch (error) {}
   // 解析命令行参数
   const cliHandler = {
