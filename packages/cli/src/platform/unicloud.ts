@@ -21,12 +21,17 @@ const getTargetPath = () => {
 };
 
 // 在源代码中添加指定的代码片段
-const addCode = async (args: Argv<CommandConfig>) => {
+const addCode = async (args: Argv<CommandConfig>, sourcePath?: string) => {
   const _path = join('.sword', args._[0] as unknown as string, 'unicloud', 'src', 'index.js');
+  const processShimData = readFileSync(resolve(process.cwd(), './.sword/shim/process.js')).toString();
   // 在源代码中添加默认导出的代码片段
   await writeFileRecursive(
     resolve(process.cwd(), _path),
-    `${readFileSync(resolve(process.cwd(), _path)).toString()}
+    `
+    ${processShimData}
+    ${sourcePath ? `process.env.${UnicloudEnv.symlinkSourcePath} = '${sourcePath}';` : ''}
+    process.argv = ${JSON.stringify(process.argv)};
+    ${readFileSync(resolve(process.cwd(), _path)).toString()}
   module.exports = async (e, c) => {
     let { event, context } = await import_sword_framework.useUnicloudApp(e, c);
     const validateResult = await import_sword_framework.useUnicloudValidateEvent(event, context);
@@ -42,23 +47,21 @@ const addCode = async (args: Argv<CommandConfig>) => {
   );
 };
 
-// unicloud shim是否已创建
-let isShimCreated = false;
-
 /**
  *
  * unicloud环境下的启动服务器
  * @param {Argv<CommandConfig>} args
  */
 export const devUnicloudApp = async (args: Argv<CommandConfig>) => {
-  if (!isShimCreated) await link();
+  const sourcePath = resolve(process.cwd(), `./.sword/dev/unicloud`);
+  await link(sourcePath);
   // 删除指定的文件夹
   delDir(resolve(process.cwd(), `.sword/dev/unicloud`));
   build(
     args,
     {
       success: async () => {
-        await addCode(args);
+        await addCode(args, sourcePath);
         log.success(`[unicloud:dev]📦 编译成功`);
       },
       error: () => log.err(`[unicloud:dev]📦 编译出现未知问题`)
@@ -96,11 +99,6 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
       } catch (error) {}
       // 在打包之前, 需要删除之前的产物
       delDir(sourcePath);
-      // 打包之前替换shim
-      await shim({
-        reloadShim: true,
-        sourcePath: `/tmp/function/sword`
-      });
       // 打包unicloud app产物
       build(
         args,
@@ -132,7 +130,7 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
 };
 
 // 将文件夹软链接到目标文件夹
-const link = async () => {
+const link = async (sourcePath: string) => {
   const targetPath = getTargetPath();
   // 如果目标存在且目标是文件夹, 就删除
   try {
@@ -141,12 +139,6 @@ const link = async () => {
     }
   } catch (error) {}
 
-  const sourcePath = resolve(process.cwd(), `./.sword/dev/unicloud`);
-  // 初始化unicloud shim
-  await shim({
-    reloadShim: true,
-    sourcePath
-  });
   // 判断目标路径的sword是否存在，并且是否是替身，如果不存在/不是替身，就创建
   if (!existsSync(targetPath) || !lstatSync(targetPath).isSymbolicLink()) {
     symlink(sourcePath, targetPath, 'junction', (err) => {
@@ -161,20 +153,4 @@ const link = async () => {
   } else {
     log.info(`[unicloud:link] 🔗跳过创建软链接，因为目标目录已存在sword目录`);
   }
-};
-
-// 生成unicloud shim
-export const shim = async (params: { reloadShim?: boolean; sourcePath: string }) => {
-  const reloadShim = params.reloadShim ?? false;
-  const shimPath = resolve(process.cwd(), './.sword/shim/unicloud.js');
-  // 判断shimpath是否存在
-  if (reloadShim || !existsSync(shimPath)) {
-    const shim = `
-    // unicloud shim
-  process.env.${UnicloudEnv.symlinkSourcePath} = '${params.sourcePath}';
-    `;
-    await writeFileRecursive(shimPath, shim);
-    log.success(`[shim:unicloud]创建shim成功`);
-  }
-  isShimCreated = true;
 };
