@@ -8,5 +8,5 @@ export enum env {
 }
 
 export enum UnicloudEnv {
-  symlinkSourcePath = '_unicloud_shim_symlink_source_path'
+  symlinkSourcePath = '_SWORD_UNICLOUD_SHIM_SYMLINK_SOURCE_PATH'
 }
