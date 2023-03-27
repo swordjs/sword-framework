@@ -1,7 +1,5 @@
 #! /usr/bin/env node
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import * as esbuildRegister from 'esbuild-register/dist/node';
 import dev from './dev';
 import build from './build';

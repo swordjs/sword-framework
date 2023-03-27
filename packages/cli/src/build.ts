@@ -7,6 +7,7 @@ import log from './core/log';
 import { buildUnicloudApp } from './platform/unicloud';
 import { writeFileRecursive, copyDir } from '~util/file';
 import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from './core/conditionalCompiler';
+import { esbuildPluginAutoImport } from './core/autoImport';
 import { env } from '#types/env';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
@@ -73,7 +74,7 @@ export const build = async (
         outdir: `${buildOptions.outPath}/src`,
         mainFields: ['module', 'main'],
         minify: buildOptions.minify,
-        plugins: [esbuildPluginConditionalCompiler(args.platform)],
+        plugins: [esbuildPluginConditionalCompiler(args.platform), esbuildPluginAutoImport],
         define: buildDefine(args)
       })
       .then(() => {
