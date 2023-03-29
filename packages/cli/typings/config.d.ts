@@ -1,4 +1,4 @@
-import { PackageJson } from '#types/package';
+import { PackageJson } from '~types/package';
 import type { TransProtoReturn } from '../src/doc';
 import type { Map } from '@runtime/core/map';
 import type {} from 'wrangler';
@@ -11,8 +11,6 @@ export interface Config {
   unicloud?: {
     link: string;
   };
-  // cloudflare worker 的 wrangler 配置
-  woker?: {};
   // 共享目录
   share?: {
     // share目录的名称

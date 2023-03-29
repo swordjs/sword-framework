@@ -1,6 +1,6 @@
 import { commandArgs } from './config';
 import { resolve } from 'path';
-import { UnicloudEnv } from '#types/env';
+import { UnicloudEnv } from '~types/env';
 import type { CommandConfig } from '../typings/config';
 
 /**

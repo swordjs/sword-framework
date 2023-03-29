@@ -1,5 +1,5 @@
-import type { Plugin } from '#types/index';
-import type { LogType } from '#types/log';
+import type { Plugin } from '~types/index';
+import type { LogType } from '~types/log';
 
 export const log: LogType = {
   err: (v: string | Error): void => {

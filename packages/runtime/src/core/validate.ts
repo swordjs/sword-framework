@@ -2,8 +2,8 @@ import { TSBufferValidator } from 'tsbuffer-validator';
 import { platformHook } from './platform';
 import { getAsyncDependency } from './schedule';
 import type * as H3 from '@swordjs/h3';
-import type { HttpInstructMethod, HttpContext } from '#types/index';
-import type { UnicloudEvent } from '#types/unicloud';
+import type { HttpInstructMethod, HttpContext } from '~types/index';
+import type { UnicloudEvent } from '~types/unicloud';
 
 /**
  *

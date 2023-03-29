@@ -5,7 +5,7 @@ import { traverseSourceDir } from '~util/file';
 import { getSourcePath } from '~util/path';
 import { getKey } from '~util/map';
 import { log } from './log';
-import type { HttpInstructMethod, HttpApiReturn, HttpContext, HttpApiInstructType } from '#types/index';
+import type { HttpInstructMethod, HttpApiReturn, HttpContext, HttpApiInstructType } from '~types/index';
 import type { Result as ApiJSON } from '@cli/core/api';
 
 export type Map = {

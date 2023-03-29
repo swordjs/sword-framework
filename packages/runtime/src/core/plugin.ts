@@ -1,6 +1,6 @@
 import { getAsyncDependency } from './schedule';
 import { platformHook } from './platform';
-import type { Plugin, RegisterOneceRoot } from '#types/index';
+import type { Plugin, RegisterOneceRoot } from '~types/index';
 
 export const plugins: Plugin[] = [];
 

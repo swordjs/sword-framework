@@ -1,7 +1,7 @@
 import { push, pipelineMap } from '../core/pipeline';
 import type { PipelineTypeKeys } from '../core/pipeline';
-import type { HttpContext } from '#types/index';
-import { PipelineNode } from '#types/pipeline';
+import type { HttpContext } from '~types/index';
+import { PipelineNode } from '~types/pipeline';
 
 /**
  *

@@ -2,7 +2,7 @@ import { existsSync, lstatSync, readdirSync, unlinkSync } from 'fs';
 import { resolve } from 'path';
 import log from '../core/log';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '#types/config';
+import type { CommandConfig } from '~types/config';
 
 export default (args: Argv<CommandConfig>) => {
   // 如果当前存在shim文件夹, 就清空shim文件夹

@@ -1,6 +1,6 @@
 import { aggregatePlugin } from './plugin';
-import type { PipelineNode } from '#types/pipeline';
-import type { HttpContext } from '#types/index';
+import type { PipelineNode } from '~types/pipeline';
+import type { HttpContext } from '~types/index';
 
 export type PipelineTypeKeys = 'preApiCall' | 'postApiCall';
 

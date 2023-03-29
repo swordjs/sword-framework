@@ -5,10 +5,11 @@ import chokidar from 'chokidar';
 import { debounce } from '~util/index';
 import { generateSchema } from './core/api';
 import { devUnicloudApp } from './platform/unicloud';
+import { devServerApp } from './platform/server';
 import { presetApi } from './util/presetApi';
 import log from './core/log';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '#types/config';
+import type { CommandConfig } from '~types/config';
 
 let indexcp: ChildProcess | null = null;
 
@@ -27,13 +28,14 @@ const generate = async () => {
 /**
  * @param {CommandConfigReturn} config
  */
-const start = (args: Argv<CommandConfig>) => {
+const start = async (args: Argv<CommandConfig>) => {
   killProcess();
   // 判断如果platform是server，则执行server端的dev
   // server端的dev指的就是node直接运行index.ts文件
   if (args.platform === 'server') {
+    await devServerApp(args);
     // 入口enrty ts 文件
-    indexcp = spawn(`node`, ['-r', 'esbuild-register', './src/index.ts'], {
+    indexcp = spawn(`node`, ['./src/index.ts'], {
       stdio: 'inherit'
     });
     // 运行成功

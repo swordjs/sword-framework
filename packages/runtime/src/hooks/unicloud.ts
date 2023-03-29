@@ -2,7 +2,7 @@ import { triggerApi, validateEvent } from '../core/platform/unicloud/api';
 import { asyncDependencyScheduler } from '../core/schedule';
 import { aggregatePluginBehavior } from '../core/plugin';
 import { isJSON } from '~util/data';
-import type { UnicloudOriginContext, UnicloudUrlOriginEvent, UnicloudEvent } from '#types/unicloud';
+import type { UnicloudOriginContext, UnicloudUrlOriginEvent, UnicloudEvent } from '~types/unicloud';
 
 export let unicloudOriginContext: UnicloudOriginContext;
 export let unicloudOriginUrlEvent: UnicloudUrlOriginEvent;

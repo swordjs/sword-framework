@@ -1,6 +1,6 @@
 import { ConditionCommentMacroPlugin } from '@swordjs/esbuild-plugin-condition-comment-macro';
-import { env } from '#types/env';
-import type { CommandConfig } from '#types/config';
+import { env } from '~types/env';
+import type { CommandConfig } from '~types/config';
 
 /**
  * esbuild插件, 用于条件编译

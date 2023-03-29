@@ -1,4 +1,4 @@
-import type { HttpInstruct } from '#types/index';
+import type { HttpInstruct } from '~types/index';
 
 export const Get: HttpInstruct = (path) => {
   return {

@@ -8,7 +8,7 @@ import { buildUnicloudApp } from './platform/unicloud';
 import { writeFileRecursive, copyDir } from '~util/file';
 import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from './core/conditionalCompiler';
 import { esbuildPluginAutoImport } from './core/autoImport';
-import { env } from '#types/env';
+import { env } from '~types/env';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
 import { generateSchema } from './core/api';

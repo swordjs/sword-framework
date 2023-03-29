@@ -4,7 +4,7 @@ import { camelCase } from '~util/index';
 import { writeFileRecursive } from '~util/file';
 import log from '../core/log';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '#types/config';
+import type { CommandConfig } from '~types/config';
 
 /**
  * @name 编译文件返回处理后的类型声明内容
