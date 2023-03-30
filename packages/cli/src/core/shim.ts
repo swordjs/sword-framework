@@ -2,12 +2,13 @@ import { resolve } from 'path';
 import log from './log';
 import { writeFileRecursive } from '~util/file';
 import { env } from '~types/env';
+import { PRIVATE_CACHE_DIR, PRIVATE_SHIM_DIR, SHIM_PROCESS_FILE } from '~util/constants';
 import type { Config } from '../../typings/config';
 import type { CommandConfig } from '~types/config';
 
-// 生成process shim
+// Generate process shim
 export const processShim = async (command: 'dev' | 'build', platform: CommandConfig['platform'], config: Config) => {
-  const shimPath = resolve(process.cwd(), './.sword/shim/process.js');
+  const shimPath = resolve(process.cwd(), PRIVATE_CACHE_DIR, PRIVATE_SHIM_DIR, SHIM_PROCESS_FILE);
   const shim = `
   // process shim
   process.env.${env['swordCommand']} = '${command}'

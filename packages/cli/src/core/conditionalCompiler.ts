@@ -3,7 +3,7 @@ import { env } from '~types/env';
 import type { CommandConfig } from '~types/config';
 
 /**
- * esbuild插件, 用于条件编译
+ * esbuild plugin, for conditional compilation
  * @param platform
  * @returns
  */

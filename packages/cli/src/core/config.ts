@@ -7,7 +7,7 @@ export let configData: Required<Config>;
 
 const packageData = getPackageJson();
 
-// 默认配置的类型是非必选的config
+// The type of default configuration is optional config
 const defaultConfig: Config = {
   share: {
     dirName: 'share',
@@ -43,16 +43,15 @@ export const initConfig = async () => {
     merge: false
   });
   if (typeof config === 'undefined') return defaultConfig;
-  // 合并对象
   configData = mergeConfig(config, defaultConfig) as any;
   return configData;
 };
 
-// 递归遍历defaultConfig, 如果config中没有某个配置, 则使用defaultConfig中的配置
+// recursively iterate through defaultConfig, and if there is no configuration in config, use the configuration in defaultConfig
 const mergeConfig = (config: Config, defaultConfig: Config) => {
   let key: keyof typeof config;
   for (key in defaultConfig) {
-    // 如果配置中存在一个对象, 则递归遍历
+    // If there is an object in the configuration, then recursively traverse
     if (typeof defaultConfig[key] === 'object' && config[key]) {
       config[key] = mergeConfig(config[key] as any, defaultConfig[key] as any) as any;
     } else {
