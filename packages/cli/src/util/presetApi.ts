@@ -2,7 +2,7 @@ import { resolve } from 'path';
 import { writeFileRecursive } from '~util/file';
 import log from '../core/log';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '#types/config';
+import type { CommandConfig } from '~types/config';
 
 /**
  * 生成预先设置的API结构

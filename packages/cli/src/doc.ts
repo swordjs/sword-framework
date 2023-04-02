@@ -7,7 +7,7 @@ import { OpenAPIV3_1 } from 'openapi-types';
 import { getPackageJson } from '~util/package';
 import { configData } from './core/config';
 import type Mri from 'mri';
-import type { CommandConfig } from '#types/config';
+import type { CommandConfig } from '~types/config';
 import type { Map } from '@runtime/core/map';
 
 type AccepptProtoName = ['ReqParams', 'ReqQuery', 'Res'];

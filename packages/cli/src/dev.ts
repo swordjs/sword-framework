@@ -7,8 +7,10 @@ import { generateSchema } from './core/api';
 import { devUnicloudApp } from './platform/unicloud';
 import { presetApi } from './util/presetApi';
 import log from './core/log';
+import { getImportCode } from './core/autoImport';
+
 import type { Argv } from 'mri';
-import type { CommandConfig } from '#types/config';
+import type { CommandConfig } from '~types/config';
 
 let indexcp: ChildProcess | null = null;
 
@@ -27,15 +29,28 @@ const generate = async () => {
 /**
  * @param {CommandConfigReturn} config
  */
-const start = (args: Argv<CommandConfig>) => {
+const start = async (args: Argv<CommandConfig>) => {
   killProcess();
   // 判断如果platform是server，则执行server端的dev
   // server端的dev指的就是node直接运行index.ts文件
   if (args.platform === 'server') {
     // 入口enrty ts 文件
-    indexcp = spawn(`node`, ['-r', 'esbuild-register', './src/index.ts', '--platform=', args.platform], {
-      stdio: 'inherit'
-    });
+    indexcp = spawn(
+      `node`,
+      [
+        '--loader',
+        '@swordjs/esbuild-register/loader',
+        '-r',
+        '@swordjs/esbuild-register',
+        './src/index.ts',
+        `--esbuild-config=${JSON.stringify({
+          banner: await getImportCode()
+        })}`
+      ],
+      {
+        stdio: 'inherit'
+      }
+    );
     // 运行成功
     log.info(`启动入口文件: src/index.ts`);
   } else if (args.platform === 'unicloud') devUnicloudApp(args);

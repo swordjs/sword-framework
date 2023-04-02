@@ -15,7 +15,7 @@ import {
 } from './platform/server/api';
 import { adaptUnicloudEvent } from './platform/unicloud/api';
 import type * as H3 from '@swordjs/h3';
-import type { HttpContext, HttpInstructMethod, UnPromisify, Event, CustomHandlerReturn, HttpApiStatusResponse, RouterHandlerOptions } from '#types/index';
+import type { HttpContext, HttpInstructMethod, UnPromisify, Event, CustomHandlerReturn, HttpApiStatusResponse, RouterHandlerOptions } from '~types/index';
 import type { ValidateProto } from './validate';
 import type { InterruptPipelineResult } from './pipeline';
 import type { Map } from './map';

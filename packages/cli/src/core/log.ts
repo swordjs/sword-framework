@@ -2,7 +2,7 @@ import consola from 'consola';
 import chalk from 'chalk';
 
 /**
- * 终端打印日志
+ * Terminal Print Log
  * @return {*}
  */
 export default {

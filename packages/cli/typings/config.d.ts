@@ -1,8 +1,13 @@
-import { PackageJson } from '#types/package';
+import { PackageJson } from '~types/package';
 import type { TransProtoReturn } from '../src/doc';
 import type { Map } from '@runtime/core/map';
+import type {} from 'wrangler';
 
 export interface Config {
+  server?: {
+    // 服务端口
+    port?: number;
+  };
   unicloud?: {
     link: string;
   };
@@ -19,6 +24,8 @@ export interface Config {
   };
   // 编译文档的配置
   doc?: {
+    // doc server
+    server?: boolean;
     markdown?: {
       // 每一个api都会被调用一次编译函数, 传入的参数是api的信息, 返回的则是现有的markdown文档
       compile: (result: TransProtoReturn, markdown: string, options: { apiMap: Record<string, Map> }) => string;

@@ -1,4 +1,4 @@
-import type { HttpContext, Plugin } from '#types/index';
+import type { HttpContext, Plugin } from '~types/index';
 
 // 定义默认的返回context值
 const defaultResHeaders: Partial<HttpContext['resHeaders']> = {

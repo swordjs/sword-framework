@@ -1,4 +1,4 @@
-import type { HttpInstructReturn, HttpApiHandler, HttpApiInstructReturn, HttpApiReturn, ContextData } from '#types/index';
+import type { HttpInstructReturn, HttpApiHandler, HttpApiInstructReturn, HttpApiReturn, ContextData } from '~types/index';
 
 /**
  *

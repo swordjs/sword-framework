@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import type { Plugin } from '#types/index';
-import type { LogType } from '#types/log';
+import type { Plugin } from '~types/index';
+import type { LogType } from '~types/log';
 
 const now = () => {
   const _ = new Date();

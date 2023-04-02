@@ -3,7 +3,7 @@ import schema2interface from './util/schema2interface';
 import clearShim from './util/clearShim';
 import presetApi from './util/presetApi';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '#types/config';
+import type { CommandConfig } from '~types/config';
 
 export default async (args: Argv<CommandConfig>) => {
   // 判断是否指定了util-name

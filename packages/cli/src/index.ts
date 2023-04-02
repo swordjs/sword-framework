@@ -1,7 +1,5 @@
 #! /usr/bin/env node
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import * as esbuildRegister from 'esbuild-register/dist/node';
 import dev from './dev';
 import build from './build';
@@ -24,14 +22,14 @@ async function main() {
     return;
   }
   // 解析config参数
-  await initConfig();
+  const config = await initConfig();
   if (['dev', 'build'].includes(args._[0])) {
     // 创建shim
-    processShim(args._[0] as 'dev' | 'build', args.platform);
+    processShim(args._[0] as 'dev' | 'build', args.platform, config);
   }
   // 加载可能已经预定义的shim
   try {
-    require(resolve(process.cwd(), './.sword/shim/process.js'));
+    await import(resolve(process.cwd(), './.sword/shim/process.js'));
   } catch (error) {}
   // 解析命令行参数
   const cliHandler = {
