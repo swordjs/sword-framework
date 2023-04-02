@@ -5,9 +5,10 @@ import chokidar from 'chokidar';
 import { debounce } from '~util/index';
 import { generateSchema } from './core/api';
 import { devUnicloudApp } from './platform/unicloud';
-import { devServerApp } from './platform/server';
 import { presetApi } from './util/presetApi';
 import log from './core/log';
+import { getImportCode } from './core/autoImport';
+
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
@@ -33,11 +34,23 @@ const start = async (args: Argv<CommandConfig>) => {
   // 判断如果platform是server，则执行server端的dev
   // server端的dev指的就是node直接运行index.ts文件
   if (args.platform === 'server') {
-    await devServerApp(args);
     // 入口enrty ts 文件
-    indexcp = spawn(`node`, ['./src/index.ts'], {
-      stdio: 'inherit'
-    });
+    indexcp = spawn(
+      `node`,
+      [
+        '--loader',
+        '@swordjs/esbuild-register/loader',
+        '-r',
+        '@swordjs/esbuild-register',
+        './src/index.ts',
+        `--esbuild-config=${JSON.stringify({
+          banner: await getImportCode()
+        })}`
+      ],
+      {
+        stdio: 'inherit'
+      }
+    );
     // 运行成功
     log.info(`启动入口文件: src/index.ts`);
   } else if (args.platform === 'unicloud') devUnicloudApp(args);

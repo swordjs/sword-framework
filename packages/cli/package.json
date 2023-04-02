@@ -42,7 +42,6 @@
   },
   "dependencies": {
     "@swordjs/esbuild-plugin-condition-comment-macro": "^1.0.1",
-    "glob": "^9.3.1",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
     "consola": "^2.15.3",
@@ -50,10 +49,11 @@
     "enquirer": "^2.3.6",
     "esbuild": "^0.14.27",
     "esbuild-register": "^3.3.3",
+    "glob": "^9.3.1",
     "mv": "^2.1.1",
     "ohmyfetch": "^0.4.15",
     "tsbuffer-proto-generator": "^1.7.1",
     "unconfig": "^0.3.1",
-    "wrangler": "^2.11.1"
+    "unimport": "^3.0.4"
   }
 }

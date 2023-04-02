@@ -74,7 +74,7 @@ export const build = async (
         outdir: `${buildOptions.outPath}/src`,
         mainFields: ['module', 'main'],
         minify: buildOptions.minify,
-        plugins: [esbuildPluginConditionalCompiler(args.platform), esbuildPluginAutoImport],
+        plugins: [esbuildPluginAutoImport, esbuildPluginConditionalCompiler(args.platform)],
         define: buildDefine(args)
       })
       .then(() => {
