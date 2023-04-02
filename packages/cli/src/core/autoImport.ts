@@ -1,20 +1,23 @@
-import { createUnimport } from 'unimport';
+import { resolve } from 'path';
+import { createUnimport, TypeDeclarationOptions } from 'unimport';
 import Unimport from 'unimport/unplugin';
+import { APP_SRC_DIR, AUTO_IMPORT_TYPE_DECLARATION_FILE } from '~util/constants';
+import { writeFileRecursive } from '~util/file';
+import { configData } from '../core/config';
+import type { Preset } from 'unimport';
+import type { EsbuildPlugin } from 'unplugin';
 
-const autoImportsPresets = [
+const autoImportsPresets: Preset[] = [
   {
     from: '@swordjs/sword-framework',
     imports: ['useApi', 'useApp', 'usePipeline', 'usePlugin', 'useGetApiMap', 'usePlatform', 'usePlatformHook', 'useIsDev', 'useIsProd']
   }
 ];
 
-const { toExports } = createUnimport({
-  presets: autoImportsPresets
-});
-
-const esbuildPluginAutoImport = Unimport.esbuild({ presets: autoImportsPresets });
-
 let importCode: string;
+let toExports: (filepath?: string | undefined) => Promise<string>;
+let generateTypeDeclarations: (options?: TypeDeclarationOptions | undefined) => Promise<string>;
+let esbuildPluginAutoImport: EsbuildPlugin | undefined;
 
 const getImportCode = async () => {
   if (importCode) return importCode;
@@ -26,4 +29,21 @@ const getImportCode = async () => {
   return importCode;
 };
 
-export { getImportCode, esbuildPluginAutoImport };
+const generateTypeDeclarationsFile = async () => {
+  const typeDeclarationsCode = await generateTypeDeclarations();
+  // typeDeclarationsCode is the automatically imported type declarations
+  writeFileRecursive(resolve(process.cwd(), APP_SRC_DIR, AUTO_IMPORT_TYPE_DECLARATION_FILE), typeDeclarationsCode);
+};
+
+export default () => {
+  const options = {
+    presets: autoImportsPresets.concat(configData.autoImport?.presets || []),
+    imports: configData.autoImport?.imports || []
+  };
+  const unimport = createUnimport(options);
+  toExports = unimport.toExports;
+  generateTypeDeclarations = unimport.generateTypeDeclarations;
+  esbuildPluginAutoImport = Unimport.esbuild(options);
+};
+
+export { getImportCode, generateTypeDeclarationsFile, esbuildPluginAutoImport };

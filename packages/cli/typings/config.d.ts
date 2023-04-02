@@ -1,7 +1,7 @@
 import { PackageJson } from '~types/package';
 import type { TransProtoReturn } from '../src/doc';
 import type { Map } from '@runtime/core/map';
-import type {} from 'wrangler';
+import type { Import, Preset } from 'unimport';
 
 export interface Config {
   server?: {
@@ -31,6 +31,11 @@ export interface Config {
       compile: (result: TransProtoReturn, markdown: string, options: { apiMap: Record<string, Map> }) => string;
       output: (markdownMap: Record<string, string>) => void;
     };
+  };
+  // AutoImport
+  autoImport?: {
+    imports?: Import[];
+    presets?: Preset[];
   };
   language?: 'CN' | 'EN';
 }
