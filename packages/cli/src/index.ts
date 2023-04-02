@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-import * as esbuildRegister from 'esbuild-register/dist/node';
+import { register } from 'esbuild-register/dist/node';
 import dev from './dev';
 import build from './build';
 import init from './init';
@@ -8,30 +8,35 @@ import doc from './doc';
 import util from './util';
 import share from './share';
 import packageJSON from './../package.json';
+import { getImportCode } from './core/autoImport';
 import { processShim } from './core/shim';
 import { initConfig } from './core/config';
 import { commandArgs as args } from '~util/config';
 import { resolve } from 'path';
-esbuildRegister.register();
+import { PRIVATE_CACHE_DIR, PRIVATE_SHIM_DIR, SHIM_PROCESS_FILE } from '~util/constants';
 
 type commands = 'dev' | 'build' | 'init' | 'doc' | 'share' | 'util';
 
-async function main() {
+const main = async () => {
+  // parse config params
+  const config = await initConfig();
+  // The cli compiler may execute some ts files at runtime,
+  // especially the program runtime logic in the dev environment
+  await registerTsRuntimeByEsbuild();
+  // check version
   if (args['v']) {
     console.log(`cli version: ${packageJSON.version}`);
     return;
   }
-  // 解析config参数
-  const config = await initConfig();
   if (['dev', 'build'].includes(args._[0])) {
-    // 创建shim
+    // create shim when dev or build
     processShim(args._[0] as 'dev' | 'build', args.platform, config);
   }
-  // 加载可能已经预定义的shim
+  // Load the shim that may have been predefined
   try {
-    await import(resolve(process.cwd(), './.sword/shim/process.js'));
+    await import(resolve(process.cwd(), PRIVATE_CACHE_DIR, PRIVATE_SHIM_DIR, SHIM_PROCESS_FILE));
   } catch (error) {}
-  // 解析命令行参数
+  // Parsing command line parameters
   const cliHandler = {
     dev,
     build,
@@ -43,7 +48,19 @@ async function main() {
   if (args._[0]) {
     cliHandler[args._[0] as commands](args);
   }
-}
+};
+
+/**
+ *
+ * @description When using cli to compile api to api.json, the dev environment needs to run the ts file directly to get the information of each api
+ */
+const registerTsRuntimeByEsbuild = async () => {
+  // get auto import code
+  const code = await getImportCode();
+  register({
+    banner: code
+  });
+};
 
 main().catch((err) => {
   console.error(err);

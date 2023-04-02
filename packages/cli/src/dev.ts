@@ -7,7 +7,7 @@ import { generateSchema } from './core/api';
 import { devUnicloudApp } from './platform/unicloud';
 import { presetApi } from './util/presetApi';
 import log from './core/log';
-import { getImportCode } from './core/autoImport';
+import { getImportCode, generateTypeDeclarationsFile } from './core/autoImport';
 
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
@@ -51,6 +51,7 @@ const start = async (args: Argv<CommandConfig>) => {
         stdio: 'inherit'
       }
     );
+    generateTypeDeclarationsFile();
     // 运行成功
     log.info(`启动入口文件: src/index.ts`);
   } else if (args.platform === 'unicloud') devUnicloudApp(args);

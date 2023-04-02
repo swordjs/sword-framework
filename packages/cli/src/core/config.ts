@@ -1,6 +1,7 @@
 import { cwd } from 'process';
 import { loadConfig } from 'unconfig';
 import { getPackageJson } from '~util/package';
+import autoImport from '../core/autoImport';
 import type { Config } from '../../typings/config';
 
 export let configData: Required<Config>;
@@ -44,6 +45,7 @@ export const initConfig = async () => {
   });
   if (typeof config === 'undefined') return defaultConfig;
   configData = mergeConfig(config, defaultConfig) as any;
+  await afterInitConfig();
   return configData;
 };
 
@@ -59,6 +61,11 @@ const mergeConfig = (config: Config, defaultConfig: Config) => {
     }
   }
   return config;
+};
+
+const afterInitConfig = async () => {
+  // The automatically imported configuration items are initialized in autoImport
+  await autoImport();
 };
 
 export type { Config } from '../../typings/config';

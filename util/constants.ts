@@ -12,3 +12,5 @@ export const PRIVATE_DEV_DIR = 'dev';
 export const PRIVATE_SHIM_DIR = 'shim';
 
 export const SHIM_PROCESS_FILE = 'process.js';
+
+export const AUTO_IMPORT_TYPE_DECLARATION_FILE = 'auto-import.d.ts';
