@@ -1,7 +1,9 @@
+import { t } from 'i18next';
 import { cwd } from 'process';
 import { loadConfig } from 'unconfig';
 import { getPackageJson } from '~util/package';
 import autoImport from '../core/autoImport';
+import { init } from './i18n';
 import type { Config } from '../../typings/config';
 
 export let configData: Required<Config>;
@@ -64,6 +66,8 @@ const mergeConfig = (config: Config, defaultConfig: Config) => {
 };
 
 const afterInitConfig = async () => {
+  // i18n
+  await init();
   // The automatically imported configuration items are initialized in autoImport
   await autoImport();
 };
