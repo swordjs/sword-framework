@@ -5,6 +5,7 @@ export default defineBuildConfig({
   entries: ['./src/index'],
   outDir: 'lib',
   declaration: true,
+  failOnWarn: false,
   rollup: {
     emitCJS: true,
     // 从tsconfig.json读取paths
@@ -14,6 +15,9 @@ export default defineBuildConfig({
     cjsBridge: true,
     esbuild: {
       target: 'node12'
+    },
+    dts: {
+      respectExternal: false
     }
   }
 });

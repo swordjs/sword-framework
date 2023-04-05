@@ -3,6 +3,7 @@ import log from './log';
 import { writeFileRecursive } from '~util/file';
 import { env } from '~types/env';
 import { PRIVATE_CACHE_DIR, PRIVATE_SHIM_DIR, SHIM_PROCESS_FILE } from '~util/constants';
+import { t } from '../i18n/i18n-node';
 import type { Config } from '../../typings/config';
 import type { CommandConfig } from '~types/config';
 
@@ -16,5 +17,5 @@ export const processShim = async (command: 'dev' | 'build', platform: CommandCon
   process.env.${env['swordConfig']} = '${JSON.stringify(config)}'
   `;
   await writeFileRecursive(shimPath, shim);
-  log.success(`[shim:process]创建shim成功`);
+  log.success(`[shim:process]${t.Create_Shim_Successfully()}`);
 };

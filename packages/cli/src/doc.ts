@@ -6,6 +6,7 @@ import { resolve } from 'path';
 import { OpenAPIV3_1 } from 'openapi-types';
 import { getPackageJson } from '~util/package';
 import { configData } from './core/config';
+import { t } from './i18n/i18n-node';
 import type Mri from 'mri';
 import type { CommandConfig } from '~types/config';
 import type { Map } from '@runtime/core/map';
@@ -71,7 +72,7 @@ const openApiJson: OpenAPIV3_1.Document = {
 
 export default async (args: Mri.Argv<CommandConfig>) => {
   try {
-    log.info('开始生成文档');
+    log.info(t.Start_Generate_Documentation());
     // 生成api数据，用于获取指示器等详细api信息
     const { apiMap: map } = await getApiMap();
     apiMap = map;
@@ -119,10 +120,10 @@ export default async (args: Mri.Argv<CommandConfig>) => {
         }
       }
     } else {
-      log.err('未找到package.json文件');
+      log.err(t.PackageJson_Not_Found());
     }
   } catch (error) {
-    log.err('生成文档错误');
+    log.err(t.Generate_Documentation_Error());
     throw new Error(error as any);
   }
 };
@@ -198,8 +199,8 @@ const parseComment = (proto: Proto, result: TransProtoReturn, acceptProtoName: A
 // 编译markdown文档
 const compileMarkdown = async (result: TransProtoReturn, markdown: string) => {
   // 判断config中是否有markdown的配置
-  if (configData.doc.markdown) {
-    return await configData.doc.markdown.compile(result, markdown, { apiMap });
+  if (configData.value.doc.markdown) {
+    return await configData.value.doc.markdown.compile(result, markdown, { apiMap });
   }
   const handleMarkdownTable = (data: PropertiesAstReturn) => {
     return data
@@ -318,8 +319,8 @@ const compileOpenApi = (result: TransProtoReturn, parentRoute: string): OpenAPIV
 
 // 输出markdown文档到指定目录
 const outputMarkdown = async () => {
-  if (configData.doc.markdown) {
-    return configData.doc.markdown.output(markdownMap);
+  if (configData.value.doc.markdown) {
+    return configData.value.doc.markdown.output(markdownMap);
   }
   let str = '';
   for (const key in markdownMap) {
@@ -327,11 +328,11 @@ const outputMarkdown = async () => {
     str += `## ${key} \n ${markdownMap[key]}`;
   }
   await writeFileRecursive(resolve(process.cwd(), `docs`, `api.md`), str);
-  log.success('生成markdown成功');
+  log.success(t.Generate_Markdown_Documentation_Success());
 };
 
 // 输出openapi文档到指定目录
 const outputOpenApi = async () => {
   await writeFileRecursive(resolve(process.cwd(), `docs`, `openapi.json`), JSON.stringify(openApiJson));
-  log.success('生成openapi.json成功');
+  log.success(t.Generate_Openapi_Json_Success());
 };

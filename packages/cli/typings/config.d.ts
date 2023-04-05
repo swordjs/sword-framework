@@ -2,6 +2,7 @@ import { PackageJson } from '~types/package';
 import type { TransProtoReturn } from '../src/doc';
 import type { Map } from '@runtime/core/map';
 import type { Import, Preset } from 'unimport';
+import type { Locales } from '../src/i18n/i18n-types';
 
 export interface Config {
   server?: {
@@ -37,5 +38,5 @@ export interface Config {
     imports?: Import[];
     presets?: Preset[];
   };
-  language?: 'CN' | 'EN';
+  language?: Locales;
 }

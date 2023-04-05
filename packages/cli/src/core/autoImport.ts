@@ -17,7 +17,7 @@ const autoImportsPresets: Preset[] = [
 let importCode: string;
 let toExports: (filepath?: string | undefined) => Promise<string>;
 let generateTypeDeclarations: (options?: TypeDeclarationOptions | undefined) => Promise<string>;
-let esbuildPluginAutoImport: EsbuildPlugin | undefined;
+let esbuildPluginAutoImport: EsbuildPlugin;
 
 const getImportCode = async () => {
   if (importCode) return importCode;
@@ -37,8 +37,8 @@ const generateTypeDeclarationsFile = async () => {
 
 export default () => {
   const options = {
-    presets: autoImportsPresets.concat(configData.autoImport?.presets || []),
-    imports: configData.autoImport?.imports || []
+    presets: autoImportsPresets.concat(configData.value.autoImport?.presets || []),
+    imports: configData.value.autoImport?.imports || []
   };
   const unimport = createUnimport(options);
   toExports = unimport.toExports;

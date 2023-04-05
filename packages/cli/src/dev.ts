@@ -8,7 +8,7 @@ import { devUnicloudApp } from './platform/unicloud';
 import { presetApi } from './util/presetApi';
 import log from './core/log';
 import { getImportCode, generateTypeDeclarationsFile } from './core/autoImport';
-
+import { t } from './i18n/i18n-node';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
@@ -53,7 +53,7 @@ const start = async (args: Argv<CommandConfig>) => {
     );
     generateTypeDeclarationsFile();
     // 运行成功
-    log.info(`启动入口文件: src/index.ts`);
+    log.info(`${t.Launch_Entry_File()}: src/index.ts`);
   } else if (args.platform === 'unicloud') devUnicloudApp(args);
 };
 
@@ -69,9 +69,9 @@ const generatePreset = async (sourceDir: string, parentDir: string, dir: string)
     const [cwd, _parentDir] = await presetApi(sourceDir, parentDir, dir);
     renameSync(resolve(cwd, sourceDir, 'api', ..._parentDir, dir), resolve(cwd, sourceDir, 'api', ..._parentDir, _dir));
   } catch (error) {
-    return log.err(`API创建失败, ${error as Error}`);
+    return log.err(`${t.API_Create_Failed()}, ${error as Error}`);
   }
-  return log.info(`${_dir} API创建成功，已自动生成index.ts,proto.ts`);
+  return log.info(`${_dir} ${t.API_Create_Success()}`);
 };
 
 /**
@@ -80,7 +80,7 @@ const generatePreset = async (sourceDir: string, parentDir: string, dir: string)
  */
 const listenApiSource = (args: Argv<CommandConfig>) => {
   try {
-    log.info(`正在监听工程中的src/api文件夹...`);
+    log.info(t.Watching_Src_Api_Folder());
     const watcher = chokidar.watch(resolve('src', 'api'), {
       ignoreInitial: true,
       atomic: 1000
@@ -104,7 +104,7 @@ const listenApiSource = (args: Argv<CommandConfig>) => {
             }
             break;
           case 'change':
-            log.info(`[重新编译]触发文件:${path}`);
+            log.info(t.Rebuild_Trigger_File(path));
         }
         await generate();
       }, 500)

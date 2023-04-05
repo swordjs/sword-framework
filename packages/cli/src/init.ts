@@ -3,8 +3,9 @@ import { $fetch } from 'ohmyfetch';
 import mv from 'mv';
 import download from 'download';
 import { spawnSync } from 'child_process';
-import consola from 'consola';
 import { existsSync } from 'fs';
+import log from './core/log';
+import { t } from './i18n/i18n-node';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
 
@@ -12,9 +13,9 @@ export default async (args: Argv<CommandConfig>) => {
   const project = await prompt({
     type: 'input',
     name: 'value',
-    message: '项目名称',
+    message: t.Project_Name(),
     validate: (value) => {
-      return existsSync(value) ? '项目已存在' : true;
+      return existsSync(value) ? t.Project_Exist() : true;
     }
   });
   const CNPM_PACKAGE_URL = 'https://registry.npmmirror.com/@swordjs/sword-framework-example';
@@ -25,7 +26,7 @@ export default async (args: Argv<CommandConfig>) => {
     type: 'select',
     choices: versions,
     name: 'value',
-    message: '选择项目版本'
+    message: t.Select_Project_Version()
   });
   const now = String(new Date().getTime());
   // 下载项目
@@ -39,7 +40,7 @@ export default async (args: Argv<CommandConfig>) => {
     // windows中使用del删除
     spawnSync(process.platform === 'win32' ? 'del' : 'rm', ['-rf', now]);
     // 初始化项目成功
-    consola.success(`初始化${(project as any)['value']}项目成功⚡️`);
-    consola.info(`你完全可以使用pnpm,yarn,npm安装项目（我就不给你装了，我也不知道你喜欢什么❤️  ）`);
+    log.success(t.Init_Project_Success(project));
+    log.info(t.Init_Project_Success_Hint());
   });
 };

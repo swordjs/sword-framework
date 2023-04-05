@@ -1,12 +1,12 @@
-import { t } from 'i18next';
 import { cwd } from 'process';
 import { loadConfig } from 'unconfig';
 import { getPackageJson } from '~util/package';
 import autoImport from '../core/autoImport';
-import { init } from './i18n';
+import { loadI18n } from '../i18n/i18n-node';
+import { ref } from '@vue/reactivity';
 import type { Config } from '../../typings/config';
 
-export let configData: Required<Config>;
+export const configData = ref<Required<Config>>({} as any);
 
 const packageData = getPackageJson();
 
@@ -24,7 +24,7 @@ const defaultConfig: Config = {
       }
     }
   },
-  language: 'EN'
+  language: 'en'
 };
 
 export const initConfig = async () => {
@@ -45,14 +45,16 @@ export const initConfig = async () => {
     ],
     merge: false
   });
-  if (typeof config === 'undefined') return defaultConfig;
-  configData = mergeConfig(config, defaultConfig) as any;
+  if (typeof config === 'undefined') {
+    configData.value = defaultConfig as Required<Config>;
+    return;
+  }
+  configData.value = mergeConfig(config, defaultConfig);
   await afterInitConfig();
-  return configData;
 };
 
 // recursively iterate through defaultConfig, and if there is no configuration in config, use the configuration in defaultConfig
-const mergeConfig = (config: Config, defaultConfig: Config) => {
+const mergeConfig = (config: Config, defaultConfig: Config): Required<Config> => {
   let key: keyof typeof config;
   for (key in defaultConfig) {
     // If there is an object in the configuration, then recursively traverse
@@ -62,12 +64,12 @@ const mergeConfig = (config: Config, defaultConfig: Config) => {
       config[key] = defaultConfig[key] as any;
     }
   }
-  return config;
+  return config as Required<Config>;
 };
 
 const afterInitConfig = async () => {
-  // i18n
-  await init();
+  // Load i18n
+  await loadI18n(configData.value.language);
   // The automatically imported configuration items are initialized in autoImport
   await autoImport();
 };

@@ -1,6 +1,7 @@
 import { existsSync, lstatSync, readdirSync, unlinkSync } from 'fs';
 import { resolve } from 'path';
 import log from '../core/log';
+import { t } from '../i18n/i18n-node';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
@@ -18,12 +19,12 @@ export default (args: Argv<CommandConfig>) => {
             unlinkSync(filePath);
           }
         });
-        log.success('shim folder is cleaned');
+        log.success(t.Shim_Folder_Is_Cleaned());
       } catch {
-        log.err('delete shim folder failed');
+        log.err(t.Delete_Shim_Folder_Failed());
       }
     } else {
-      log.err('shim folder is not a directory');
+      log.err(t.Shim_Folder_Is_Not_A_Directory());
     }
   }
 };
