@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { camelCase } from '~util/index';
 import { writeFileRecursive } from '~util/file';
 import log from '../core/log';
+import { t } from '../i18n/i18n-node';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
@@ -53,11 +54,11 @@ ${_value}
 
 export default (args: Argv<CommandConfig>) => {
   // 提示用户此工具的文档
-  log.info(`schema2interface documentation: https://www.yuque.com/mlgrgm/lrf0ra/lywbzt#nwG2Q`);
+  log.info(`${t.Schema2Interface_Documentation()}: https://www.yuque.com/mlgrgm/lrf0ra/lywbzt#nwG2Q`);
   // 判断当前的环境
   if (args.platform !== 'unicloud') {
-    log.err('schema2interface only support unicloud platform');
-    log.info(`current platform is ${args.platform}`);
+    log.err(t.Schema2Interface_Only_Support_Unicloud_Platform());
+    log.info(t.Schema2Interface_Current_Platform_Is(args.platform));
     return;
   }
   // 查看文件夹是否符合要求
@@ -70,9 +71,9 @@ export default (args: Argv<CommandConfig>) => {
         checkUnicloudPath('uniCloud-tencent');
       } else {
         // 如果腾讯云还报错
-        log.err(`uniCloud-aliyun/uniCloud-tencent dir not found`);
+        log.err(t.Schema2Interface_Platform_Dir_Not_Found());
         // 请用户确认是否是unicloud项目
-        log.err(`please confirm you are using unicloud project`);
+        log.err(t.Schema2Interface_Platform_Dir_Not_Found_Hint());
         return false;
       }
     }
@@ -97,10 +98,10 @@ export default (args: Argv<CommandConfig>) => {
         const tsName = unicloudPath + `/typings/database/${f.replace('schema.json', '')}d.ts`;
         await writeFileRecursive(tsName, complieResult);
         // ts文件编译成功
-        log.success(`${f} complie success -> ${tsName}`);
+        log.success(`${f} ${t.Schema2Interface_Compile_Success()} ${tsName}`);
       });
     } else {
-      log.err(`database dir not found`);
+      log.err(t.Schema2Interface_Database_Dir_Not_Found());
       return;
     }
   }

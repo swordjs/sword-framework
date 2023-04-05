@@ -9,9 +9,10 @@ import { writeFileRecursive, copyDir } from '~util/file';
 import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from './core/conditionalCompiler';
 import { esbuildPluginAutoImport } from './core/autoImport';
 import { env } from '~types/env';
+import { t } from './i18n/i18n-node';
+import { generateSchema } from './core/api';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
-import { generateSchema } from './core/api';
 
 type BuildOptions = {
   skipPackageJson?: boolean;
@@ -94,8 +95,8 @@ export default async (args: Argv<CommandConfig>) => {
       // 拷贝shim文件夹到server中
       copyDir(resolve(process.cwd(), `.sword/shim`), resolve(process.cwd(), `.sword/build/server/.shim`));
       build(args, {
-        success: () => log.success(`[server]📦 打包成功`),
-        error: () => log.err(`[server]📦 打包出现未知问题`)
+        success: () => log.success(`[server]📦 ${t.Server_Pack_Success()}`),
+        error: () => log.err(`[server]📦 ${t.Server_Pack_Failed()}`)
       });
     } else if (args.platform === 'unicloud') await buildUnicloudApp(args);
   } catch (e) {

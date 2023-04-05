@@ -5,72 +5,9 @@ import { traverseSourceDir, writeFileRecursive } from '~util/file';
 import { getKey } from '~util/map';
 import log from './log';
 import { existsSync } from 'fs';
-import type { HttpApiReturn, HttpApiInstructType } from '#types/index';
-
-type Map = Record<string, { path: string; method: string[]; protoPath?: string; type: HttpApiInstructType }>;
-
-/**
- *
- * 生成apimap以及api路径数组（用于打包产物分析）
- * @param {string} [apiDir='api']
- * @param {string} [dir='src']
- * @return {*}  {Promise<{
- *   // apiPaths用于cli构建产物，用于esbuild打包分析, 只需要真实的api路径，不需要指示器强行修改的api路径
- *   apiPaths: string[];
- *   apiMap: Map;
- * }>}
- */
-export const getApiMap = async (
-  apiDir = 'api',
-  dir = 'src'
-): Promise<{
-  // apiPaths用于cli构建产物，用于esbuild打包分析, 只需要真实的api路径，不需要指示器强行修改的api路径
-  apiPaths: string[];
-  apiMap: Map;
-}> => {
-  const require = createRequire(import.meta.url);
-  const apiPaths: Set<string> = new Set();
-  const apiMap: Map = {};
-  const files = traverseSourceDir(resolve(dir, apiDir));
-  for (const key in files) {
-    // 解构path和d
-    const [path, d] = files[key];
-    const modulePath = resolve(path, d);
-    delete require.cache[modulePath];
-    if (['index.ts', 'proto.ts'].includes(d)) {
-      // apiPath 比如hello/detail 诸如此类
-      // 如果在windows下, 则路径中的\被转义成\\, 所以需要进行转义
-      const apiPath = path.substring(path.lastIndexOf(apiDir)).substring(apiDir.length).replace(/\\/g, '/');
-      // 执行函数，获取instruct指示器
-      if (d === 'index.ts') {
-        apiPaths.add(apiPath);
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const module = require(modulePath) as any;
-        const { instruct }: HttpApiReturn<any> = module.default ?? module.main;
-        // 解析instruct, 是一个map
-        instruct.forEach((value, key) => {
-          let _key = getKey(`/${apiDir}`, apiPath, key);
-          // 在windows环境下, /会被转义为\\, 所以需要转义为/
-          _key = _key.replace(/\\/g, '/');
-          apiMap[_key] = {
-            path: modulePath,
-            type: value.type,
-            // set转换成数组
-            method: [...value.methods]
-          };
-          // 如果当前目录下，存在proto.ts文件，则记录
-          if (existsSync(resolve(path, 'proto.ts'))) {
-            apiMap[_key] = { ...apiMap[_key], protoPath: resolve(path, 'proto.ts') };
-          }
-        });
-      }
-    }
-  }
-  return {
-    apiPaths: [...apiPaths],
-    apiMap
-  };
-};
+import { t } from './../i18n/i18n-node';
+import type { HttpApiReturn, HttpApiInstructType } from '~types/index';
+import { APP_SRC_DIR, APP_API_DIR, API_SUITE_FILES, API_SUITE_INDEX_FILE, API_SUITE_PROTO_FILE } from '~util/constants';
 
 export type Result = Record<
   string,
@@ -81,51 +18,96 @@ export type Result = Record<
     proto: Record<string, unknown>;
   }
 >;
+
 type Options = {
   dev?: boolean;
   format?: boolean;
   keepComment?: boolean;
 };
 
+type Map = Record<string, { path: string; method: string[]; protoPath?: string; type: HttpApiInstructType }>;
+
+/**
+ * Generate apimap
+ * @return {*}  {Promise<{
+ *   apiMap: Map;
+ * }>}
+ */
+export const getApiMap = async (): Promise<{
+  apiMap: Map;
+}> => {
+  const require = createRequire(import.meta.url);
+  const apiMap: Map = {};
+  const files = traverseSourceDir(resolve(APP_SRC_DIR, APP_API_DIR));
+  for (const key in files) {
+    const [path, d] = files[key];
+    const modulePath = resolve(path, d);
+    delete require.cache[modulePath];
+    if (API_SUITE_FILES.includes(d)) {
+      // apiPath such as hello/detail and so on
+      // If it is under windows, the \ in the path is escaped as \\, so it needs to be escaped
+      const apiPath = path.substring(path.lastIndexOf(APP_API_DIR)).substring(APP_API_DIR.length).replace(/\\/g, '/');
+      // Execute the function and get the instruct indicator
+      if (d === API_SUITE_INDEX_FILE) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const module = require(modulePath) as any;
+        const { instruct }: HttpApiReturn<any> = module.default ?? module.main;
+        // Parse instruct, is a map
+        instruct.forEach((value, key) => {
+          let _key = getKey(`/${APP_API_DIR}`, apiPath, key);
+          // In windows environment, / is escaped to \\, so it needs to be escaped to /
+          _key = _key.replace(/\\/g, '/');
+          apiMap[_key] = {
+            path: modulePath,
+            type: value.type,
+            method: [...value.methods]
+          };
+          // If the proto.ts file exists in the current directory, record
+          if (existsSync(resolve(path, API_SUITE_PROTO_FILE))) {
+            apiMap[_key] = { ...apiMap[_key], protoPath: resolve(path, 'proto.ts') };
+          }
+        });
+      }
+    }
+  }
+  return {
+    apiMap
+  };
+};
+
 /**
  *
- * 检索资源目录生成api路径数组 & protoMap & proto ast树
+ * Retrieve resource directory to generate api path array & protoMap & proto ast tree
  * @param {(string | null)} outPath
  * @param {Options} [options={
- *     // 是否是dev环境，如果是dev环境，则不生成除了proto的其他内容
+ *     // Whether it is a dev environment or not, if it is a dev environment, no other content other than proto is generated
  *     dev: false,
- *     // 是否格式化
  *     format: false,
  *     keepComment: false
  *   }]
  * @return {*}  {Promise<{
- *   apiPaths: string[];
  *   apiResult: Result;
  * }>}
  */
 export const generateSchema = async (
   outPath: string | null,
   options: Options = {
-    // 是否是dev环境，如果是dev环境，则不生成除了proto的其他内容
+    // Whether it is a dev environment or not, if it is a dev environment, no other content other than proto is generated
     dev: false,
-    // 是否格式化
     format: false,
     keepComment: false
   }
 ): Promise<{
-  apiPaths: string[];
   apiResult: Result;
 }> => {
-  const { apiMap, apiPaths } = await getApiMap();
+  const { apiMap } = await getApiMap();
   const result: Result = {};
   try {
-    // 迭代apimap
     for (const key in apiMap) {
-      // 生成proto信息
       const generator = new TSBufferProtoGenerator({
         keepComment: options.keepComment
       });
-      // 如果是dev环境, 则仅仅生成proto
+      // If it is a dev environment, only the proto is generated
       if (apiMap[key].protoPath) {
         result[key] = {
           proto: await generator.generate(apiMap[key].protoPath as any),
@@ -140,14 +122,14 @@ export const generateSchema = async (
         };
       }
     }
-    // 判断outPath是否存在，如果存在，就把api.json输出到指定目录
+    // Determine if outPath exists, and if so, output api.json to the specified directory
     if (outPath) {
-      // 生成api json文件到指定目录
+      // Generate API JSON file to specified directory
       await writeFileRecursive(outPath, JSON.stringify(result, null, typeof options?.format === 'undefined' ? undefined : 2));
-      log.success('API.Schema加载成功');
+      log.success(t.Schema_Loaded_Successfully());
     }
   } catch (error) {
-    log.err(`API.Schema加载错误: ${error}`);
+    log.err(t.Schema_Loaded_Failed(error));
   }
-  return { apiPaths, apiResult: result };
+  return { apiResult: result };
 };

@@ -15,7 +15,7 @@
     "paths": {
       "@cli/*": ["./packages/cli/src/*"],
       "@runtime/*": ["./packages/runtime/src/*"],
-      "#types/*": ["./typings/*"],
+      "~types/*": ["./typings/*"],
       "~util/*": ["./util/*"]
     }
   },

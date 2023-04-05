@@ -1,6 +1,7 @@
 import { resolve } from 'path';
 import { writeFileRecursive } from '~util/file';
 import log from '../core/log';
+import { t } from '../i18n/i18n-node';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
@@ -10,9 +11,8 @@ import type { CommandConfig } from '~types/config';
  * @param {string} dir
  */
 export default (args: Argv<CommandConfig>) => {
-  console.log(args);
   if (!args['presetApi-name']) {
-    log.err('presetApi-name is required');
+    log.err(t.PresetApi_Name_Is_Required());
   } else {
     presetApi('src', '/', args['presetApi-name']);
   }

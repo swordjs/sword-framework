@@ -4,6 +4,7 @@ import log from './core/log';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { configData } from './core/config';
+import { t } from './i18n/i18n-node';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
 import type { Result } from './core/api';
@@ -11,7 +12,7 @@ import type { Result } from './core/api';
 export default async (args: Argv<CommandConfig>) => {
   if (isDev()) {
     try {
-      const { share } = configData;
+      const { share } = configData.value;
       // 读取api.json内容
       const apiJson: Result = JSON.parse(readFileSync(resolve(process.cwd(), `./src/api.json`), 'utf-8'));
       for (const key in apiJson) {
@@ -26,15 +27,12 @@ export default async (args: Argv<CommandConfig>) => {
         resolve(share?.path as string, share?.dirName as string, share?.type?.dirName as string, `package.json`),
         JSON.stringify(share?.type?.package, null, 4)
       );
-      log.success(`Share success: ${share?.path}/${share?.dirName}/${share?.type?.dirName}`);
-      log.success(`you can run \`npm publish\``);
+      log.success(`${t.Share_Success()}: ${share?.path}/${share?.dirName}/${share?.type?.dirName}`);
+      log.success(t.Share_Success_Hint());
     } catch (error) {
-      log.err('Share failed, please check the configuration file');
+      log.err(t.Share_Failed());
     }
   } else {
-    log.err(`When you run the share command, the current directory must be in the dev environment. 
-        If you execute the command in the prod environment, this is not allowed, 
-        because the api.json cache file is necessary for the share command in the dev environment, 
-        and in the prod environment The api.json strips out the necessary analysis.`);
+    log.err(t.Share_Failed_Hint());
   }
 };

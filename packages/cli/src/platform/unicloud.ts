@@ -6,25 +6,26 @@ import { delDir, writeFileRecursive, copyDir } from '~util/file';
 import { getPackageJson } from '~util/package';
 import { configData } from '../core/config';
 import { UnicloudEnv } from '~types/env';
+import { t } from '../i18n/i18n-node';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
-// 获取云函数目标根目录
+// Get cloud function target root directory
 const getTargetPath = () => {
-  // 判断unicloud的link是否配置, 如果没有配置, 则就抛出错误
-  if (!configData.unicloud?.link || configData.unicloud?.link === '') {
-    log.err('[unicloud]请配置unicloud.link (未配置或者为空)');
-    log.err('[unicloud]关于unicloud.link的配置参考: https://www.yuque.com/mlgrgm/lrf0ra/ngkk5m#wL5HU');
+  // Determine whether the unicloud link is configured or not, if not, then an error is thrown
+  if (!configData.value.unicloud?.link || configData.value.unicloud?.link === '') {
+    log.err(`[unicloud]${t.Please_Config_Unicloud_Link()}`);
+    log.err(`[unicloud]${t.About_Unicloud_Link_Config}: https://www.yuque.com/mlgrgm/lrf0ra/ngkk5m#wL5HU`);
     process.exit();
   }
-  return `${configData.unicloud.link}/sword`;
+  return `${configData.value.unicloud.link}/sword`;
 };
 
-// 在源代码中添加指定的代码片段
+// Add the specified code snippet to the source code
 const addCode = async (args: Argv<CommandConfig>, sourcePath?: string) => {
   const _path = join('.sword', args._[0] as unknown as string, 'unicloud', 'src', 'index.js');
   const processShimData = readFileSync(resolve(process.cwd(), './.sword/shim/process.js')).toString();
-  // 在源代码中添加默认导出的代码片段
+  // Add the default exported code snippet to the source code
   await writeFileRecursive(
     resolve(process.cwd(), _path),
     `
@@ -62,9 +63,9 @@ export const devUnicloudApp = async (args: Argv<CommandConfig>) => {
     {
       success: async () => {
         await addCode(args, sourcePath);
-        log.success(`[unicloud:dev]📦 编译成功`);
+        log.success(`[unicloud:dev]📦 ${t.Unicloud_Build_Success()}`);
       },
-      error: () => log.err(`[unicloud:dev]📦 编译出现未知问题`)
+      error: () => log.err(`[unicloud:dev]📦 ${t.Unicloud_Build_Failed()}`)
     },
     {
       skipPackageJson: true,
@@ -78,7 +79,7 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
   // 给云函数根目录的packagejson, 添加依赖
   const targetPath = getTargetPath();
   try {
-    const packageData = getPackageJson(configData.unicloud.link);
+    const packageData = getPackageJson(configData.value.unicloud.link);
     if (packageData) {
       const { package: packageJson, path: packageJsonPath } = packageData;
       const sourcePath = resolve(process.cwd(), `./.sword/build/unicloud`);
@@ -107,11 +108,11 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
             await addCode(args);
             // 递归拷贝一个新的文件夹sword到unicloud目录
             copyDir(sourcePath, targetPath);
-            log.success(`[unicloud]📦 打包成功, 请移动到hbuilderx中执行上传云函数命令`);
+            log.success(`[unicloud]📦 ${t.Unicloud_Pack_Success()}}`);
           },
           error: (e) => {
             console.log(e);
-            log.err(`[unicloud]📦 打包出现未知问题`);
+            log.err(`[unicloud]📦 ${t.Unicloud_Pack_Failed()}`);
           }
         },
         {
@@ -122,7 +123,7 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
       );
     } else {
       // 不存在则报告错误
-      log.err(`[unicloud:build] 目标目录不存在package.json`);
+      log.err(`[unicloud:build] ${t.Unicloud_Target_Dir_Not_Exist()}`);
     }
   } catch (error) {
     log.err(error as Error);
@@ -143,14 +144,13 @@ const link = async (sourcePath: string) => {
   if (!existsSync(targetPath) || !lstatSync(targetPath).isSymbolicLink()) {
     symlink(sourcePath, targetPath, 'junction', (err) => {
       if (err) {
-        console.log(err);
-        log.err('[unicloud:link]🔗创建软链接失败');
+        log.err(`[unicloud:link]🔗${t.Unicloud_Link_Create_Failed()}`);
       } else {
-        log.success(`[unicloud:link]🔗软链接成功`);
-        log.info(`[unicloud:link]在hbuilderx中，无法在项目管理中显示通过软链接创建的文件夹，你可以打开文件目录查看详情`);
+        log.success(`[unicloud:link]🔗${t.Unicloud_Link_Create_Success}`);
+        log.info(`[unicloud:link]${t.Unicloud_Link_Create_Failed_Hint()}}`);
       }
     });
   } else {
-    log.info(`[unicloud:link] 🔗跳过创建软链接，因为目标目录已存在sword目录`);
+    log.info(`[unicloud:link] 🔗${t.Unicloud_Link_Skip_Create()}`);
   }
 };
