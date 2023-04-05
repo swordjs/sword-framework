@@ -47,9 +47,9 @@ export const initConfig = async () => {
   });
   if (typeof config === 'undefined') {
     configData.value = defaultConfig as Required<Config>;
-    return;
+  } else {
+    configData.value = mergeConfig(config, defaultConfig);
   }
-  configData.value = mergeConfig(config, defaultConfig);
   await afterInitConfig();
 };
 
@@ -60,7 +60,7 @@ const mergeConfig = (config: Config, defaultConfig: Config): Required<Config> =>
     // If there is an object in the configuration, then recursively traverse
     if (typeof defaultConfig[key] === 'object' && config[key]) {
       config[key] = mergeConfig(config[key] as any, defaultConfig[key] as any) as any;
-    } else {
+    } else if (config[key] === undefined) {
       config[key] = defaultConfig[key] as any;
     }
   }
