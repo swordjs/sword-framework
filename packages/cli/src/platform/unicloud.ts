@@ -7,10 +7,24 @@ import { getPackageJson } from '~util/package';
 import { configData } from '../core/config';
 import { UnicloudEnv } from '~types/env';
 import { t } from '../i18n/i18n-node';
+import {
+  PRIVATE_CACHE_DIR,
+  PRIVATE_DEV_DIR,
+  PRIVATE_BUILD_DIR,
+  UNICLOUD_CACHE_DIR,
+  UNICLOUD_DIR,
+  UNICLOUD_SRC_DIR,
+  UNICLOUD_INDEX_FILE
+} from '~util/constants';
+import { renderUnicloudIndexCode } from '../code/unicloud';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
-// Get cloud function target root directory
+/**
+ *
+ * Get cloud function target root directory
+ * @return {*}
+ */
 const getTargetPath = () => {
   // Determine whether the unicloud link is configured or not, if not, then an error is thrown
   if (!configData.value.unicloud?.link || configData.value.unicloud?.link === '') {
@@ -18,12 +32,17 @@ const getTargetPath = () => {
     log.err(`[unicloud]${t.About_Unicloud_Link_Config}: https://www.yuque.com/mlgrgm/lrf0ra/ngkk5m#wL5HU`);
     process.exit();
   }
-  return `${configData.value.unicloud.link}/sword`;
+  return join(configData.value.unicloud.link, `/${UNICLOUD_CACHE_DIR}`);
 };
 
-// Add the specified code snippet to the source code
+/**
+ *
+ * Add the specified code snippet to the source code
+ * @param {Argv<CommandConfig>} args
+ * @param {string} [sourcePath]
+ */
 const addCode = async (args: Argv<CommandConfig>, sourcePath?: string) => {
-  const _path = join('.sword', args._[0] as unknown as string, 'unicloud', 'src', 'index.js');
+  const _path = join(PRIVATE_CACHE_DIR, args._[0] as unknown as string, UNICLOUD_DIR, UNICLOUD_SRC_DIR, UNICLOUD_INDEX_FILE);
   const processShimData = readFileSync(resolve(process.cwd(), './.sword/shim/process.js')).toString();
   // Add the default exported code snippet to the source code
   await writeFileRecursive(
@@ -33,31 +52,21 @@ const addCode = async (args: Argv<CommandConfig>, sourcePath?: string) => {
     ${sourcePath ? `process.env.${UnicloudEnv.symlinkSourcePath} = '${sourcePath}';` : ''}
     process.argv = ${JSON.stringify(process.argv)};
     ${readFileSync(resolve(process.cwd(), _path)).toString()}
-  module.exports = async (e, c) => {
-    let { event, context } = await import_sword_framework.useUnicloudApp(e, c);
-    const validateResult = await import_sword_framework.useUnicloudValidateEvent(event, context);
-    // 判断校验结果是否严格等于true
-    if (validateResult !== true) {
-      return validateResult;
-    }
-    const { apiMap } = await import_sword_framework.useGetApiMap({
-      apiPath: event.route.split("?")[0]
-    })
-    return await import_sword_framework.useUnicloudTriggerApi(event, context, apiMap)
-  }`
+    ${renderUnicloudIndexCode()}
+    `
   );
 };
 
 /**
  *
- * unicloud环境下的启动服务器
+ * Start server in unicloud environment
  * @param {Argv<CommandConfig>} args
  */
 export const devUnicloudApp = async (args: Argv<CommandConfig>) => {
-  const sourcePath = resolve(process.cwd(), `./.sword/dev/unicloud`);
+  const sourcePath = resolve(process.cwd(), PRIVATE_CACHE_DIR, PRIVATE_DEV_DIR, UNICLOUD_DIR);
   await link(sourcePath);
-  // 删除指定的文件夹
-  delDir(resolve(process.cwd(), `.sword/dev/unicloud`));
+  // Delete the specified folder
+  delDir(sourcePath);
   build(
     args,
     {
@@ -69,28 +78,34 @@ export const devUnicloudApp = async (args: Argv<CommandConfig>) => {
     },
     {
       skipPackageJson: true,
-      outPath: `./.sword/dev/unicloud`,
+      outPath: sourcePath,
       minify: false
     }
   );
 };
 
+/**
+ * buildUnicloudApp
+ * @param {Argv<CommandConfig>} args
+ */
 export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
-  // 给云函数根目录的packagejson, 添加依赖
+  // Add a dependency to the packagejson, in the root of the cloud function
   const targetPath = getTargetPath();
   try {
     const packageData = getPackageJson(configData.value.unicloud.link);
     if (packageData) {
       const { package: packageJson, path: packageJsonPath } = packageData;
-      const sourcePath = resolve(process.cwd(), `./.sword/build/unicloud`);
-      // 判断json中的dependencies是否存在@swordjs/sword-framework
-      if (!packageJson.dependencies!['@swordjs/sword-framework']) {
-        packageJson.dependencies!['@swordjs/sword-framework'] = 'latest';
+      const sourcePath = resolve(process.cwd(), PRIVATE_CACHE_DIR, PRIVATE_BUILD_DIR, UNICLOUD_DIR);
+      // Determine if @swordjs/sword-framework exists for dependencies in json
+      if (!packageJson.dependencies?.['@swordjs/sword-framework']) {
+        packageJson.dependencies = {
+          ...packageJson.dependencies,
+          '@swordjs/sword-framework': 'latest'
+        };
       }
-      // 将packagejson写入
       await writeFileRecursive(packageJsonPath, JSON.stringify(packageJson, null, 4));
       try {
-        // 判断unicloud产物是文件夹还是快捷方式, 如果是文件夹, 就递归删除, 如果是快捷方式, 则删除快捷方式
+        // Determine whether the unicloud product is a folder or a shortcut, if it is a folder, delete it recursively, if it is a shortcut, then delete the shortcut
         if (lstatSync(targetPath).isDirectory()) {
           delDir(targetPath);
         }
@@ -98,15 +113,14 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
           unlinkSync(targetPath);
         }
       } catch (error) {}
-      // 在打包之前, 需要删除之前的产物
+      // Before packing, need to delete the previous product
       delDir(sourcePath);
-      // 打包unicloud app产物
       build(
         args,
         {
           success: async () => {
             await addCode(args);
-            // 递归拷贝一个新的文件夹sword到unicloud目录
+            // Recursively copy a new folder sword to the unicloud directory
             copyDir(sourcePath, targetPath);
             log.success(`[unicloud]📦 ${t.Unicloud_Pack_Success()}}`);
           },
@@ -117,12 +131,12 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
         },
         {
           skipPackageJson: true,
-          outPath: `./.sword/build/unicloud`,
+          outPath: sourcePath,
           minify: true
         }
       );
     } else {
-      // 不存在则报告错误
+      // Report error if not present
       log.err(`[unicloud:build] ${t.Unicloud_Target_Dir_Not_Exist()}`);
     }
   } catch (error) {
@@ -130,24 +144,28 @@ export const buildUnicloudApp = async (args: Argv<CommandConfig>) => {
   }
 };
 
-// 将文件夹软链接到目标文件夹
+/**
+ *
+ * Softlinking a folder to a target folder
+ * @param {string} sourcePath
+ */
 const link = async (sourcePath: string) => {
   const targetPath = getTargetPath();
-  // 如果目标存在且目标是文件夹, 就删除
+  // If the target exists and the target is a folder, delete
   try {
     if (lstatSync(targetPath).isDirectory()) {
       delDir(targetPath);
     }
   } catch (error) {}
 
-  // 判断目标路径的sword是否存在，并且是否是替身，如果不存在/不是替身，就创建
+  // Determine if the sword of the target path exists and is a stand-in, and if not/not a stand-in, create
   if (!existsSync(targetPath) || !lstatSync(targetPath).isSymbolicLink()) {
     symlink(sourcePath, targetPath, 'junction', (err) => {
       if (err) {
         log.err(`[unicloud:link]🔗${t.Unicloud_Link_Create_Failed()}`);
       } else {
         log.success(`[unicloud:link]🔗${t.Unicloud_Link_Create_Success}`);
-        log.info(`[unicloud:link]${t.Unicloud_Link_Create_Failed_Hint()}}`);
+        log.info(`[unicloud:link]${t.Unicloud_Link_Create_Success_Hint()}}`);
       }
     });
   } else {

@@ -4,25 +4,25 @@ import { camelCase } from '~util/index';
 import { writeFileRecursive } from '~util/file';
 import log from '../core/log';
 import { t } from '../i18n/i18n-node';
+import { UNICLOUD_ALIYUN_DIR, UNICLOUD_TENCENT_DIR } from '~util/constants';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
 /**
- * @name 编译文件返回处理后的类型声明内容
+ * @name The compiler file returns the contents of the processed type declaration
  * @param {*} filePath
  */
 const complie = (filePath: string) => {
-  // 读取文件
   const { properties } = JSON.parse(readFileSync(filePath).toString());
   let _value = ``;
   for (const key in properties) {
-    // 判断key是否有.，如果存在.说明是在定义外键（unicloud）
+    // Determine if the key has . If it exists. means it is defining a foreign key (unicloud)
     if (key.includes('.')) {
       continue;
     }
-    // 解构类型和介绍
+    // Deconstruction type and introduction
     const { bsonType = 'string', description = '' } = properties[key];
-    // 定义一些类型，在ts中表达会默认为string
+    // Define some types, expressions in ts will default to string
     const defaultKeys = ['timestamp', 'string'];
     const objectKeys = ['object'];
     const numberKeys = ['number', 'int', 'double'];
@@ -41,9 +41,9 @@ const complie = (filePath: string) => {
     }${bsonType === 'array' ? '[]' : ''};
     `;
   }
-  // 获取文件名
+  // Get file name
   const lastIndex = filePath.lastIndexOf('/') + 1;
-  // 去掉sword，.schema.json等前缀并且对字符串进行格式化
+  // Remove prefixes such as sword, .schema.json and format the strings
   const fileName = camelCase(filePath.substring(lastIndex).replace(/sword-|.schema.json/g, ''));
   return `/* tslint:disable */
 export interface ${fileName[0].toUpperCase() + fileName.substring(1)} {
@@ -53,20 +53,20 @@ ${_value}
 };
 
 export default (args: Argv<CommandConfig>) => {
-  // 提示用户此工具的文档
+  // Prompt the user for documentation on this tool
   log.info(`${t.Schema2Interface_Documentation()}: https://www.yuque.com/mlgrgm/lrf0ra/lywbzt#nwG2Q`);
-  // 判断当前的环境
+  // Judging the current environment
   if (args.platform !== 'unicloud') {
     log.err(t.Schema2Interface_Only_Support_Unicloud_Platform());
     log.info(t.Schema2Interface_Current_Platform_Is(args.platform));
     return;
   }
-  // 查看文件夹是否符合要求
+  // Check if the folder meets the requirements
   const checkUnicloudPath = (platformName = 'uniCloud-aliyun') => {
     try {
       readdirSync(resolve(process.cwd(), platformName));
     } catch (error) {
-      // 如果当前检查的是aliyun, 则重试检查tencent
+      // If the current check is aliyun, then retry checking tencent
       if (platformName === 'uniCloud-aliyun') {
         checkUnicloudPath('uniCloud-tencent');
       } else {

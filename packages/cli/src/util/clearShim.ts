@@ -2,17 +2,16 @@ import { existsSync, lstatSync, readdirSync, unlinkSync } from 'fs';
 import { resolve } from 'path';
 import log from '../core/log';
 import { t } from '../i18n/i18n-node';
-import type { Argv } from 'mri';
-import type { CommandConfig } from '~types/config';
+import { PRIVATE_CACHE_DIR, PRIVATE_SHIM_DIR } from '~util/constants';
 
-export default (args: Argv<CommandConfig>) => {
-  // 如果当前存在shim文件夹, 就清空shim文件夹
-  if (existsSync(resolve(process.cwd(), '.sword/shim'))) {
-    const shimPath = resolve(process.cwd(), '.sword/shim');
-    // 判断是否是文件夹
+export default () => {
+  const shimPath = resolve(process.cwd(), PRIVATE_CACHE_DIR, PRIVATE_SHIM_DIR);
+  // If the shim folder currently exists, empty the shim folder
+  if (existsSync(shimPath)) {
+    // Determine if it is a folder
     if (lstatSync(shimPath).isDirectory()) {
       try {
-        // 删除文件夹
+        // Delete Folder
         readdirSync(shimPath).forEach((file) => {
           const filePath = resolve(shimPath, file);
           if (existsSync(filePath)) {

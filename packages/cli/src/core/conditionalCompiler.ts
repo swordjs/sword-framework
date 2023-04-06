@@ -18,6 +18,12 @@ export const esbuildPluginConditionalCompiler = (platform: CommandConfig['platfo
   })();
 };
 
+/**
+ *
+ *
+ * @param {CommandConfig['platform']} platform
+ * @return {*}  {Record<string, string>}
+ */
 export const esbuildDefineConditionalCompiler = (platform: CommandConfig['platform']): Record<string, string> => {
   return {
     [`process.env.${env.swordPlatform}`]: `'${platform}'`

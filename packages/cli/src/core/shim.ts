@@ -7,7 +7,13 @@ import { t } from '../i18n/i18n-node';
 import type { Config } from '../../typings/config';
 import type { CommandConfig } from '~types/config';
 
-// Generate process shim
+/**
+ *
+ * // Generate process shim
+ * @param {('dev' | 'build')} command
+ * @param {CommandConfig['platform']} platform
+ * @param {Config} config
+ */
 export const processShim = async (command: 'dev' | 'build', platform: CommandConfig['platform'], config: Config) => {
   const shimPath = resolve(process.cwd(), PRIVATE_CACHE_DIR, PRIVATE_SHIM_DIR, SHIM_PROCESS_FILE);
   const shim = `
