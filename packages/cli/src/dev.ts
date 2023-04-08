@@ -1,6 +1,6 @@
 import { renameSync } from 'fs';
 import { ChildProcess, spawn } from 'child_process';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import chokidar from 'chokidar';
 import { debounce } from '~util/index';
 import { generateSchema } from './core/api';
@@ -9,18 +9,19 @@ import { presetApi } from './util/presetApi';
 import log from './core/log';
 import { getImportCode, generateTypeDeclarationsFile } from './core/autoImport';
 import { t } from './i18n/i18n-node';
+import { APP_SRC_DIR, API_SUITE_JSON_FILE, API_SUITE_INDEX_FILE, SERVER_DIR, UNICLOUD_DIR, APP_API_DIR } from '~util/constants';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
 let indexcp: ChildProcess | null = null;
 
-// 如果进程存在,则杀掉
+// If the process exists, kill it
 const killProcess = (): void => {
   indexcp && indexcp.kill();
 };
 
 const generate = async () => {
-  await generateSchema(resolve(process.cwd(), `./src/api.json`), {
+  await generateSchema(resolve(process.cwd(), APP_SRC_DIR, API_SUITE_JSON_FILE), {
     dev: true,
     format: true
   });
@@ -31,10 +32,10 @@ const generate = async () => {
  */
 const start = async (args: Argv<CommandConfig>) => {
   killProcess();
-  // 判断如果platform是server，则执行server端的dev
-  // server端的dev指的就是node直接运行index.ts文件
-  if (args.platform === 'server') {
-    // 入口enrty ts 文件
+  // Determine if the platform is server, then execute the server side dev
+  // The server-side dev means that the node runs the index.ts file directly
+  if (args.platform === SERVER_DIR) {
+    // Entry enrty ts file
     indexcp = spawn(
       `node`,
       [
@@ -42,7 +43,8 @@ const start = async (args: Argv<CommandConfig>) => {
         '@swordjs/esbuild-register/loader',
         '-r',
         '@swordjs/esbuild-register',
-        './src/index.ts',
+        `${resolve(process.cwd(), APP_SRC_DIR, API_SUITE_INDEX_FILE)}`,
+        // auto import code by esbuild banner options
         `--esbuild-config=${JSON.stringify({
           banner: await getImportCode()
         })}`
@@ -52,22 +54,22 @@ const start = async (args: Argv<CommandConfig>) => {
       }
     );
     generateTypeDeclarationsFile();
-    // 运行成功
-    log.info(`${t.Launch_Entry_File()}: src/index.ts`);
-  } else if (args.platform === 'unicloud') devUnicloudApp(args);
+    // success
+    log.info(`${t.Launch_Entry_File()}: ${APP_SRC_DIR}/${API_SUITE_INDEX_FILE}`);
+  } else if (args.platform === UNICLOUD_DIR) devUnicloudApp(args);
 };
 
 /**
- * 生成预先设置的API结构
+ * Generate pre-set API structures
  * @param {string} sourceDir
  * @param {string} dir
  */
 const generatePreset = async (sourceDir: string, parentDir: string, dir: string) => {
-  // 删除前缀后的root根节点路由
+  // Remove the root root route after the prefix
   const _dir = dir.slice(1);
   try {
     const [cwd, _parentDir] = await presetApi(sourceDir, parentDir, dir);
-    renameSync(resolve(cwd, sourceDir, 'api', ..._parentDir, dir), resolve(cwd, sourceDir, 'api', ..._parentDir, _dir));
+    renameSync(resolve(cwd, sourceDir, ..._parentDir, dir), resolve(cwd, sourceDir, ..._parentDir, _dir));
   } catch (error) {
     return log.err(`${t.API_Create_Failed()}, ${error as Error}`);
   }
@@ -75,13 +77,13 @@ const generatePreset = async (sourceDir: string, parentDir: string, dir: string)
 };
 
 /**
- * 监听资源文件夹
+ * Listening to the resource folder
  * @param {Config} config
  */
 const listenApiSource = (args: Argv<CommandConfig>) => {
   try {
     log.info(t.Watching_Src_Api_Folder());
-    const watcher = chokidar.watch(resolve('src', 'api'), {
+    const watcher = chokidar.watch(resolve(APP_SRC_DIR, APP_API_DIR), {
       ignoreInitial: true,
       atomic: 1000
     });
@@ -91,16 +93,16 @@ const listenApiSource = (args: Argv<CommandConfig>) => {
         start(args);
         switch (event) {
           case 'addDir':
-            // 当文件夹约定一个规则，比如下划线开头，那么将会自动生成proto.ts 以及初始化的hook函数
+            // When a folder agrees on a rule, such as starting with an underscore, then proto.ts and the initialized hook function will be generated automatically
             const prefix = '_';
-            // 新增文件夹名称
+            // New folder name
             const dir = path.substring(path.lastIndexOf('/') + 1);
-            // 父级目录，比如当前创建的文件夹有父级别，那么就是字符串api之后且dir之间的路径，我们需要把资源产出到正确的目录中
-            const parentDir = path.substring(path.lastIndexOf('api') + 3, path.lastIndexOf(dir));
-            // 判断当前新建的文件夹是否有前缀
+            // Parent directory, such as the currently created folder has a parent level, then it is the path between the string api after and dir, we need to output the resources to the correct directory
+            const parentDir = path.substring(path.lastIndexOf(APP_API_DIR) + APP_API_DIR.length, path.lastIndexOf(dir));
+            // Determine if the current new folder has a prefix
             if (prefix === dir[0]) {
-              // 自动生成预设置
-              await generatePreset('src', parentDir, dir);
+              // Automatic generation of pre-settings
+              await generatePreset(join(APP_SRC_DIR, APP_API_DIR), parentDir, dir);
             }
             break;
           case 'change':
@@ -114,9 +116,13 @@ const listenApiSource = (args: Argv<CommandConfig>) => {
   }
 };
 
-// 监听入口文件
+/**
+ * Listening portal file
+ *
+ * @param {Argv<CommandConfig>} args
+ */
 const listenIndex = (args: Argv<CommandConfig>) => {
-  const watcher = chokidar.watch(resolve('src', 'index.ts'), {
+  const watcher = chokidar.watch(resolve(APP_SRC_DIR, API_SUITE_INDEX_FILE), {
     ignoreInitial: true,
     atomic: 1000
   });
@@ -129,6 +135,5 @@ export default async (args: Argv<CommandConfig>) => {
   await generate();
   start(args);
   listenIndex(args);
-  // 监听资源文件夹下的api文件夹
   listenApiSource(args);
 };

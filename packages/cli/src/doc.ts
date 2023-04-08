@@ -50,12 +50,12 @@ export type TransProtoReturn = {
 
 const accepptProtoNames: AccepptProtoName = ['ReqParams', 'ReqQuery', 'Res'];
 
-// 定义apimap
+// Define apimap
 let apiMap: Record<string, Map> = {};
-// 定义一个以父路由为key，value为markdown文档的对象
+// Define an object with parent route as key and value as markdown document
 const markdownMap: Record<string, string> = {};
 
-// 定义一个openapi格式的json
+// Define a json in openapi format
 const openApiJson: OpenAPIV3_1.Document = {
   openapi: '3.0.1',
   info: {
@@ -73,17 +73,16 @@ const openApiJson: OpenAPIV3_1.Document = {
 export default async (args: Mri.Argv<CommandConfig>) => {
   try {
     log.info(t.Start_Generate_Documentation());
-    // 生成api数据，用于获取指示器等详细api信息
+    // Generate api data to get detailed api information such as indicators
     const { apiMap: map } = await getApiMap();
     apiMap = map;
-    // 生成ast数据
+    // Generating ast data
     const { apiResult } = await generateSchema(null, {
       keepComment: true
     });
     for (const key in apiResult) {
-      // key 为 api
-      // 判断parentRoute是否存在
-      // 通过key解析出api后的第一个路由作为父路由
+      // key for api
+      // The first route after the api is resolved by key is used as the parent route
       const parentRoute = key.split('/')[2];
       if (!markdownMap[parentRoute]) {
         markdownMap[parentRoute] = ``;
@@ -96,11 +95,11 @@ export default async (args: Mri.Argv<CommandConfig>) => {
         Res: []
       };
       transAst(protoData, result);
-      // 编译markdown文档
+      // Compiling markdown documents
       markdownMap[parentRoute] += await compileMarkdown(result, markdownMap[parentRoute]);
-      // 编译openapi文档
+      // Compiling openapi documentation
       openApiJson.paths![key] = await compileOpenApi(result, parentRoute);
-      // 给openapi中的tags字段写入parentRoute
+      // Write a parentRoute to the tags field in openapi
       if (!openApiJson.tags!.find((t) => t.name === parentRoute)) {
         openApiJson.tags!.push({
           name: parentRoute
@@ -109,11 +108,11 @@ export default async (args: Mri.Argv<CommandConfig>) => {
     }
     outputMarkdown();
     outputOpenApi();
-    // 处理packagejson
+    // Processing packagejson
     const packageData = getPackageJson();
     if (packageData) {
       const { package: packageInfo } = packageData;
-      // 给openapi的info赋值
+      // Assign a value to openapi's info
       for (const key in openApiJson.info) {
         if (packageInfo[key]) {
           (openApiJson.info as any)[key] = packageInfo[key];
@@ -128,21 +127,31 @@ export default async (args: Mri.Argv<CommandConfig>) => {
   }
 };
 
-// 从ast转换数据
+/**
+ * Converting data from ast
+ *
+ * @param {Record<string, unknown>} protoData
+ * @param {TransProtoReturn} result
+ */
 const transAst = async (protoData: Record<string, unknown>, result: TransProtoReturn) => {
   for (const protoKey in protoData) {
     const proto = protoData[protoKey] as Proto;
     for (const acceptProtoName of accepptProtoNames) {
-      // 筛选合格的proto
+      // Screening of qualified proto
       if (protoKey.endsWith(acceptProtoName)) {
-        // 解析注释
+        // Parsing Notes
         parseComment(proto, result, acceptProtoName);
       }
     }
   }
 };
 
-// 解析多行注释
+/**
+ * Parsing multi-line comments
+ *
+ * @param {(string | undefined)} comment
+ * @return {*}
+ */
 const parseMultiLineComment = (comment: string | undefined) => {
   if (comment) {
     const commentArr = comment.split('\n');
@@ -152,16 +161,23 @@ const parseMultiLineComment = (comment: string | undefined) => {
   }
 };
 
-// 解析注释
+/**
+ * Parsing Notes
+ *
+ * @param {Proto} proto
+ * @param {TransProtoReturn} result
+ * @param {AccepptProtoName[number]} acceptProtoName
+ * @return {*}
+ */
 const parseComment = (proto: Proto, result: TransProtoReturn, acceptProtoName: AccepptProtoName[number]) => {
-  // 当前如果是params的节点，解析顶层注释时要设置title，desc等等，因为params的顶层代表了整个接口的说明
-  // 通过换行符分割注释
+  // If the current node is params, set title, desc, etc. when parsing the top-level annotation, because the top level of params represents the entire interface description
+  // Splitting comments by line breaks
   const [title, desc] = parseMultiLineComment(proto.comment);
   if (acceptProtoName === 'ReqParams') {
     result.title = title;
     result.desc = desc;
   } else {
-    // 如果存在顶级注释且没有properties，就说明这是一个类型别名，用户使用顶级注释来表示类型别名
+    // If there are top-level comments and no properties, it means it is a type alias and the user uses the top-level comments to represent the type alias
     if (proto.comment && !proto.properties) {
       result[acceptProtoName].push({
         id: 0,
@@ -175,11 +191,11 @@ const parseComment = (proto: Proto, result: TransProtoReturn, acceptProtoName: A
     }
   }
 
-  // 解析完顶层注释之后，就要解析具体proto属性的字段
+  // After parsing the top-level annotations, you have to parse the fields of the specific proto properties
   if (proto.properties) {
     for (const key in proto.properties) {
       const property = proto.properties[key];
-      // 判断property中是否存在type
+      // Determine if type exists in property
       const [title, desc] = parseMultiLineComment(property.type.comment);
       result[acceptProtoName].push({
         id: property.id,
@@ -196,9 +212,15 @@ const parseComment = (proto: Proto, result: TransProtoReturn, acceptProtoName: A
   return result;
 };
 
-// 编译markdown文档
+/**
+ * Compiling markdown documents
+ *
+ * @param {TransProtoReturn} result
+ * @param {string} markdown
+ * @return {*}
+ */
 const compileMarkdown = async (result: TransProtoReturn, markdown: string) => {
-  // 判断config中是否有markdown的配置
+  // Determine if there is a markdown configuration in config
   if (configData.value.doc.markdown) {
     return await configData.value.doc.markdown.compile(result, markdown, { apiMap });
   }
@@ -210,7 +232,7 @@ const compileMarkdown = async (result: TransProtoReturn, markdown: string) => {
       )
       .join('\n');
   };
-  // 拼接内容
+  // Spliced content
   markdown += `
   ## ${result.title}
   > ${result.desc}
@@ -236,12 +258,18 @@ const compileMarkdown = async (result: TransProtoReturn, markdown: string) => {
   return markdown;
 };
 
-// 编译openapi
+/**
+ * Compiling openapi
+ *
+ * @param {TransProtoReturn} result
+ * @param {string} parentRoute
+ * @return {*}  {OpenAPIV3_1.Document['paths']}
+ */
 const compileOpenApi = (result: TransProtoReturn, parentRoute: string): OpenAPIV3_1.Document['paths'] => {
   const apiResult: OpenAPIV3_1.Document['paths'] = {};
   const assignObjArray = (data: Record<string, unknown>[]) => {
     const res: any = {};
-    // 循环data
+    // Loop data
     for (const item of data) {
       for (const key in item) {
         res[key] = item[key];
@@ -249,7 +277,7 @@ const compileOpenApi = (result: TransProtoReturn, parentRoute: string): OpenAPIV
     }
     return res;
   };
-  // key为该api的methods
+  // key is the methods of the api
   apiMap[result.url].method.map((m) => {
     apiResult[m.toLowerCase()] = {
       summary: result.title,
@@ -317,21 +345,28 @@ const compileOpenApi = (result: TransProtoReturn, parentRoute: string): OpenAPIV
   return apiResult;
 };
 
-// 输出markdown文档到指定目录
+/**
+ * Export markdown documents to the specified directory
+ *
+ * @return {*}
+ */
 const outputMarkdown = async () => {
   if (configData.value.doc.markdown) {
     return configData.value.doc.markdown.output(markdownMap);
   }
   let str = '';
   for (const key in markdownMap) {
-    // 给markdown拼接父标题
+    // Splicing parent headers to markdown
     str += `## ${key} \n ${markdownMap[key]}`;
   }
   await writeFileRecursive(resolve(process.cwd(), `docs`, `api.md`), str);
   log.success(t.Generate_Markdown_Documentation_Success());
 };
 
-// 输出openapi文档到指定目录
+/**
+ * Export openapi documents to the specified directory
+ *
+ */
 const outputOpenApi = async () => {
   await writeFileRecursive(resolve(process.cwd(), `docs`, `openapi.json`), JSON.stringify(openApiJson));
   log.success(t.Generate_Openapi_Json_Success());

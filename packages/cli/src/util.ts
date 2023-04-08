@@ -7,24 +7,24 @@ import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
 export default async (args: Argv<CommandConfig>) => {
-  // 判断是否指定了util-name
+  // Determines if the util-name is specified
   if (!args['util-name']) {
     log.err(t.Util_Name_Is_Required());
   } else {
-    // 定义一个对象, 存储和匹配所有的util函数
+    // Define an object that stores and matches all the util functions
     const utilHandler = {
       schema2interface,
       clearShim,
       presetApi
     };
-    // 判断util-name是否在utilHandler中
+    // Determine if the util-name is in the utilHandler
     if (utilHandler[args['util-name']]) {
-      // 如果在，则执行utilHandler中的util-name
+      // If in, then execute the util-name in the utilHandler
       utilHandler[args['util-name']](args);
     } else {
-      // 如果不在，则报错
+      // If not, an error is reported
       log.err(t.Util_Name_Not_Found(args['util-name']));
-      // 查阅文档查看支持的util-name
+      // Check the documentation for supported util-names
       log.info(`${t.Util_Name_Not_Found_Hint()}: https://www.yuque.com/mlgrgm/lrf0ra/lywbzt`);
     }
   }

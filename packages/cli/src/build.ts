@@ -1,4 +1,4 @@
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import { readFileSync } from 'fs';
 import esbuild from 'esbuild';
 import glob from 'glob';
@@ -11,6 +11,17 @@ import { esbuildPluginAutoImport } from './core/autoImport';
 import { env } from '~types/env';
 import { t } from './i18n/i18n-node';
 import { generateSchema } from './core/api';
+import {
+  APP_SRC_DIR,
+  API_SUITE_JSON_FILE,
+  PRIVATE_CACHE_DIR,
+  PRIVATE_DEV_DIR,
+  PRIVATE_SHIM_DIR,
+  SERVER_DIR,
+  PRIVATE_BUILD_DIR,
+  PRIVATE_SHIM_SERVER_DIR,
+  UNICLOUD_DIR
+} from '~util/constants';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '../../../typings/config';
 
@@ -20,10 +31,11 @@ type BuildOptions = {
   minify?: boolean;
 };
 
-// 默认的打包参数
+// Default packing parameters
 const defaultBuildOptions: Required<BuildOptions> = {
   skipPackageJson: false,
-  outPath: `./.sword/build/server`,
+  // default output path is server
+  outPath: join(PRIVATE_CACHE_DIR, PRIVATE_BUILD_DIR, SERVER_DIR),
   minify: true
 };
 
@@ -36,8 +48,8 @@ const buildDefine = (args: Argv<CommandConfig>) => {
 
 /**
  *
- * 抽象build函数
- * @description 抽象build函数的目的主要是，不仅让外部可以引入，还可以让外部有更多的控制权，所以主要抽象了option
+ * Abstract build function
+ * @description The main purpose of abstracting the build function is, not only to allow external introduction, but also to give external more control, so the main abstraction of the option
  * @param {Argv<CommandConfig>} args
  * @param {{
  *     success: () => void;
@@ -57,22 +69,22 @@ export const build = async (
     ...defaultBuildOptions,
     ...buildOptions
   };
-  // 将packge.json输出到.sword目录中
+  // Export packge.json to the .sword directory
   if (!buildOptions.skipPackageJson) {
-    await writeFileRecursive(resolve(process.cwd(), `${buildOptions.outPath}/package.json`), readFileSync(resolve(process.cwd(), 'package.json')).toString());
+    await writeFileRecursive(resolve(process.cwd(), buildOptions.outPath!, 'package.json'), readFileSync(resolve(process.cwd(), 'package.json')).toString());
   }
-  // 编译proto，并且把json输出到.sword目录中
+  // Compile the proto and export the json to the .sword directory
   try {
-    await generateSchema(resolve(process.cwd(), `${buildOptions.outPath}/src/api.json`));
-    // glob屏蔽d.ts文件, 但是包裹src下所有的ts和js文件
-    const entryPoints = glob.sync('./src/**/!(*.d).{ts,js}');
+    await generateSchema(resolve(process.cwd(), buildOptions.outPath!, APP_SRC_DIR, API_SUITE_JSON_FILE));
+    // glob blocks the d.ts file, but wraps all the ts and js files under src
+    const entryPoints = glob.sync(`./${APP_SRC_DIR}/**/!(*.d).{ts,js}`);
     esbuild
       .build({
-        // 使用global语法来设置entryPoints
+        // Use the global syntax to set entryPoints
         entryPoints,
         format: 'cjs',
         platform: 'node',
-        outdir: `${buildOptions.outPath}/src`,
+        outdir: join(buildOptions.outPath!, APP_SRC_DIR),
         mainFields: ['module', 'main'],
         minify: buildOptions.minify,
         plugins: [esbuildPluginAutoImport, esbuildPluginConditionalCompiler(args.platform)],
@@ -89,16 +101,19 @@ export const build = async (
 
 export default async (args: Argv<CommandConfig>) => {
   try {
-    // 清空sword文件夹,需要根据platform条件进行清空
-    delDir(resolve(process.cwd(), `.sword/dev/${args.platform}`));
-    if (args.platform === 'server') {
-      // 拷贝shim文件夹到server中
-      copyDir(resolve(process.cwd(), `.sword/shim`), resolve(process.cwd(), `.sword/build/server/.shim`));
+    // Empty the sword folder, you need to empty it according to platform conditions
+    delDir(resolve(process.cwd(), PRIVATE_CACHE_DIR, PRIVATE_DEV_DIR, args.platform));
+    if (args.platform === SERVER_DIR) {
+      // Copy the shim folder to the server
+      copyDir(
+        resolve(process.cwd(), PRIVATE_CACHE_DIR, PRIVATE_SHIM_DIR),
+        resolve(process.cwd(), PRIVATE_CACHE_DIR, PRIVATE_BUILD_DIR, SERVER_DIR, PRIVATE_SHIM_SERVER_DIR)
+      );
       build(args, {
-        success: () => log.success(`[server]📦 ${t.Server_Pack_Success()}`),
-        error: () => log.err(`[server]📦 ${t.Server_Pack_Failed()}`)
+        success: () => log.success(`[${SERVER_DIR}]📦 ${t.Server_Pack_Success()}`),
+        error: () => log.err(`[${SERVER_DIR}]📦 ${t.Server_Pack_Failed()}`)
       });
-    } else if (args.platform === 'unicloud') await buildUnicloudApp(args);
+    } else if (args.platform === UNICLOUD_DIR) await buildUnicloudApp(args);
   } catch (e) {
     throw log.err(e as Error);
   }

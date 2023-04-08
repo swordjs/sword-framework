@@ -67,12 +67,12 @@ export default (args: Argv<CommandConfig>) => {
       readdirSync(resolve(process.cwd(), platformName));
     } catch (error) {
       // If the current check is aliyun, then retry checking tencent
-      if (platformName === 'uniCloud-aliyun') {
-        checkUnicloudPath('uniCloud-tencent');
+      if (platformName === UNICLOUD_ALIYUN_DIR) {
+        checkUnicloudPath(UNICLOUD_TENCENT_DIR);
       } else {
-        // 如果腾讯云还报错
+        // If Tencent Cloud still reports errors
         log.err(t.Schema2Interface_Platform_Dir_Not_Found());
-        // 请用户确认是否是unicloud项目
+        // Ask the user to confirm if it is a unicloud project
         log.err(t.Schema2Interface_Platform_Dir_Not_Found_Hint());
         return false;
       }
@@ -80,24 +80,23 @@ export default (args: Argv<CommandConfig>) => {
     return platformName;
   };
 
-  // 检查是否是unicloud项目
+  // Check if it is a unicloud project
   const checkResult = checkUnicloudPath();
-  // 查看检查结果是否全等于false
+  // Check if the check result is all equal to false
   if (checkResult === false) {
     return;
   } else {
-    // 拿到有效的unicloud文件夹路径
+    // Get the path to the valid unicloud folder
     const unicloudPath = resolve(process.cwd(), checkResult);
-    // 查看unicloudPath下有没有database文件夹
+    // Check if there is a database folder under unicloudPath
     const databasePath = unicloudPath + '/database';
     if (existsSync(databasePath) && lstatSync(databasePath).isDirectory()) {
-      // 拿到database文件夹下的所有文件
+      // Get all the files in the database folder
       const files = readdirSync(databasePath).filter((f) => f.includes('schema.json'));
       files.map(async (f) => {
         const complieResult = complie(`${databasePath}/${f}`);
         const tsName = unicloudPath + `/typings/database/${f.replace('schema.json', '')}d.ts`;
         await writeFileRecursive(tsName, complieResult);
-        // ts文件编译成功
         log.success(`${f} ${t.Schema2Interface_Compile_Success()} ${tsName}`);
       });
     } else {
