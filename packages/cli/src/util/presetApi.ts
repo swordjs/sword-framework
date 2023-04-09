@@ -3,7 +3,7 @@ import { writeFileRecursive } from '~util/file';
 import log from '../core/log';
 import { t } from '../i18n/i18n-node';
 import { renderProtoCode, renderApiCode } from '../code/api';
-import { APP_API_DIR, API_SUITE_PROTO_FILE, API_SUITE_INDEX_FILE, APP_SRC_DIR } from '~util/constants';
+import { API_SUITE_PROTO_FILE, API_SUITE_INDEX_FILE, APP_SRC_DIR } from '~util/constants';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
@@ -25,7 +25,7 @@ export const presetApi = async (sourceDir: string, parentDir: string, dir: strin
   // Process the path of parnetDir so that it can be split into multiple folders by /, e.g. /level1/level2 will be split into ['level1', 'level2'], which will make resolve work better
   const _parentDir = parentDir.split('/');
   const cwd = process.cwd();
-  const prefixPath = [cwd, sourceDir, APP_API_DIR, ..._parentDir, dir];
+  const prefixPath = [cwd, sourceDir, ..._parentDir, dir];
   // Generate proto
   await writeFileRecursive(`${resolve(...prefixPath, API_SUITE_PROTO_FILE)}`, renderProtoCode());
   // Generate API
