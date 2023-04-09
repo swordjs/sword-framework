@@ -76,8 +76,8 @@ export const build = async (
   // Compile the proto and export the json to the .sword directory
   try {
     await generateSchema(resolve(process.cwd(), buildOptions.outPath!, APP_SRC_DIR, API_SUITE_JSON_FILE));
-    // glob blocks the d.ts file, but wraps all the ts and js files under src
-    const entryPoints = glob.sync(`./${APP_SRC_DIR}/**/!(*.d).{ts,js}`);
+    // glob blocks the d.ts file and the proto.ts under src, but wraps all ts and js files under src
+    const entryPoints = glob.sync(`./${APP_SRC_DIR}/**/!(*.d|proto).{ts,js}`);
     esbuild
       .build({
         // Use the global syntax to set entryPoints
