@@ -4,10 +4,10 @@ import mv from 'mv';
 import download from 'download';
 import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
-import log from './core/log';
-import { t } from './i18n/i18n-node';
+import log from '../core/log';
+import { t } from '../i18n/i18n-node';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '../../../typings/config';
+import type { CommandConfig } from '~types/config';
 
 export default async (args: Argv<CommandConfig>) => {
   const project = await prompt({

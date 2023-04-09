@@ -83,5 +83,3 @@ const afterInitConfig = async () => {
   // The automatically imported configuration items are initialized in autoImport
   await autoImport();
 };
-
-export type { Config } from '../../typings/config';

@@ -1,8 +1,8 @@
-import log from './core/log';
-import schema2interface from './util/schema2interface';
-import clearShim from './util/clearShim';
-import presetApi from './util/presetApi';
-import { t } from './i18n/i18n-node';
+import log from '../core/log';
+import schema2interface from '../util/schema2interface';
+import clearShim from '../util/clearShim';
+import presetApi from '../util/presetApi';
+import { t } from '../i18n/i18n-node';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 

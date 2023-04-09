@@ -1,7 +1,7 @@
 import { resolve, join } from 'path';
 import { symlink, existsSync, lstatSync, readFileSync, unlinkSync } from 'fs';
 import log from '../core/log';
-import { build } from '../build';
+import { build } from '../commands/build';
 import { delDir, writeFileRecursive, copyDir } from '~util/file';
 import { getPackageJson } from '~util/package';
 import { configData } from '../core/config';

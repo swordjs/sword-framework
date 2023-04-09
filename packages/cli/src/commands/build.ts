@@ -3,14 +3,14 @@ import { readFileSync } from 'fs';
 import esbuild from 'esbuild';
 import glob from 'glob';
 import { delDir } from '~util/file';
-import log from './core/log';
-import { buildUnicloudApp } from './platform/unicloud';
+import log from '../core/log';
+import { buildUnicloudApp } from '../platform/unicloud';
 import { writeFileRecursive, copyDir } from '~util/file';
-import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from './core/conditionalCompiler';
-import { esbuildPluginAutoImport } from './core/autoImport';
+import { esbuildPluginConditionalCompiler, esbuildDefineConditionalCompiler } from '../core/conditionalCompiler';
+import { esbuildPluginAutoImport } from '../core/autoImport';
 import { env } from '~types/env';
-import { t } from './i18n/i18n-node';
-import { generateSchema } from './core/api';
+import { t } from '../i18n/i18n-node';
+import { generateSchema } from '../core/api';
 import {
   APP_SRC_DIR,
   API_SUITE_JSON_FILE,
@@ -23,7 +23,7 @@ import {
   UNICLOUD_DIR
 } from '~util/constants';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '../../../typings/config';
+import type { CommandConfig } from '../../../../typings/config';
 
 type BuildOptions = {
   skipPackageJson?: boolean;

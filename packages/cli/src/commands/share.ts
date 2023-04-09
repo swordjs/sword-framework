@@ -1,14 +1,14 @@
 import { writeFileRecursive } from '~util/file';
 import { isDev } from '~util/env';
-import log from './core/log';
+import log from '../core/log';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { configData } from './core/config';
-import { t } from './i18n/i18n-node';
+import { configData } from '../core/config';
+import { t } from '../i18n/i18n-node';
 import { APP_SRC_DIR, API_SUITE_JSON_FILE } from '~util/constants';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '../../../typings/config';
-import type { Result } from './core/api';
+import type { CommandConfig } from '~types/config';
+import type { Result } from '../core/api';
 
 export default async (args: Argv<CommandConfig>) => {
   if (isDev()) {
