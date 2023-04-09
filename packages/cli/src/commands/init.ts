@@ -4,10 +4,10 @@ import mv from 'mv';
 import download from 'download';
 import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
-import log from './core/log';
-import { t } from './i18n/i18n-node';
+import log from '../core/log';
+import { t } from '../i18n/i18n-node';
 import type { Argv } from 'mri';
-import type { CommandConfig } from '../../../typings/config';
+import type { CommandConfig } from '~types/config';
 
 export default async (args: Argv<CommandConfig>) => {
   const project = await prompt({
@@ -20,7 +20,7 @@ export default async (args: Argv<CommandConfig>) => {
   });
   const CNPM_PACKAGE_URL = 'https://registry.npmmirror.com/@swordjs/sword-framework-example';
   const packageInfo = await $fetch(CNPM_PACKAGE_URL);
-  // 获取全部的版本(倒序)
+  // Get all versions (in reverse order)
   const versions = Object.keys(packageInfo.versions).reverse();
   const version = await prompt({
     type: 'select',
@@ -29,7 +29,7 @@ export default async (args: Argv<CommandConfig>) => {
     message: t.Select_Project_Version()
   });
   const now = String(new Date().getTime());
-  // 下载项目
+  // Download Project
   await download(`${CNPM_PACKAGE_URL}/-/sword-framework-example-${(version as any)['value']}.tgz`, now, {
     extract: true
   });
@@ -37,9 +37,9 @@ export default async (args: Argv<CommandConfig>) => {
     if (err) {
       throw err;
     }
-    // windows中使用del删除
+    // Use del to delete in windows
     spawnSync(process.platform === 'win32' ? 'del' : 'rm', ['-rf', now]);
-    // 初始化项目成功
+    // Initialize project successfully
     log.success(t.Init_Project_Success(project));
     log.info(t.Init_Project_Success_Hint());
   });

@@ -1,34 +1,35 @@
 import { PackageJson } from '~types/package';
-import type { TransProtoReturn } from '../src/doc';
+import type { TransProtoReturn } from '../src/commands/doc';
 import type { Map } from '@runtime/core/map';
 import type { Import, Preset } from 'unimport';
 import type { Locales } from '../src/i18n/i18n-types';
 
 export interface Config {
+  language?: Locales;
   server?: {
-    // 服务端口
+    // Server port
     port?: number;
   };
   unicloud?: {
     link: string;
   };
-  // 共享目录
+  // Shared directory
   share?: {
-    // share目录的名称
+    // Name of the shared directory
     dirName?: string;
-    // share目录的路径
+    // Path of the shared directory
     path?: string;
     type?: {
       dirName?: string;
       package?: PackageJson;
     };
   };
-  // 编译文档的配置
+  // Configuration for compiling documents
   doc?: {
-    // doc server
+    // Doc server
     server?: boolean;
     markdown?: {
-      // 每一个api都会被调用一次编译函数, 传入的参数是api的信息, 返回的则是现有的markdown文档
+      // The compilation function will be called once for each API. The input parameter is the API information, and the output is the existing markdown document.
       compile: (result: TransProtoReturn, markdown: string, options: { apiMap: Record<string, Map> }) => string;
       output: (markdownMap: Record<string, string>) => void;
     };
@@ -38,5 +39,4 @@ export interface Config {
     imports?: Import[];
     presets?: Preset[];
   };
-  language?: Locales;
 }

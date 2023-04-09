@@ -27,6 +27,10 @@ const defaultConfig: Config = {
   language: 'en'
 };
 
+/**
+ *
+ * @return {*}
+ */
 export const initConfig = async () => {
   const { config } = await loadConfig<Config>({
     sources: [
@@ -53,7 +57,13 @@ export const initConfig = async () => {
   await afterInitConfig();
 };
 
-// recursively iterate through defaultConfig, and if there is no configuration in config, use the configuration in defaultConfig
+/**
+ *
+ * recursively iterate through defaultConfig, and if there is no configuration in config, use the configuration in defaultConfig
+ * @param {Config} config
+ * @param {Config} defaultConfig
+ * @return {*}  {Required<Config>}
+ */
 const mergeConfig = (config: Config, defaultConfig: Config): Required<Config> => {
   let key: keyof typeof config;
   for (key in defaultConfig) {
@@ -73,5 +83,3 @@ const afterInitConfig = async () => {
   // The automatically imported configuration items are initialized in autoImport
   await autoImport();
 };
-
-export type { Config } from '../../typings/config';

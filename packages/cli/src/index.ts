@@ -1,12 +1,12 @@
 #! /usr/bin/env node
 
 import { register } from '@swordjs/esbuild-register/dist/node';
-import dev from './dev';
-import build from './build';
-import init from './init';
-import doc from './doc';
-import util from './util';
-import share from './share';
+import dev from './commands/dev';
+import build from './commands/build';
+import init from './commands/init';
+import doc from './commands/doc';
+import util from './commands/util';
+import share from './commands/share';
 import packageJSON from './../package.json';
 import { getImportCode } from './core/autoImport';
 import { processShim } from './core/shim';
@@ -15,6 +15,7 @@ import { commandArgs as args } from '~util/config';
 import { resolve } from 'path';
 import { PRIVATE_CACHE_DIR, PRIVATE_SHIM_DIR, SHIM_PROCESS_FILE } from '~util/constants';
 import { t } from './i18n/i18n-node';
+import type { Config } from '../typings/config';
 
 type commands = 'dev' | 'build' | 'init' | 'doc' | 'share' | 'util';
 
@@ -68,4 +69,4 @@ main().catch((err) => {
   process.exit(1);
 });
 
-export * from './core/config';
+export type { Config };

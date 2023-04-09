@@ -125,7 +125,7 @@ export const generateSchema = async (
     // Determine if outPath exists, and if so, output api.json to the specified directory
     if (outPath) {
       // Generate API JSON file to specified directory
-      await writeFileRecursive(outPath, JSON.stringify(result, null, typeof options?.format === 'undefined' ? undefined : 2));
+      await writeFileRecursive(outPath, JSON.stringify(result, null, options.dev ? 2 : 0));
       log.success(t.Schema_Loaded_Successfully());
     }
   } catch (error) {

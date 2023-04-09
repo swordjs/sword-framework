@@ -4,25 +4,25 @@ import { camelCase } from '~util/index';
 import { writeFileRecursive } from '~util/file';
 import log from '../core/log';
 import { t } from '../i18n/i18n-node';
+import { UNICLOUD_ALIYUN_DIR, UNICLOUD_TENCENT_DIR } from '~util/constants';
 import type { Argv } from 'mri';
 import type { CommandConfig } from '~types/config';
 
 /**
- * @name 编译文件返回处理后的类型声明内容
+ * @name The compiler file returns the contents of the processed type declaration
  * @param {*} filePath
  */
 const complie = (filePath: string) => {
-  // 读取文件
   const { properties } = JSON.parse(readFileSync(filePath).toString());
   let _value = ``;
   for (const key in properties) {
-    // 判断key是否有.，如果存在.说明是在定义外键（unicloud）
+    // Determine if the key has . If it exists. means it is defining a foreign key (unicloud)
     if (key.includes('.')) {
       continue;
     }
-    // 解构类型和介绍
+    // Deconstruction type and introduction
     const { bsonType = 'string', description = '' } = properties[key];
-    // 定义一些类型，在ts中表达会默认为string
+    // Define some types, expressions in ts will default to string
     const defaultKeys = ['timestamp', 'string'];
     const objectKeys = ['object'];
     const numberKeys = ['number', 'int', 'double'];
@@ -41,9 +41,9 @@ const complie = (filePath: string) => {
     }${bsonType === 'array' ? '[]' : ''};
     `;
   }
-  // 获取文件名
+  // Get file name
   const lastIndex = filePath.lastIndexOf('/') + 1;
-  // 去掉sword，.schema.json等前缀并且对字符串进行格式化
+  // Remove prefixes such as sword, .schema.json and format the strings
   const fileName = camelCase(filePath.substring(lastIndex).replace(/sword-|.schema.json/g, ''));
   return `/* tslint:disable */
 export interface ${fileName[0].toUpperCase() + fileName.substring(1)} {
@@ -53,26 +53,26 @@ ${_value}
 };
 
 export default (args: Argv<CommandConfig>) => {
-  // 提示用户此工具的文档
+  // Prompt the user for documentation on this tool
   log.info(`${t.Schema2Interface_Documentation()}: https://www.yuque.com/mlgrgm/lrf0ra/lywbzt#nwG2Q`);
-  // 判断当前的环境
+  // Judging the current environment
   if (args.platform !== 'unicloud') {
     log.err(t.Schema2Interface_Only_Support_Unicloud_Platform());
     log.info(t.Schema2Interface_Current_Platform_Is(args.platform));
     return;
   }
-  // 查看文件夹是否符合要求
+  // Check if the folder meets the requirements
   const checkUnicloudPath = (platformName = 'uniCloud-aliyun') => {
     try {
       readdirSync(resolve(process.cwd(), platformName));
     } catch (error) {
-      // 如果当前检查的是aliyun, 则重试检查tencent
-      if (platformName === 'uniCloud-aliyun') {
-        checkUnicloudPath('uniCloud-tencent');
+      // If the current check is aliyun, then retry checking tencent
+      if (platformName === UNICLOUD_ALIYUN_DIR) {
+        checkUnicloudPath(UNICLOUD_TENCENT_DIR);
       } else {
-        // 如果腾讯云还报错
+        // If Tencent Cloud still reports errors
         log.err(t.Schema2Interface_Platform_Dir_Not_Found());
-        // 请用户确认是否是unicloud项目
+        // Ask the user to confirm if it is a unicloud project
         log.err(t.Schema2Interface_Platform_Dir_Not_Found_Hint());
         return false;
       }
@@ -80,24 +80,23 @@ export default (args: Argv<CommandConfig>) => {
     return platformName;
   };
 
-  // 检查是否是unicloud项目
+  // Check if it is a unicloud project
   const checkResult = checkUnicloudPath();
-  // 查看检查结果是否全等于false
+  // Check if the check result is all equal to false
   if (checkResult === false) {
     return;
   } else {
-    // 拿到有效的unicloud文件夹路径
+    // Get the path to the valid unicloud folder
     const unicloudPath = resolve(process.cwd(), checkResult);
-    // 查看unicloudPath下有没有database文件夹
+    // Check if there is a database folder under unicloudPath
     const databasePath = unicloudPath + '/database';
     if (existsSync(databasePath) && lstatSync(databasePath).isDirectory()) {
-      // 拿到database文件夹下的所有文件
+      // Get all the files in the database folder
       const files = readdirSync(databasePath).filter((f) => f.includes('schema.json'));
       files.map(async (f) => {
         const complieResult = complie(`${databasePath}/${f}`);
         const tsName = unicloudPath + `/typings/database/${f.replace('schema.json', '')}d.ts`;
         await writeFileRecursive(tsName, complieResult);
-        // ts文件编译成功
         log.success(`${f} ${t.Schema2Interface_Compile_Success()} ${tsName}`);
       });
     } else {
