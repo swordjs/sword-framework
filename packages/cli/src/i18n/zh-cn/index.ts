@@ -51,7 +51,9 @@ const zhCN = {
     '当你运行share命令时，当前目录必须是在dev环境中。如果你在prod环境下执行该命令，这是不允许的，因为api.json缓存文件对于dev环境下的share命令是必要的，而在prod环境下，api.json剥离了必要的分析。',
   Util_Name_Is_Required: 'util-name是必填项',
   Util_Name_Not_Found: '未找到util-name: ${0}',
-  Util_Name_Not_Found_Hint: '查阅文档查看支持的util-name'
+  Util_Name_Not_Found_Hint: '查阅文档查看支持的util-name',
+  Parse_Route_Validate_Error_Hint:
+    '解析路由验证错误，请检查您的路由列表，支持的路由列表：https://github.com/swordjs/sword-framework/issues/25#issuecomment-1530995497'
 } satisfies BaseTranslation;
 
 export default zhCN;

@@ -52,7 +52,9 @@ const en = {
     'When you run the share command, the current directory must be in the dev environment. If you execute the command in the prod environment, this is not allowed, because the api.json cache file is necessary for the share command in the dev environment, and in the prod environment The api.json strips out the necessary analysis.',
   Util_Name_Is_Required: 'util-name is required',
   Util_Name_Not_Found: '{0} not found',
-  Util_Name_Not_Found_Hint: 'you can see the util-name list in the documentation'
+  Util_Name_Not_Found_Hint: 'you can see the util-name list in the documentation',
+  Parse_Route_Validate_Error_Hint:
+    'parse route validate error, please check your route list, support route list: https://github.com/swordjs/sword-framework/issues/25#issuecomment-1530995497'
 } satisfies BaseTranslation;
 
 export default en;

@@ -5,10 +5,13 @@ export const APP_SRC_DIR = 'src';
 export const APP_API_DIR = 'api';
 
 // What files are included in an API suite
-export const API_SUITE_FILES = ['index.ts', 'proto.ts'];
-export const API_SUITE_INDEX_FILE = 'index.ts';
-export const API_SUITE_PROTO_FILE = 'proto.ts';
+export const API_SUITE_INDEX = 'index';
+export const API_SUITE_PROTO = 'proto';
+export const API_SUITE_FILES = [`${API_SUITE_INDEX}.ts`, `${API_SUITE_PROTO}.ts`];
+export const API_SUITE_INDEX_FILE = `${API_SUITE_INDEX}.ts`;
+export const API_SUITE_PROTO_FILE = `${API_SUITE_PROTO}.ts`;
 export const API_SUITE_JSON_FILE = 'api.json';
+export const API_SUITE_METHOD_FILE = ['get', 'post', 'put', 'delete', 'patch', 'head', 'options', 'trace'];
 
 export const PRIVATE_CACHE_DIR = '.sword';
 export const PRIVATE_BUILD_DIR = 'build';

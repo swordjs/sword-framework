@@ -219,6 +219,10 @@ type RootTranslation = {
 	 * y​o​u​ ​c​a​n​ ​s​e​e​ ​t​h​e​ ​u​t​i​l​-​n​a​m​e​ ​l​i​s​t​ ​i​n​ ​t​h​e​ ​d​o​c​u​m​e​n​t​a​t​i​o​n
 	 */
 	Util_Name_Not_Found_Hint: string
+	/**
+	 * p​a​r​s​e​ ​r​o​u​t​e​ ​v​a​l​i​d​a​t​e​ ​e​r​r​o​r​,​ ​p​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​r​o​u​t​e​ ​l​i​s​t​,​ ​s​u​p​p​o​r​t​ ​r​o​u​t​e​ ​l​i​s​t​:​ ​h​t​t​p​s​:​/​/​g​i​t​h​u​b​.​c​o​m​/​s​w​o​r​d​j​s​/​s​w​o​r​d​-​f​r​a​m​e​w​o​r​k​/​i​s​s​u​e​s​/​2​5​#​i​s​s​u​e​c​o​m​m​e​n​t​-​1​5​3​0​9​9​5​4​9​7
+	 */
+	Parse_Route_Validate_Error_Hint: string
 }
 
 export type TranslationFunctions = {
@@ -422,6 +426,10 @@ export type TranslationFunctions = {
 	 * you can see the util-name list in the documentation
 	 */
 	Util_Name_Not_Found_Hint: () => LocalizedString
+	/**
+	 * parse route validate error, please check your route list, support route list: https://github.com/swordjs/sword-framework/issues/25#issuecomment-1530995497
+	 */
+	Parse_Route_Validate_Error_Hint: () => LocalizedString
 }
 
 export type Formatters = {}
