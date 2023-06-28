@@ -26,7 +26,7 @@
     "@swordjs/esbuild-register": "0.0.2",
     "@swordjs/sword-framework-cli": "workspace:*",
     "@types/node": "^17.0.24",
-    "esbuild": "^0.14.27",
+    "esbuild": "^0.15.13",
     "typescript": "^4.6.3"
   }
 }

@@ -126,7 +126,6 @@ export const getApiMap = async (): Promise<{
   const apiMap: Map = {};
   const appPath = resolve(APP_SRC_DIR, APP_API_DIR);
   const files = traverseSourceDir(appPath);
-  console.log(files);
   for (const key in files) {
     const [path, d] = files[key];
     const modulePath = resolve(path, d);

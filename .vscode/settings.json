@@ -4,5 +4,8 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
-  }
+  },
+  "commentTranslate.hover.enabled": true,
+  "commentTranslate.source": "kitiho.chatgpt-comment-translate-chatgpt",
+  "commentTranslate.targetLanguage": "en"
 }
