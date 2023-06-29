@@ -1,4 +1,5 @@
 ---
+id: core
 title: core
 url: https://www.yuque.com/mlgrgm/lrf0ra/womuuz
 ---

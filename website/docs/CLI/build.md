@@ -1,4 +1,5 @@
 ---
+id: build
 title: build
 url: https://www.yuque.com/mlgrgm/lrf0ra/szbogs
 ---
