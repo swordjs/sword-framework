@@ -1,7 +1,6 @@
-<p align="center">
-<img width="40%" src="https://static.yinzhuoei.com/typecho/2022/02/17/048881447338917/WX20220217-212200-removebg-preview.png"/>
-</p>
+## New version of Sword.js
 
-## Sword.js (V2.0)
+<img src="https://static.yinzhuoei.com/typecho/2023/08/01/04807775663723/无标题-2023-07-30-2111.svg"/>
 
 
+> Not part of swordjs v2, it's just a refactored version of v1
